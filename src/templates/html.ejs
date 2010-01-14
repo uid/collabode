@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title><%= helpers.htmlTitle() %></title>
+<base href="<%= helpers.baseHref() %>" />
+<%= helpers.cssIncludes() %>
+<%= helpers.headExtra() %>
+</head>
+<body id="<% helpers.bodyId() %>" class="<%= helpers.bodyClasses() %>">
+<%= bodyHtml %>
+<%= helpers.clientVarsScript() %>
+<%= helpers.jsIncludes() %>
+</body>
+</html>
