@@ -15,8 +15,11 @@ jimport("java.lang.System.out.println");
 serverhandlers.startupHandler = function() {
     println("Startup handler");
     
-    var sp = function(k) { return appjet.config['SQL_'+k] || null; };
-    sqlcommon.init(sp('JDBC_DRIVER'), sp('JDBC_URL'), sp('USERNAME'), sp('PASSWORD'));
+    //var sp = function(k) { return appjet.config['SQL_'+k] || null; };
+    //sqlcommon.init(sp('JDBC_DRIVER'), sp('JDBC_URL'), sp('USERNAME'), sp('PASSWORD'));
+    
+    sqlcommon.init("org.apache.derby.jdbc.EmbeddedDriver",
+                   "jdbc:derby:pads");
     
     model.onStartup();
     collab_server.onStartup();
@@ -69,7 +72,7 @@ function handlePath() {
     var dispatcher = new Dispatcher();
     dispatcher.addLocations([
         [PrefixMatcher('/static/'), forward(static_control)],
-        [/^\/([^\/]+)$/, pad_control.render_pad]
+        [/^\/src\/(.+)$/, pad_control.render_pad]
     ]);
     
     if (dispatcher.dispatch()) {

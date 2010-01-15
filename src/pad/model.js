@@ -7,7 +7,7 @@ import("sync");
 
 import("collab.ace.easysync2.{Changeset,AttribPool}");
 //import("etherpad.log");
-//import("etherpad.pad.padevents");
+import("pad.pad_events");
 import("pad.pad_utils");
 import("pad.dbwriter");
 //import("etherpad.pad.pad_migrations");
@@ -219,10 +219,10 @@ function accessPadGlobal(padId, padFunc, rwMode) {
             id: padId, version: 2, creationTime: new Date(t), lastWriteTime: new Date(),
             headRev: meta.head }); // headRev is not authoritative, just for info
 
-      // XXX padevents.onNewPad(pad);
+      pad_events.onNewPad(pad);
     },
     destroy: function() { // you may want to collab_server.bootAllUsers first
-          // XXX padevents.onDestroyPad(pad);
+          pad_events.onDestroyPad(pad);
 
       _destroyPadStringArray(padId, "revs");
       _destroyPadStringArray(padId, "revs10");

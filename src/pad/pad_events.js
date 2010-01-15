@@ -28,9 +28,13 @@ import("pad.pad_utils");
 //import("etherpad.pad.pad_security");
 //import("etherpad.pad.noprowatcher");
 import("collab.collab_server");
+
+jimport("collabode.Events");
+
 jimport("java.lang.System.out.println");
 
 function onNewPad(pad) {
+  Events.create(pad.getId(), pad.text());
   //log.custom("padevents", {
   //  type: "newpad",
   //  padId: pad.getId()
@@ -160,6 +164,7 @@ function onClientMessage(pad, senderUserInfo, msg) {
 }
 
 function onEditPad(pad, authorId) {
+  Events.edit(pad.getId(), pad.text());
   //log.callCatchingExceptions(function() {
 
   //  pro_pad_db.onEditPad(pad, authorId);

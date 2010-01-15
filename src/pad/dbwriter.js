@@ -152,7 +152,7 @@ function taskWritePad(padId) {
     }
     finally {
       if (! success) {
-        log.warn("DB WRITER FAILED TO WRITE PAD: "+padId);
+        println("DB WRITER FAILED TO WRITE PAD: "+padId); // XXX was log.warn
       }
       profiler.print();
     }

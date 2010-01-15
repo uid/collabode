@@ -12,7 +12,7 @@ function _createIfNecessary(localPadId, pad) {
     }
     // XXX make sure localPadId is valid?
     //if (request.params.createImmediately || getSession().instantCreate == localPadId) {
-    pad.create("This is an empty pad.\n");
+    pad.create("\n");
     // XXX delete getSession().instantCreate;
     return;
     //}
