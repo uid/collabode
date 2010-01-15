@@ -14,11 +14,4 @@
 	<natures>
 		<nature>org.eclipse.jdt.core.javanature</nature>
 	</natures>
-	<linkedResources>
-		<link>
-			<name>lib/appjet-eth-dev.jar</name>
-			<type>1</type>
-			<location>/Users/maxg/Source/etherpad/trunk/etherpad/appjet-eth-dev.jar</location>
-		</link>
-	</linkedResources>
 </projectDescription>
