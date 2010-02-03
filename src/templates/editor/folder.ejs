@@ -1,0 +1,16 @@
+<% helpers.setHtmlTitle(project.getName()) %>
+<% helpers.includeCss("editor_ejs.css") %>
+<% helpers.includeCometJs() %>
+<% helpers.includeJQuery() %>
+<% helpers.includeJs("json2.js") %>
+
+<div id="editorpage">
+
+<div id="editortop">
+  <div id="docbar">
+    <div id="docbarproject"><span><%= project.getName() %></span></div>
+    <div id="docbarfile"><span><%= folder.getProjectRelativePath() %></span></div>
+  </div>
+</div>
+
+</div>

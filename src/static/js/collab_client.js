@@ -26,7 +26,6 @@ function getCollabClient(ace2editor, serverVars, initialUserInfo, options) {
 
   var rev = serverVars.rev;
   var padId = serverVars.padId;
-  var globalPadId = serverVars.globalPadId;
 
   var state = "IDLE";
   var stateMessage;
@@ -79,6 +78,8 @@ function getCollabClient(ace2editor, serverVars, initialUserInfo, options) {
   editor.setProperty("userAuthor", userId);
   editor.setBaseAttributedText(serverVars.initialAttributedText, serverVars.apool);
   editor.setUserChangeNotificationCallback(wrapRecordingErrors("handleUserChanges", handleUserChanges));
+  
+  editor.setRequestCodeCompletion(handleRequestCodeCompletion);
 
   function abandonConnection(reason) {
     if (socket) {
@@ -154,6 +155,10 @@ function getCollabClient(ace2editor, serverVars, initialUserInfo, options) {
                  3000);
     }
   }
+  
+  function handleRequestCodeCompletion(offset) {
+    sendMessage({ type: "REQUEST_CODE_COMPLETION", offset: offset });
+  }
 
   function getStats() {
     var stats = {};
@@ -181,7 +186,7 @@ function getCollabClient(ace2editor, serverVars, initialUserInfo, options) {
         hiccupCount = 0;
         setChannelState("CONNECTED");
         var msg = { type:"CLIENT_READY", roomType:'padpage',
-                    roomName:'padpage/'+globalPadId,
+                    roomName:'padpage/'+padId,
                     data: {
                       lastRev:rev,
                       userInfo:userSet[userId],
@@ -335,6 +340,14 @@ function getCollabClient(ace2editor, serverVars, initialUserInfo, options) {
     }
     else if (msg.type == "SERVER_MESSAGE") {
       callbacks.onServerMessage(msg.payload);
+    }
+    else if (msg.type == "ANNOTATIONS") {
+      editor.setAnnotations(msg.annotationType, msg.annotations);
+    }
+    else if (msg.type == "CODE_COMPLETION_PROPOSALS") {
+      if (padId == msg.id) {
+        editor.showCodeCompletionProposals(msg.offset, msg.proposals);
+      }
     }
   }
   function updateUserInfo(userInfo) {

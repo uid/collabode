@@ -14,6 +14,9 @@ import("pad.dbwriter");
 //import("etherpad.pad.pad_security");
 import("collab.collab_server");
 import("cache_utils.syncedWithCache");
+
+import("editor.workspace");
+
 jimport("net.appjet.common.util.LimitedSizeMapping");
 
 jimport("java.lang.System.out.println");
@@ -123,6 +126,8 @@ function accessPadGlobal(padId, padFunc, rwMode) {
         revmeta.setJSONEntry(newRev, thisRevMeta);
 
         updateCoarseChangesets(true);
+        
+        workspace.reviseWorkingCopy(padId, newAText.text);
       }
       function getNumForAuthor(author, dontAddIfAbsent) {
         return pad.pool().putAttrib(['author',author||''], dontAddIfAbsent);
@@ -229,7 +234,7 @@ function accessPadGlobal(padId, padFunc, rwMode) {
       _destroyPadStringArray(padId, "revs100");
       _destroyPadStringArray(padId, "revs1000");
       _destroyPadStringArray(padId, "revmeta");
-      _destroyPadStringArray(padId, "chat");
+      //_destroyPadStringArray(padId, "chat");
       _destroyPadStringArray(padId, "authors");
       _removePadMetaData(padId);
       _removePadAPool(padId);

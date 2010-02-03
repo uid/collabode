@@ -3,21 +3,18 @@ import("fastJSON");
 import("sqlbase.sqlcommon");
 
 import("control.static_control");
-import("control.pad_control");
+import("control.editor_control");
 
 import("collab.collabroom_server");
 import("collab.collab_server");
 import("pad.model");
 import("pad.dbwriter");
 
+import("editor.workspace");
+
 jimport("java.lang.System.out.println");
 
 serverhandlers.startupHandler = function() {
-    println("Startup handler");
-    
-    //var sp = function(k) { return appjet.config['SQL_'+k] || null; };
-    //sqlcommon.init(sp('JDBC_DRIVER'), sp('JDBC_URL'), sp('USERNAME'), sp('PASSWORD'));
-    
     sqlcommon.init("org.apache.derby.jdbc.EmbeddedDriver",
                    "jdbc:derby:pads");
     
@@ -25,6 +22,7 @@ serverhandlers.startupHandler = function() {
     collab_server.onStartup();
     dbwriter.onStartup();
     collabroom_server.onStartup();
+    workspace.onStartup();
 };
 
 serverhandlers.requestHandler = function() {
@@ -38,7 +36,6 @@ serverhandlers.tasks.writePad = function(globalPadId) {
 
 serverhandlers.cometHandler = function(op, id, data) {
     if ( ! data) {
-        // XXX println("[comet] connect/disconnect " + op + " " + id);
         collabroom_server.handleComet(op, id, data);
         return;
     }
@@ -59,7 +56,6 @@ serverhandlers.cometHandler = function(op, id, data) {
         }
     }
     if (wrapper.type == "COLLABROOM") {
-        // XXX println("[comet] " + op + " " + id + " " + wrapper.data);
         collabroom_server.handleComet(op, id, wrapper.data);
     } else {
         println("[comet] incorrectly wrapped " + wrapper['type']);
@@ -72,7 +68,8 @@ function handlePath() {
     var dispatcher = new Dispatcher();
     dispatcher.addLocations([
         [PrefixMatcher('/static/'), forward(static_control)],
-        [/^\/src\/(.+)$/, pad_control.render_pad]
+        [/^\/(\w+)\/?$/, editor_control.render_project],
+        [/^\/(\w+)\/(.+)$/, editor_control.render_path]
     ]);
     
     if (dispatcher.dispatch()) {

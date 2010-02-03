@@ -1,0 +1,25 @@
+<% helpers.setHtmlTitle(project.getName()) %>
+<% helpers.includeCss("editor_ejs.css") %>
+<% helpers.includeCometJs() %>
+<% helpers.includeJQuery() %>
+<% helpers.includeJs("json2.js") %>
+
+<div id="editorpage">
+
+<div id="editortop">
+  <div id="docbar">
+    <div id="docbarproject"><span><%= project.getName() %></span></div>
+  </div>
+</div>
+
+<div id="padmain">
+  <div id="padeditor">
+    <div id="wizardcontainerbox">
+      <h1>Java project</h1>
+      <p><a href="/<%= project.getName() %>/.project">Edit project configuration XML</a></p>
+      <p><a href="/<%= project.getName() %>/.classpath">Edit classpath configuration XML</a></p>
+    </div>
+  </div>
+</div>
+
+</div>

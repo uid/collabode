@@ -312,7 +312,7 @@ function writePadNow(pad, andFlush) {
       if (sched) {
         var delay = now - sched;
         if (delay > MIN_WRITE_DELAY_NOTIFY_MS) {
-          log.warn("dbwriter["+pad.getId()+"] behind schedule by "+delay+"ms");
+          //log.warn("dbwriter["+pad.getId()+"] behind schedule by "+delay+"ms");
         }
         _dbwriter().scheduledFor.remove(pad.getId());
       }

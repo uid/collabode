@@ -12,7 +12,11 @@ import("fastJSON");
 import("fileutils.readFile");
 import("jsutils.{eachProperty,keys}");
 import("collab.collabroom_server.*");
+
+import("editor.workspace");
+
 jimport("java.util.concurrent.ConcurrentHashMap");
+jimport("java.lang.System");
 
 var PADPAGE_ROOMTYPE = "padpage";
 
@@ -87,7 +91,7 @@ function _checkChangesetAndPool(cs, pool) {
 }
 
 function _doWarn(str) {
-  log.warn(appjet.executionId+": "+str);
+  System.err.println(appjet.executionId+": "+str);
 }
 
 function _doInfo(str) {
@@ -388,8 +392,7 @@ function getCollabClientVars(pad) {
   return {
     initialAttributedText: forWire.atext,
     rev: pad.getHeadRevisionNumber(),
-    padId: pad.getLocalId(),
-    globalPadId: pad.getId(),
+    padId: pad.getId(),
     historicalAuthorData: forWire.historicalAuthorData,
     apool: forWire.apool,
     clientIp: request.clientAddr,
@@ -607,6 +610,8 @@ function getRoomCallbacks(roomName) {
         updateClient(pad, connectionId);
 
       });
+      
+      workspace.reconcileWorkingCopy(padId); // XXX as a way to get annotations
 
       if (isCommitPending) {
         // tell client that if it hasn't received an ACCEPT_COMMIT by now, it isn't coming.
@@ -719,6 +724,9 @@ function _handleCometMessage(connection, msg) {
       }
     });
   }
+  else if (msg.type == "REQUEST_CODE_COMPLETION") {
+    workspace.codeComplete(_roomToPadId(connection.roomName), msg.offset, connection.connectionId);
+  }
 }
 
 function _correctMarkersInPad(atext, apool) {
@@ -758,4 +766,27 @@ function _correctMarkersInPad(atext, apool) {
     offset = pos+1;
   });
   return builder.toString();
+}
+
+function updateClientAnnotations(connectionId, type, annotations) {
+  sendMessage(connectionId, {
+    type: "ANNOTATIONS",
+    annotationType: type,
+    annotations: annotations
+  });
+}
+
+function updatePadClientsAnnotations(pad, type, annotations) {
+  _getPadConnections(pad).forEach(function(connection) {
+    updateClientAnnotations(connection.connectionId, type, annotations);
+  });
+}
+
+function updateClientCodeCompletionProposals(connectionId, padId, offset, proposals) {
+  sendMessage(connectionId, {
+    type: "CODE_COMPLETION_PROPOSALS",
+    id: padId,
+    offset: offset,
+    proposals: proposals
+  });
 }

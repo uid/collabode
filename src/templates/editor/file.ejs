@@ -1,0 +1,32 @@
+<% helpers.setHtmlTitle(project.getName()) %>
+<% helpers.includeCss("editor_ejs.css") %>
+<% helpers.includeCometJs() %>
+<% helpers.includeJQuery() %>
+<% helpers.includeJs("json2.js") %>
+<% helpers.includeJs("ace/ace2_outer.js") %>
+<% helpers.includeJs("collab_client.js") %>
+<% helpers.includeJs("ode.js") %>
+
+<div id="editorpage">
+
+<div id="editortop">
+  <div id="docbar">
+    <div id="docbarproject"><span><%= project.getName() %></span></div>
+    <div id="docbarfile"><span><%= file.getName() %></span></div>
+  </div>
+</div>
+
+<div id="padmain">
+  <div id="padeditor">
+    <div id="editorcontainerbox">
+      <div id="syncstatussyncing" title="Syncing..."><!-- --></div>
+      <div id="syncstatusdone" title="Synced."><!-- --></div>
+      <div id="editorloadingbox">Loading...</div>
+      <div id="editorcontainer"><!-- --></div>
+      <select id="codecompletion" multiple="multiple" size="10">
+      </select>
+    </div>
+  </div>
+</div>
+
+</div>
