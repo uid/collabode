@@ -1,23 +1,33 @@
 import("jsutils.scalaFn");
 
+import("collab.ace.easysync2.{AttribPool,Changeset}");
 import("collab.collab_server");
 
 import("pad.model");
 
 jimport("collabode.PadFunctions");
-jimport("collabode.PadWorkingCopyOwner");
+jimport("collabode.PadDocumentOwner");
 jimport("collabode.Workspace");
 
 jimport("java.lang.System");
 
 function onStartup() {
   PadFunctions.bind(scalaFn(3, _createPad),
-                    scalaFn(3, _setPadContents),
-                    scalaFn(3, _reportPadProblems));
+                    //scalaFn(3, _setPadContents),
+                    scalaFn(3, _reportPadProblems),
+                    scalaFn(4, _updatePadStyle));
+}
+
+function listProjects() {
+  return Workspace.listProjects();
 }
 
 function accessProject(projectname) {
   return Workspace.accessProject(projectname);
+}
+
+function createProject(projectname) {
+  return Workspace.createProject(projectname);
 }
 
 function _padIdFor(username, file) {
@@ -25,7 +35,6 @@ function _padIdFor(username, file) {
 }
 
 function _createPad(username, file, initialText) {
-  //System.out.println("_createPad " + username + " " + file);
   model.accessPadGlobal(_padIdFor(username, file), function(pad) {
     if (pad.exists()) {
       collab_server.setPadText(pad, initialText);
@@ -36,19 +45,15 @@ function _createPad(username, file, initialText) {
   return true;
 }
 
-function _setPadContents(username, file, newText) {
-  //System.out.println("_setPadContents " + username + " " + file);
-  model.accessPadGlobal(_padIdFor(username, file), function(pad) {
-    collab_server.setPadText(pad, newText);
-  });
-  return true;
-}
+//function _setPadContents(username, file, newText) {
+//  //System.out.println("_setPadContents " + username + " " + file);
+//  model.accessPadGlobal(_padIdFor(username, file), function(pad) {
+//    collab_server.setPadText(pad, newText);
+//  });
+//  return true;
+//}
 
 function _reportPadProblems(username, file, problems) {
-  //System.out.println("_reportPadProblems " + username + " " + file);
-  //problems.forEach(function(problem) {
-  //  System.out.println("  " + problem);
-  //});
   model.accessPadGlobal(_padIdFor(username, file), function(pad) {
     collab_server.updatePadClientsAnnotations(pad, "problem", problems.map(function(problem) {
       return {
@@ -60,40 +65,50 @@ function _reportPadProblems(username, file, problems) {
   });
 }
 
-function accessWorkingCopyPad(username, file) {
-  //System.out.println("accessWorkingCopyPad");
-  
-  Workspace.createWorkingCopy(username, file);
+function _updatePadStyle(username, file, len, ops) {
+  model.accessPadGlobal(_padIdFor(username, file), function(pad) {
+    var apool = pad.pool();
+    var builder = Changeset.builder(pad.text().length); // XXX ignoring len
+    while (ops.hasNext()) {
+      var op = ops.next();
+      builder.keep(op.chars, op.lines, op.attribs.map(function(a) { return a.slice(); }), apool);
+    }
+    var changeset = builder.toString();
+    collab_server.applyChangesetToPad(pad, changeset, "#syntaxcolor");
+  });
+}
+
+function accessDocumentPad(username, file) {
+  Workspace.createDocument(username, file);
   
   var padId = _padIdFor(username, file);
   
   model.accessPadGlobal(padId, function(pad) {
     if ( ! pad.exists()) {
-      System.err.println("  rendering nonexistent pad " + padId);
+      System.err.println("  accessing nonexistent pad " + padId);
     }
   });
   
   return padId;
 }
 
-function _getBuffer(padId) {
+function _getDocument(padId) {
   var username_filename = padId.split("@", 2);
-  return PadWorkingCopyOwner.of(username_filename[0]).getBuffer(username_filename[1]);
+  return PadDocumentOwner.of(username_filename[0]).get(username_filename[1]);
 }
 
-function reviseWorkingCopy(padId, text) {
-  //System.out.println("reviseWorkingCopy");
-  _getBuffer(padId).reviseContents(text);
+function taskReviseDocument(padId) {
+  model.accessPadGlobal(padId, function(pad) {
+    _getDocument(padId).revise(pad.text()); // XXX need to implement partial revision
+  });
 }
 
-function reconcileWorkingCopy(padId) {
-  //System.out.println("reconcileWorkingCopy");
-  _getBuffer(padId).reconcileWorkingCopy(true);
+function onNewEditor(padId) {
+  _getDocument(padId).emptyRevise(); // XXX
 }
 
 function codeComplete(padId, offset, connectionId) {
-  System.out.println("codeComplete");
-  _getBuffer(padId).codeComplete(offset, scalaFn(1, function(proposals) {
+  _getDocument(padId).codeComplete(offset, scalaFn(1, function(proposals) {
     collab_server.updateClientCodeCompletionProposals(connectionId, padId, offset, proposals.map(function(proposal) {
       return {
         completion: "" + new java.lang.String(proposal.getCompletion()),

@@ -4,45 +4,86 @@ import java.io.IOException;
 
 import org.eclipse.core.resources.*;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.eclipse.jdt.core.IClasspathEntry;
+import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
-import org.mortbay.util.IO;
+import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.launching.JavaRuntime;
+import org.eclipse.jdt.ui.PreferenceConstants;
+import org.eclipse.jdt.ui.text.JavaTextTools;
 
 public class Workspace {
-    private static final Workspace THIS = new Workspace();
-    
     private static IWorkspace WORKSPACE;
+    private static JavaTextTools JAVA_TEXT_TOOLS;
     
-    public static synchronized IWorkspace initWorkspace() {
+    public static synchronized IWorkspace getWorkspace() {
         if (WORKSPACE == null) {
             new InstanceScope().getNode(ResourcesPlugin.PI_RESOURCES).putBoolean(ResourcesPlugin.PREF_AUTO_REFRESH, true);
             WORKSPACE = ResourcesPlugin.getWorkspace();
-            //WORKSPACE.addResourceChangeListener(new Changes(), IResourceChangeEvent.POST_BUILD);
         }
         return WORKSPACE;
     }
     
-    public static IProject accessProject(final String projectname) {
-        return THIS.getWorkspace().getRoot().getProject(projectname);
+    public static synchronized JavaTextTools getJavaTextTools() {
+        if (JAVA_TEXT_TOOLS == null) {
+            // XXX maybe need to PreferenceConstants.initializeDefaultValues?
+            JAVA_TEXT_TOOLS = new JavaTextTools(PreferenceConstants.getPreferenceStore());
+        }
+        return JAVA_TEXT_TOOLS;
     }
     
-    public static void createWorkingCopy(String username, IFile file) throws IOException, CoreException {
-        //System.out.println("createWorkingCopy");
-        if (JavaCore.isJavaLikeFileName(file.getName())) {
-            JavaCore.createCompilationUnitFrom(file).getWorkingCopy(PadWorkingCopyOwner.of(username), null);
-            // working copy initializes buffer contents
-        } else {
-            PadBuffer buffer = PadWorkingCopyOwner.of(username).createBuffer(file);
-            buffer.setContents(IO.toString(file.getContents()));
-        }
+    public static IProject[] listProjects() {
+        return getWorkspace().getRoot().getProjects();
     }
     
-    private IWorkspace workspace;
+    public static IProject accessProject(String projectname) {
+        return getWorkspace().getRoot().getProject(projectname);
+    }
     
-    private IWorkspace getWorkspace() {
-        if (workspace == null) {
-            workspace = initWorkspace();
+    public static IProject createProject(String projectname) throws CoreException {
+        final IProject project = getWorkspace().getRoot().getProject(projectname);
+        if ( ! project.exists()) {
+            getWorkspace().run(new IWorkspaceRunnable() {
+                public void run(IProgressMonitor monitor) throws CoreException {
+                    project.create(null);
+                    project.open(null);
+                    addJavaNature(project);
+                    setupJavaClasspath(project);
+                }
+            }, null);
         }
-        return workspace;
+        return project;
+    }
+    
+    public static void createDocument(String username, IFile file) throws IOException, JavaModelException {
+        PadDocumentOwner.of(username).create(file);
+    }
+    
+    private static void addJavaNature(IProject project) throws CoreException {
+        IProjectDescription description = project.getDescription();
+        String[] prevNatures = description.getNatureIds();
+        String[] newNatures = new String[prevNatures.length + 1];
+        System.arraycopy(prevNatures, 0, newNatures, 0, prevNatures.length);
+        newNatures[prevNatures.length] = JavaCore.NATURE_ID;
+        description.setNatureIds(newNatures);
+        project.setDescription(description, null);
+    }
+
+    private static void setupJavaClasspath(IProject project) throws CoreException {
+        IFolder srcFolder = project.getFolder("src");
+        srcFolder.create(true, true, null);
+        IFolder binFolder = project.getFolder("bin");
+        if ( ! binFolder.exists()) {
+            binFolder.create(true, true, null);
+        }
+        IJavaProject javaProject = JavaCore.create(project);
+        javaProject.setOutputLocation(binFolder.getFullPath(), null);
+        IClasspathEntry[] entries = new IClasspathEntry[] {
+                JavaRuntime.getDefaultJREContainerEntry(),
+                JavaCore.newSourceEntry(srcFolder.getFullPath())
+        };
+        javaProject.setRawClasspath(entries, null);
     }
 }

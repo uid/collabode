@@ -1,8 +1,5 @@
 <% helpers.setHtmlTitle(project.getName()) %>
 <% helpers.includeCss("editor_ejs.css") %>
-<% helpers.includeCometJs() %>
-<% helpers.includeJQuery() %>
-<% helpers.includeJs("json2.js") %>
 
 <div id="editorpage">
 
@@ -14,10 +11,14 @@
 
 <div id="padmain">
   <div id="padeditor">
-    <div id="wizardcontainerbox">
+    <form id="wizardcontainerbox" method="post">
       <h1>Create a Java project</h1>
       <p>Project name: <%= project.getName() %></p>
-    </div>
+      
+      <div id="wizardbottom">
+        <button type="submit">Create project</button>
+      </div>
+    </form>
   </div>
 </div>
 

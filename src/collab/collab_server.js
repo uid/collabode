@@ -306,14 +306,14 @@ function setPadAText(pad, atext) {
   _applyChangesetToPad(pad, cs);
 }
 
-function applyChangesetToPad(pad, changeset) {
+function applyChangesetToPad(pad, changeset, author) {
   Changeset.checkRep(changeset);
 
-  _applyChangesetToPad(pad, changeset);
+  _applyChangesetToPad(pad, changeset, author);
 }
 
-function _applyChangesetToPad(pad, changeset) {
-  pad.appendRevision(changeset);
+function _applyChangesetToPad(pad, changeset, author) {
+  pad.appendRevision(changeset, author);
   updatePadClients(pad);
 }
 
@@ -611,7 +611,7 @@ function getRoomCallbacks(roomName) {
 
       });
       
-      workspace.reconcileWorkingCopy(padId); // XXX as a way to get annotations
+      workspace.onNewEditor(padId);
 
       if (isCommitPending) {
         // tell client that if it hasn't received an ACCEPT_COMMIT by now, it isn't coming.

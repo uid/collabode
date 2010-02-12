@@ -1,8 +1,5 @@
 <% helpers.setHtmlTitle(project.getName()) %>
 <% helpers.includeCss("editor_ejs.css") %>
-<% helpers.includeCometJs() %>
-<% helpers.includeJQuery() %>
-<% helpers.includeJs("json2.js") %>
 
 <div id="editorpage">
 
@@ -10,6 +7,10 @@
   <div id="docbar">
     <div id="docbarproject"><span><%= project.getName() %></span></div>
   </div>
+</div>
+
+<div id="sidebar">
+  <%= helpers.renderList("explorer", projectfiles) %>
 </div>
 
 <div id="padmain">

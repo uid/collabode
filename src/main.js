@@ -30,8 +30,11 @@ serverhandlers.requestHandler = function() {
     handlePath();
 };
 
-serverhandlers.tasks.writePad = function(globalPadId) {
-    dbwriter.taskWritePad(globalPadId);
+serverhandlers.tasks.writePad = function(padId) {
+    dbwriter.taskWritePad(padId);
+};
+serverhandlers.tasks.reviseDocument = function(padId) {
+    workspace.taskReviseDocument(padId);
 };
 
 serverhandlers.cometHandler = function(op, id, data) {
@@ -65,14 +68,23 @@ serverhandlers.cometHandler = function(op, id, data) {
 function handlePath() {
     response.neverCache();
     
-    var dispatcher = new Dispatcher();
-    dispatcher.addLocations([
+    var get = new Dispatcher();
+    get.addLocations([
         [PrefixMatcher('/static/'), forward(static_control)],
+        ['/', editor_control.render_root],
         [/^\/(\w+)\/?$/, editor_control.render_project],
         [/^\/(\w+)\/(.+)$/, editor_control.render_path]
     ]);
     
-    if (dispatcher.dispatch()) {
+    var post = new Dispatcher();
+    post.addLocations([
+        [/^\/(\w+)\/?$/, editor_control.create_project],
+        [/^\/(\w+)\/(.+)$/, editor_control.create_path]
+    ]);
+    
+    var dispatchers = { GET: get, POST: post };
+    
+    if (dispatchers[request.method].dispatch()) {
         return;
     }
     

@@ -1,20 +1,28 @@
 package collabode;
-/*
+
 import org.eclipse.jdt.ui.PreferenceConstants;
 import org.eclipse.jdt.ui.text.IJavaPartitions;
 import org.eclipse.jdt.ui.text.JavaSourceViewerConfiguration;
-import org.eclipse.jdt.ui.text.JavaTextTools;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.TextPresentation;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
+import org.eclipse.jface.text.source.ISourceViewer;
 
-public class PadSourceViewerConfig extends JavaSourceViewerConfiguration {
+class PadSourceViewerConfig extends JavaSourceViewerConfiguration {
 
     PadSourceViewerConfig() {
-        super(new JavaTextTools(PreferenceConstants.getPreferenceStore()).getColorManager(), PreferenceConstants.getPreferenceStore(), null, IJavaPartitions.JAVA_PARTITIONING);
+        super(Workspace.getJavaTextTools().getColorManager(), PreferenceConstants.getPreferenceStore(), null, IJavaPartitions.JAVA_PARTITIONING);
     }
+    
+    @Override public org.eclipse.jface.text.presentation.IPresentationReconciler getPresentationReconciler(ISourceViewer sourceViewer) {
+        throw new UnsupportedOperationException();
+    };
+    
+    // XXX can we use getContentAssistant for better code completion?
+    
+    // XXX use getContentFormatter for auto-formating
     
     PadPresentationReconciler getPresentationReconciler() {
         PadPresentationReconciler reconciler = new PadPresentationReconciler();
@@ -25,23 +33,23 @@ public class PadSourceViewerConfig extends JavaSourceViewerConfiguration {
         reconciler.setDamager(dr, IDocument.DEFAULT_CONTENT_TYPE);
         reconciler.setRepairer(dr, IDocument.DEFAULT_CONTENT_TYPE);
         
-        dr= new DefaultDamagerRepairer(getJavaDocScanner());
+        dr = new DefaultDamagerRepairer(getJavaDocScanner());
         reconciler.setDamager(dr, IJavaPartitions.JAVA_DOC);
         reconciler.setRepairer(dr, IJavaPartitions.JAVA_DOC);
         
-        dr= new DefaultDamagerRepairer(getMultilineCommentScanner());
+        dr = new DefaultDamagerRepairer(getMultilineCommentScanner());
         reconciler.setDamager(dr, IJavaPartitions.JAVA_MULTI_LINE_COMMENT);
         reconciler.setRepairer(dr, IJavaPartitions.JAVA_MULTI_LINE_COMMENT);
         
-        dr= new DefaultDamagerRepairer(getSinglelineCommentScanner());
+        dr = new DefaultDamagerRepairer(getSinglelineCommentScanner());
         reconciler.setDamager(dr, IJavaPartitions.JAVA_SINGLE_LINE_COMMENT);
         reconciler.setRepairer(dr, IJavaPartitions.JAVA_SINGLE_LINE_COMMENT);
         
-        dr= new DefaultDamagerRepairer(getStringScanner());
+        dr = new DefaultDamagerRepairer(getStringScanner());
         reconciler.setDamager(dr, IJavaPartitions.JAVA_STRING);
         reconciler.setRepairer(dr, IJavaPartitions.JAVA_STRING);
         
-        dr= new DefaultDamagerRepairer(getStringScanner());
+        dr = new DefaultDamagerRepairer(getStringScanner());
         reconciler.setDamager(dr, IJavaPartitions.JAVA_CHARACTER);
         reconciler.setRepairer(dr, IJavaPartitions.JAVA_CHARACTER);
         
@@ -56,4 +64,3 @@ class PadPresentationReconciler extends PresentationReconciler {
         return createPresentation(damage, document);
     }
 }
-*/

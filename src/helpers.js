@@ -1,6 +1,7 @@
 import("fastJSON");
 import("comet");
 import("jsutils.eachProperty");
+import("utils.renderTemplateAsString");
 
 import("globals.*");
 
@@ -161,4 +162,19 @@ function cssIncludes() {
 
 function isHeaderVisible() {
     return _hd().showHeader;
+}
+
+function renderList(name, list) {
+  var r = [];
+  list.forEach(function(item) {
+    if (item instanceof Array) {
+      r.push(renderList(name, item))
+    } else {
+      var str = renderTemplateAsString(name + "/" + item.getClass().getSimpleName().toLowerCase() + ".ejs", {
+        item: item
+      });
+      r.push('<li>' + str + '</li>');
+    }
+  });
+  return '<ul>' + r.join('\n') + '</ul>';
 }

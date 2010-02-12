@@ -1,0 +1,24 @@
+<% helpers.setHtmlTitle() %>
+<% helpers.includeCss("editor_ejs.css") %>
+
+<div id="editorpage">
+
+<div id="editortop">
+  <div id="docbar">
+    <div id="docbarproject"><span>Collabode</span></div>
+  </div>
+</div>
+
+<div id="sidebar">
+  <%= helpers.renderList("explorer", projects) %>
+</div>
+
+<div id="padmain">
+  <div id="padeditor">
+    <div id="wizardcontainerbox">
+      <h1>Welcome</h1>
+    </div>
+  </div>
+</div>
+
+</div>

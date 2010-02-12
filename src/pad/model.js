@@ -1,3 +1,4 @@
+import("execution");
 import("fastJSON");
 import("sqlbase.sqlbase");
 import("sqlbase.sqlcommon");
@@ -110,6 +111,7 @@ function accessPadGlobal(padId, padFunc, rwMode) {
       function addRevision(theChangeset, author, optDatestamp) {
         var atext = getCurrentAText();
         var newAText = Changeset.applyToAText(theChangeset, atext, pad.pool());
+        var textChanged = (atext.text != newAText.text); // XXX fast?
         Changeset.copyAText(newAText, atext); // updates pad.tempObj().atext!
 
         var newRev = ++meta.head;
@@ -127,7 +129,9 @@ function accessPadGlobal(padId, padFunc, rwMode) {
 
         updateCoarseChangesets(true);
         
-        workspace.reviseWorkingCopy(padId, newAText.text);
+        if (textChanged) { // XXX avoids infinite loop on style updates
+          execution.scheduleTask("dbwriter_infreq", "reviseDocument", 0, [padId]);
+        }
       }
       function getNumForAuthor(author, dontAddIfAbsent) {
         return pad.pool().putAttrib(['author',author||''], dontAddIfAbsent);
