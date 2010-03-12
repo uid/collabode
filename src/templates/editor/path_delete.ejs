@@ -1,4 +1,4 @@
-<% helpers.setHtmlTitle(project.getName()) %>
+<% helpers.setHtmlTitle("Confirm Delete") %>
 <% helpers.includeCss("editor_ejs.css") %>
 
 <div id="editorpage">
@@ -18,14 +18,12 @@
 <div id="padmain">
   <div id="padeditor">
     <form id="wizardcontainerbox" method="post">
-      <h1>Create a Java project</h1>
-      <p>Project name: <%= project.getName() %></p>
+      <h1>Delete <%= resource.getProjectRelativePath() %></h1>
+      <p>Are you sure you want to delete this resource from the file system?</p>
       
       <div id="wizardbottom">
-        <button type="submit">Create project</button>
+        <button type="submit">Delete resource</button>
       </div>
     </form>
   </div>
-</div>
-
 </div>

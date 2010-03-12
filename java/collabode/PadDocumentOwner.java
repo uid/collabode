@@ -13,16 +13,16 @@ import org.eclipse.jdt.core.*;
  */
 public class PadDocumentOwner extends WorkingCopyOwner {
     
-    private static final ConcurrentMap<String, PadDocumentOwner> owners = new ConcurrentHashMap<String, PadDocumentOwner>();
+    private static final ConcurrentMap<String, PadDocumentOwner> OWNERS = new ConcurrentHashMap<String, PadDocumentOwner>();
     
     /**
      * Obtain the document owner for the given user. Creates one if none.
      */
     public static PadDocumentOwner of(String username) {
-        if ( ! owners.containsKey(username)) {
-            owners.putIfAbsent(username, new PadDocumentOwner(username));
+        if ( ! OWNERS.containsKey(username)) {
+            OWNERS.putIfAbsent(username, new PadDocumentOwner(username));
         }
-        return owners.get(username);
+        return OWNERS.get(username);
     }
     
     final String username;

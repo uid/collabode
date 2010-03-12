@@ -1,8 +1,10 @@
 package collabode;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
@@ -18,11 +20,14 @@ public class PadDocument extends Document {
     final PadDocumentOwner owner;
     final IFile file;
     
+    /**
+     * Are we currently revising this document to match its EtherPad pad?
+     */
     final ThreadLocal<Boolean> revising = new ThreadLocal<Boolean>() {
         @Override protected Boolean initialValue() { return false; }
     };
     
-    public PadDocument(PadDocumentOwner owner, IFile file) throws IOException {
+    PadDocument(PadDocumentOwner owner, IFile file) throws IOException {
         super();
         try {
             super.set(IO.toString(file.getContents()));
@@ -38,8 +43,13 @@ public class PadDocument extends Document {
                 if ( ! revising.get()) {
                     System.err.println("PadFunctions.whatever(); NEED TO REVISE PAD"); // XXX
                 }
+                commit(false);
             }
         });
+    }
+    
+    public IProject getProject() {
+        return file.getProject();
     }
     
     /*
@@ -72,6 +82,19 @@ public class PadDocument extends Document {
     }
     
     /**
+     * Commit the contents of this document to the filesystem.
+     * This implementation always commits.
+     * @param force if false, the commit may be ignored if the document should not be committed
+     */
+    public void commit(boolean force) {
+        try {
+            file.setContents(new ByteArrayInputStream(get().getBytes()), false, true, null);
+        } catch (CoreException ce) {
+            ce.printStackTrace(); // XXX
+        }
+    }
+    
+    /**
      * Perform an empty revision. XXX
      * @throws BadLocationException 
      */
@@ -98,3 +121,4 @@ public class PadDocument extends Document {
         }
     }
 }
+

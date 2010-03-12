@@ -53,6 +53,9 @@ function addToHead(stuff) {
 }
 
 function setHtmlTitle(t) {
+    if (t instanceof Array) {
+        t = t.join(' - ');
+    }
     _hd().htmlTitle = t;
 }
 
@@ -164,17 +167,20 @@ function isHeaderVisible() {
     return _hd().showHeader;
 }
 
-function renderList(name, list) {
+function renderList(name, list, here) {
   var r = [];
   list.forEach(function(item) {
     if (item instanceof Array) {
-      r.push(renderList(name, item))
+      r.push(renderList(name, item, here))
     } else {
-      var str = renderTemplateAsString(name + "/" + item.getClass().getSimpleName().toLowerCase() + ".ejs", {
-        item: item
-      });
-      r.push('<li>' + str + '</li>');
+      r.push((item.equals(here) ? '<li class="here">' : '<li>') + renderView(name, item) + '</li>');
     }
   });
   return '<ul>' + r.join('\n') + '</ul>';
+}
+
+function renderView(name, item) {
+  return renderTemplateAsString(name + "/" + item.getClass().getSimpleName().toLowerCase() + ".ejs", {
+    item: item
+  });
 }

@@ -8,17 +8,18 @@ $(document).ready(function() {
   var pad = {
       
     onResize: function() {
-      $("#editorcontainerbox").height($(window).height() - $("#editorcontainerbox").offset().top - 60);
+      $(".autoresized").height($(window).height() - $("#editorcontainerbox").offset().top - 60);
       ace.adjustSize();
     },
     
     onCollabAction: function(action) {
       if (action == "commitPerformed") {
         $("#syncstatussyncing").css('display', 'block');
-        $("#syncstatusdone").css('display', 'none');
+        //$("#syncstatusdone").css('display', 'none');
       } else if (action == "newlyIdle") {
-        $("#syncstatussyncing").css('display', 'none');
-        $("#syncstatusdone").css('display', 'block').fadeOut(1000);
+        $("#syncstatussyncing").fadeOut(1000);
+        //$("#syncstatussyncing").css('display', 'none');
+        //$("#syncstatusdone").css('display', 'block').fadeOut(1000);
       }
     }
     
@@ -34,10 +35,13 @@ $(document).ready(function() {
     // ip, colorId, userAgent
   };
   
+  var testor = new Testor();
+  
   var collab = getCollabClient(ace,
                                clientVars.collab_client_vars,
                                user,
-                               { });
+                               { },
+                               testor);
     
   collab.setOnInternalAction(pad.onCollabAction);
 });

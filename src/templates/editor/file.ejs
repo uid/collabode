@@ -1,9 +1,10 @@
-<% helpers.setHtmlTitle(project.getName()) %>
+<% helpers.setHtmlTitle([ project.getName(), file.getProjectRelativePath() ]) %>
 <% helpers.includeCss("editor_ejs.css") %>
 <% helpers.includeCometJs() %>
 <% helpers.includeJQuery() %>
 <% helpers.includeJs("json2.js") %>
 <% helpers.includeJs("ace/ace2_outer.js") %>
+<% helpers.includeJs("testor.js") %>
 <% helpers.includeJs("collab_client.js") %>
 <% helpers.includeJs("ode.js") %>
 
@@ -13,18 +14,26 @@
   <div id="docbar">
     <div id="docbarproject"><span><%= project.getName() %></span></div>
     <div id="docbarfile"><span><%= file.getName() %></span></div>
+    <div id="docbartools">
+      <div id="syncstatussyncing" title="Saving"><!-- --></div>
+      <div id="syncstatusdone" title="Saved"><!-- --></div>
+      <a href="javascript:alert('save now')" id="savenow" title="Save now"></a>
+      <a href="javascript:alert('run')" id="run" title="Run"></a>
+    </div>
   </div>
 </div>
 
-<div id="sidebar">
-  <%= helpers.renderList("explorer", projectfiles) %>
+<div id="sidebarbox" class="autoresized">
+  <div class="sidebarsection">
+    <%= helpers.renderList("explorer", projectfiles, file) %>
+  </div>
+  <div id="testorcontainer" class="sidebarsection">
+  </div>
 </div>
 
 <div id="padmain">
   <div id="padeditor">
-    <div id="editorcontainerbox">
-      <div id="syncstatussyncing" title="Syncing..."><!-- --></div>
-      <div id="syncstatusdone" title="Synced."><!-- --></div>
+    <div id="editorcontainerbox" class="autoresized">
       <div id="editorloadingbox">Loading...</div>
       <div id="editorcontainer"><!-- --></div>
       <select id="codecompletion" multiple="multiple" size="10">

@@ -90,7 +90,7 @@ function onStartup() {
   // we don't wait for scheduled tasks in the infreq pool to run and complete
   execution.initTaskThreadPool("dbwriter_infreq", 1);
 
-  _scheduleCheckForStalePads();
+  // XXX what is the story with "stale pads"? _scheduleCheckForStalePads();
 }
 
 function _scheduleCheckForStalePads() {

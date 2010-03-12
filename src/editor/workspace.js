@@ -8,6 +8,7 @@ import("pad.model");
 jimport("collabode.PadFunctions");
 jimport("collabode.PadDocumentOwner");
 jimport("collabode.Workspace");
+jimport("collabode.testing.ProjectTestsOwner");
 
 jimport("java.lang.System");
 
@@ -15,7 +16,8 @@ function onStartup() {
   PadFunctions.bind(scalaFn(3, _createPad),
                     //scalaFn(3, _setPadContents),
                     scalaFn(3, _reportPadProblems),
-                    scalaFn(4, _updatePadStyle));
+                    scalaFn(4, _updatePadStyle),
+                    scalaFn(3, _reportTestResult));
 }
 
 function listProjects() {
@@ -103,8 +105,12 @@ function taskReviseDocument(padId) {
   });
 }
 
-function onNewEditor(padId) {
-  _getDocument(padId).emptyRevise(); // XXX
+function onNewEditor(padId, connectionId) {
+  var doc = _getDocument(padId);
+  doc.emptyRevise(); // XXX
+  ProjectTestsOwner.of(doc.getProject()).reportResults(scalaFn(2, function(test, result) {
+    collab_server.updateClientTestResult(connectionId, test, result);
+  }));
 }
 
 function codeComplete(padId, offset, connectionId) {
@@ -117,4 +123,8 @@ function codeComplete(padId, offset, connectionId) {
       };
     }));
   }));
+}
+
+function _reportTestResult(project, test, result) {
+  collab_server.updateProjectClientsTestResult("" + project.getName(), test, result);
 }

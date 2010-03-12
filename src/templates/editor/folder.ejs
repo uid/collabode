@@ -1,4 +1,4 @@
-<% helpers.setHtmlTitle(project.getName()) %>
+<% helpers.setHtmlTitle([ project.getName(), folder.getProjectRelativePath() ]) %>
 <% helpers.includeCss("editor_ejs.css") %>
 
 <div id="editorpage">
@@ -10,16 +10,29 @@
   </div>
 </div>
 
-<div id="sidebar">
-  <%= helpers.renderList("explorer", projectfiles) %>
+<div id="sidebarbox">
+  <div class="sidebarsection">
+    <%= helpers.renderList("explorer", projectfiles, folder) %>
+  </div>
 </div>
 
 <div id="padmain">
   <div id="padeditor">
     <form id="wizardcontainerbox" method="post">
-      <% var memberCount = folder.members().length; %>
+      <% var members = folder.members(); %>
+      <% var memberCount = members.length; %>
       <p>Folder contains <%= memberCount %> item<%= memberCount == 1 ? '' : 's' %></p>
-      <table><tr><td>
+      
+      <table id="filegrid">
+      <tr>
+      <% for (var idx = 0; idx < memberCount; idx++) { %>
+        <%= helpers.renderView("filegrid", members[idx]) %>
+      <% } %>
+      </tr>
+      </table>
+      
+      <table>
+      <tr><td>
       <p><img src="/static/img/eclipse/ui.obj.folder.gif"/> Create a sub-folder in this folder</p>
       <p><input name="foldername"/></p>
       <p><button name="folder" type="submit" value="1">Create sub-folder</button></p>
@@ -27,7 +40,8 @@
       <p><img src="/static/img/eclipse/ui.obj.file.gif"/> Create a file in this folder</p>
       <p><input name="filename"/></p>
       <p><button name="file" type="submit" value="1">Create file</button></p>
-      </td></tr></table>
+      </td></tr>
+      </table>
     </form>
   </div>
 </div>

@@ -83,6 +83,8 @@ public class Workspace {
         IClasspathEntry[] entries = new IClasspathEntry[] {
                 JavaRuntime.getDefaultJREContainerEntry(),
                 JavaCore.newSourceEntry(srcFolder.getFullPath())
+                // XXX JUnit 4
+                // XXX collabode inject
         };
         javaProject.setRawClasspath(entries, null);
     }

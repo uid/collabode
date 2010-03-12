@@ -9,8 +9,10 @@
   </div>
 </div>
 
-<div id="sidebar">
-  <%= helpers.renderList("explorer", projectfiles) %>
+<div id="sidebarbox">
+  <div class="sidebarsection">
+    <%= helpers.renderList("explorer", projectfiles, project) %>
+  </div>
 </div>
 
 <div id="padmain">
@@ -19,6 +21,29 @@
       <h1>Java project</h1>
       <p><a href="/<%= project.getName() %>/.project">Edit project configuration XML</a></p>
       <p><a href="/<%= project.getName() %>/.classpath">Edit classpath configuration XML</a></p>
+      
+      <% var members = project.members(); %>
+      <% var memberCount = members.length; %>
+      
+      <table id="filegrid">
+      <tr>
+      <% for (var idx = 0; idx < memberCount; idx++) { %>
+        <%= helpers.renderView("filegrid", members[idx]) %>
+      <% } %>
+      </tr>
+      </table>
+      
+      <table>
+      <tr><td>
+      <p><img src="/static/img/eclipse/ui.obj.folder.gif"/> Create a sub-folder in this project</p>
+      <p><input name="foldername"/></p>
+      <p><button name="folder" type="submit" value="1">Create sub-folder</button></p>
+      </td><td>
+      <p><img src="/static/img/eclipse/ui.obj.file.gif"/> Create a file in this project</p>
+      <p><input name="filename"/></p>
+      <p><button name="file" type="submit" value="1">Create file</button></p>
+      </td></tr>
+      </table>
     </div>
   </div>
 </div>

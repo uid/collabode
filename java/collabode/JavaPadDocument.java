@@ -20,25 +20,39 @@ import scala.Function1;
  */
 public class JavaPadDocument extends PadDocument implements IBuffer {
     
-    private static final Comparator<CompletionProposal> PROPOSAL_COMPARE = new Comparator<CompletionProposal>() {
-        public int compare(CompletionProposal cp1, CompletionProposal cp2) {
-            int delta = cp2.getRelevance() - cp1.getRelevance();
-            if (delta != 0) {
-                return delta;
-            }
-            delta = cp2.getKind() - cp1.getKind();
-            if (delta != 0) {
-                return delta;
-            }
-            return new String(cp1.getCompletion()).compareTo(new String(cp2.getCompletion()));
-        }
-    };
-    
     private final ICompilationUnit workingCopy;
     
     private boolean closed = false;
     private final Set<IBufferChangedListener> listeners = new HashSet<IBufferChangedListener>();
-    final ProblemRequestor problems = new ProblemRequestor();
+    
+    /**
+     * {@link IProblemRequestor} for this document. Returned by
+     * {@link PadDocumentOwner#getProblemRequestor(ICompilationUnit)}.
+     */
+    final IProblemRequestor problems = new IProblemRequestor() {
+        private final List<IProblem> problems = new LinkedList<IProblem>();
+
+        public void beginReporting() {
+            problems.clear();
+        }
+
+        public void acceptProblem(IProblem problem) {
+            problems.add(problem);
+        }
+
+        public void endReporting() {
+            // XXX can we avoid reporting if the list is unchanged?
+            PadFunctions.reportProblems.apply(owner.username, file, problems.toArray());
+            for (IProblem problem : problems) {
+                if (problem.isError()) { return; }
+            }
+            commit(true);
+        }
+
+        public boolean isActive() {
+            return true;
+        }
+    };
     
     JavaPadDocument(PadDocumentOwner owner, IFile file, ICompilationUnit workingCopy) throws IOException {
         super(owner, file);
@@ -75,7 +89,6 @@ public class JavaPadDocument extends PadDocument implements IBuffer {
         length = Math.min(length, getLength() - offset); // XXX needed to handle deletions?
         
         TextPresentation pres = owner.presenter.createRepairDescription(new Region(offset, length), this);
-        //System.out.println(offset + " " + length + " (" + this.getLength() + "): " + pres);
         
         final Iterator<?> it = pres.getAllStyleRangeIterator();
         
@@ -146,7 +159,7 @@ public class JavaPadDocument extends PadDocument implements IBuffer {
             return super.getChar(position);
         } catch (BadLocationException ble) {
             ble.printStackTrace();
-            throw new Error(ble);
+            throw new Error(ble); // XXX
         }
     }
 
@@ -171,7 +184,7 @@ public class JavaPadDocument extends PadDocument implements IBuffer {
             return super.get(offset, length);
         } catch (BadLocationException ble) {
             ble.printStackTrace();
-            throw new Error(ble);
+            throw new Error(ble); // XXX
         }
     }
 
@@ -180,7 +193,8 @@ public class JavaPadDocument extends PadDocument implements IBuffer {
     }
 
     @Override public boolean hasUnsavedChanges() {
-        // TODO Auto-generated method stub
+        Debug.here();
+        System.err.println("UNIMPLEMENTED"); // XXX
         return false;
     }
 
@@ -205,12 +219,13 @@ public class JavaPadDocument extends PadDocument implements IBuffer {
             super.replace(position, length, text);
         } catch (BadLocationException ble) {
             ble.printStackTrace();
-            throw new Error(ble);
+            throw new Error(ble); // XXX
         }
     }
 
     @Override public void save(IProgressMonitor progress, boolean force) throws JavaModelException {
-        // TODO Auto-generated method stub
+        Debug.here();
+        System.err.println("UNIMPLEMENTED"); // XXX
     }
 
     @Override public void setContents(char[] contents) {
@@ -221,6 +236,24 @@ public class JavaPadDocument extends PadDocument implements IBuffer {
         super.set(contents);
     }
     
+    /*
+     * End of IBuffer
+     */
+    
+    /**
+     * Commit the contents of this document to the filesystem.
+     * This implementation only commits when forced.
+     */
+    @Override public void commit(boolean force) {
+        if ( ! force) { return; }
+        
+        try {
+            workingCopy.commitWorkingCopy(false, null);
+        } catch (JavaModelException jme) {
+            jme.printStackTrace(); // XXX
+        }
+    }
+    
     /**
      * Obtain code completion proposals at the given offset.
      * Returns only the most relevant proposals to the reporter. XXX
@@ -229,17 +262,8 @@ public class JavaPadDocument extends PadDocument implements IBuffer {
      */
     public void codeComplete(int offset, final Function1<Object[],Boolean> reporter) {
         try {
-            workingCopy.codeComplete(offset, new CompletionRequestor() {
-                SortedSet<CompletionProposal> proposals = new TreeSet<CompletionProposal>(PROPOSAL_COMPARE);
-                public void accept(CompletionProposal proposal) {
-                    proposals.add(proposal);
-                }
-                @Override public void endReporting() {
-                    List<CompletionProposal> relevant = new ArrayList<CompletionProposal>();
-                    int ii = 0;
-                    for (Iterator<CompletionProposal> it = proposals.iterator(); ii < 20 && it.hasNext(); ii++) {
-                        relevant.add(it.next());
-                    }
+            workingCopy.codeComplete(offset, new PadCompletionRequestor() {
+                public void report(List<CompletionProposal> relevant) {
                     reporter.apply(relevant.toArray());
                 }
             });
@@ -247,25 +271,45 @@ public class JavaPadDocument extends PadDocument implements IBuffer {
             jme.printStackTrace(); // XXX
         }
     }
+}
+
+/**
+ * Code completion proposal receiver. Accepts completion proposals, determines
+ * relevant ones, and reports them.
+ * XXX Need better proposal ranking.
+ */
+abstract class PadCompletionRequestor extends CompletionRequestor {
+    private static final Comparator<CompletionProposal> COMPARE = new Comparator<CompletionProposal>() {
+        public int compare(CompletionProposal cp1, CompletionProposal cp2) {
+            int delta = cp2.getRelevance() - cp1.getRelevance();
+            if (delta != 0) {
+                return delta;
+            }
+            delta = cp2.getKind() - cp1.getKind();
+            if (delta != 0) {
+                return delta;
+            }
+            return new String(cp1.getCompletion()).compareTo(new String(cp2.getCompletion()));
+        }
+    };
     
-    class ProblemRequestor implements IProblemRequestor {
-        private final List<IProblem> problems = new LinkedList<IProblem>();
-
-        public void beginReporting() {
-            problems.clear();
-        }
-
-        public void acceptProblem(IProblem problem) {
-            problems.add(problem);
-        }
-
-        public void endReporting() {
-            // XXX can we avoid reporting if the list is unchanged?
-            PadFunctions.reportProblems.apply(owner.username, file, problems.toArray());
-        }
-
-        public boolean isActive() {
-            return true;
-        }
+    final SortedSet<CompletionProposal> proposals = new TreeSet<CompletionProposal>(COMPARE);
+    
+    public void accept(CompletionProposal proposal) {
+        proposals.add(proposal);
     }
+    
+    @Override public void endReporting() {
+        List<CompletionProposal> relevant = new ArrayList<CompletionProposal>();
+        int ii = 0;
+        for (Iterator<CompletionProposal> it = proposals.iterator(); ii < 20 && it.hasNext(); ii++) {
+            relevant.add(it.next());
+        }
+        report(relevant);
+    }
+    
+    /**
+     * Called with proposals to display. XXX
+     */
+    public abstract void report(List<CompletionProposal> relevant);
 }

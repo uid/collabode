@@ -4,6 +4,7 @@ import("sqlbase.sqlcommon");
 
 import("control.static_control");
 import("control.editor_control");
+import("control.run_control");
 
 import("collab.collabroom_server");
 import("collab.collab_server");
@@ -72,12 +73,16 @@ function handlePath() {
     get.addLocations([
         [PrefixMatcher('/static/'), forward(static_control)],
         ['/', editor_control.render_root],
+        [/^\/run\/(\w+)\/(.+)$/, run_control.render_run],
+        [/^\/test\/(\w+)\/(.+)$/, run_control.render_test],
+        [/^\/delete\/(\w+)\/(.+)$/, editor_control.render_confirm_delete],
         [/^\/(\w+)\/?$/, editor_control.render_project],
         [/^\/(\w+)\/(.+)$/, editor_control.render_path]
     ]);
     
     var post = new Dispatcher();
     post.addLocations([
+        [/^\/delete\/(\w+)\/(.+)$/, editor_control.delete_path],
         [/^\/(\w+)\/?$/, editor_control.create_project],
         [/^\/(\w+)\/(.+)$/, editor_control.create_path]
     ]);

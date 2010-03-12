@@ -23,7 +23,8 @@ function render_project(projectname) {
   
   if ( ! project.exists()) {
     renderHtml("editor/project_create.ejs", {
-      project: project
+      project: project,
+      projects: workspace.listProjects()
     });
     return true;
   }    
@@ -110,6 +111,18 @@ function _render_file(project, file, projectfiles) {
   return true;
 }
 
+function render_confirm_delete(projectname, filename) {
+  var project = workspace.accessProject(projectname);
+  var resource = project.findMember(filename);
+  
+  renderHtml("editor/path_delete.ejs", {
+    project: project,
+    projects: workspace.listProjects(),
+    resource: resource
+  });
+  return true;
+}
+
 function create_path(projectname, filename) {
   var project = workspace.accessProject(projectname);
   var folder = project.findMember(filename);
@@ -122,11 +135,11 @@ function create_path(projectname, filename) {
   var filename = request.params["filename"];
   
   if ((request.params["folder"] || ! filename.length) && foldername.length) {
-    return _create_path_folder(project, folder, foldername);
+    _create_path_folder(project, folder, foldername);
   }
   
   if ((request.params["file"] || ! foldername.length) && filename.length) {
-    return _create_path_file(project, folder, filename);
+    _create_path_file(project, folder, filename);
   }
   
   response.redirect(request.url);
@@ -135,8 +148,31 @@ function create_path(projectname, filename) {
 
 function _create_path_folder(project, parent, foldername) {
   System.err.println("_create_path_folder(" + project + ", " + parent + ", " + foldername + ")");
+  var folder = parent.getFolder(foldername);
+  if (folder.exists()) {
+    return true;
+  }
+  
+  folder.create(false, true, null);
 }
 
 function _create_path_file(project, parent, filename) {
   System.err.println("_create_path_file(" + project + ", " + parent + ", " + filename + ")");
+  var file = parent.getFile(filename);
+  if (file.exists()) {
+    return true;
+  }
+  
+  file.create(new java.io.InputStream({ read: function() { return -1; }}), false, null);
+}
+
+function delete_path(projectname, filename) {
+  var project = workspace.accessProject(projectname);
+  var resource = project.findMember(filename);
+  var parentpath = ''+resource.getParent().getFullPath();
+  
+  resource['delete'](false, null); // workaround because `delete` is a JS keyword
+  
+  response.redirect(parentpath);
+  return true;
 }

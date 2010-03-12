@@ -9,7 +9,7 @@ html { font-size: 62.5%; }
 body { background: #ebebeb url(/static/img/pad/backgradient.gif) repeat-x left top; }
 body, textarea { font-family: Arial, sans-serif; }
 
-#editorpage { margin-left: auto; margin-right: auto; width: 900px; }
+#editorpage { margin-left: auto; margin-right: auto; width: 1010px; }
 
 body.fullwidth #editorpage { width: auto; margin-left: 6px; margin-right: 6px; }
 
@@ -26,49 +26,83 @@ body.fullwidth #editorpage { width: auto; margin-left: 6px; margin-right: 6px; }
 	white-space:nowrap;
 }
 #docbarfile {
-	position: absolute; height: auto; left: 205px;
-	width: 280px; font-size: 1.6em; color: #444; font-weight: normal;
+	position: absolute; height: auto; left: 265px;
+	width: 380px; font-size: 1.6em; color: #444; font-weight: normal;
 	line-height: 22px; margin-left: 2px; height: 22px; top: 4px;
 	overflow: hidden; text-overflow: ellipsis /*not supported in FF*/;
 	white-space:nowrap;
 }
+#docbartools {
+	position:absolute; height:auto; right:9px;
+	width:200px; font-size: 1.6em; color:#444; font-weight:normal;
+	line-height: 22px; margin-right: 2px; height:22px; top:4px;
+	white-space:nowrap;
+}
 
-#sidebar {
+#sidebarbox {
+	position: absolute;
 	margin-top: 6px;
-	border: 1px solid #c4c4c4;
-	background:#fff; overflow: hidden; position: absolute;
-	font-size: 1.6em;
-	padding:11px;
-	-webkit-border-radius:6px; -moz-border-radius:6px;
-	width:169px;
+	width:253px;
 	z-index:20;
 }
 
-#sidebar ul {
+.sidebarsection {
+	margin-bottom:6px;
+	border: 1px solid #c4c4c4;
+	background:#fff; overflow: hidden;
+	font-size: 1.6em;
+	padding:10px;
+	-webkit-border-radius:6px; -moz-border-radius:6px;
+}
+
+.sidebarsection ~ .sidebarsection:last-child {
+	position:absolute;
+	margin-bottom:0;
+	bottom:0;
+	left:0;
+	right:0;
+}
+
+#sidebarbox ul {
 	list-style-type: none;
 }
 
-#sidebar ul a {
+#sidebarbox ul a {
 	text-decoration: none;
+	white-space:nowrap;
 }
 
-#sidebar ul ul {
-	margin-left:1em;
+#sidebarbox ul ul {
+	padding-left:1em;
+}
+
+#sidebarbox li.here a {
+	background:#ebebeb;
 }
 
 #padmain { margin-top: 6px; position: relative; zoom: 1; }
 
-#padeditor { margin-left: 200px; zoom: 1; }
+#padeditor { margin-left: 260px; zoom: 1; }
 
 #syncstatussyncing {
-	position: absolute; height: 26px; width: 26px;
-	background: url(/static/img/pad/syncing.gif) no-repeat center center;
-	right: 18px; top: 2px; display: none;
+	position:absolute; height: 22px; width: 22px;
+	background: url(/static/img/eclipse/jdt.ui.lcl.sync.enabled.gif) no-repeat center center;
+	rxight: 18px; xtop: 2px; display: none;
 }
 #syncstatusdone {
-	position: absolute; height: 26px; width: 26px;
-	background: url(/static/img/pad/syncdone.gif) no-repeat center center;
-	right: 18px; top: 2px; display: none;
+	float:left; height: 22px; width: 22px;
+}
+#docbartools a {
+	float:left; height:22px; width:22px; margin:0 4px;
+}
+#savenow {
+	background: url(/static/img/eclipse/ui.tool.save.disabled.gif) no-repeat center center;
+}
+#savenow.enabled {
+	background: url(/static/img/eclipse/ui.tool.save.enabled.gif) no-repeat center center;
+}
+#run {
+	background: url(/static/img/eclipse/jdt.debug.ui.tool.run.disabled.gif) no-repeat center center;
 }
 
 #editorcontainerbox {
@@ -114,6 +148,106 @@ body.fullwidth #editorpage { width: auto; margin-left: 6px; margin-right: 6px; }
 #wizardcontainerbox table {
 	border-collapse:collapse;
 	padding:0; margin:0;
-	margin-top:6px;
+	margin-top:2em;
 }
 #wizardcontainerbox td ~ td { padding-left:3em; }
+
+#filegrid a {
+	text-decoration: none;
+}
+#filegrid a.delete {
+	padding-left:18px;
+	background: url(/static/img/eclipse/ui.tool.delete.disabled.gif) no-repeat left;
+}
+#filegrid a.delete:hover {
+	background: url(/static/img/eclipse/ui.tool.delete.enabled.gif) no-repeat left;
+}
+
+.test {
+	border-width:1px;
+	border-style:solid;
+	margin-top:4px;
+	padding:10px 15px;
+	position:relative;
+}
+.test .testclass {
+	font-size: smaller;
+}
+.test.ok {
+	border-color:#360;
+	background:#efe;
+}
+.test.failure {
+	border-color:#900;
+	background:#fee;
+}
+.test.error {
+	border-color:#009;
+	background:#eef;
+}
+.test.new {
+	border-width: 9px 14px 9px 14px;
+	padding:1px;
+}
+.test.new.ok {
+	-webkit-border-image: url(/static/img/cloud-pass.png) 9 20 9 20 stretch stretch;
+	-moz-border-image: url(/static/img/cloud-pass.png) 9 20 9 20 stretch stretch;
+}
+.test.new.failure {
+	-webkit-border-image: url(/static/img/cloud-fail.png) 9 20 9 20 stretch stretch;
+	-moz-border-image: url(/static/img/cloud-fail.png) 9 20 9 20 stretch stretch;
+}
+.test.new.error {
+	-webkit-border-image: url(/static/img/cloud-error.png) 9 20 9 20 stretch stretch;
+	-moz-border-image: url(/static/img/cloud-error.png) 9 20 9 20 stretch stretch;
+}
+.test.needsimpl {
+	-webkit-border-radius:18px; -moz-border-radius:18px;
+}
+.test.needsreview {
+	-webkit-border-radius:6px; -moz-border-radius:6px;
+}
+.test.accepted.failure, .test.accepted.error {
+	border-width: 9px 14px 9px 14px;
+	padding:1px;
+}
+.test.accepted.failure {
+	-webkit-border-image: url(/static/img/bang-fail.png) 9 20 9 20 stretch stretch;
+	-moz-border-image: url(/static/img/bang-fail.png) 9 20 9 20 stretch stretch;	
+}
+.test.accepted.error {
+	-webkit-border-image: url(/static/img/bang-error.png) 9 20 9 20 stretch stretch;
+	-moz-border-image: url(/static/img/bang-error.png) 9 20 9 20 stretch stretch;	
+}
+.test button {
+	padding:.2em;
+	position:absolute;
+	top:0;
+	right:0;
+	visibility: hidden;
+	-webkit-appearance: square-button;
+}
+.test.needsimpl button, .test.needsreview button {
+	top:10px;
+	right:13px;
+}
+.test.new button {
+	visibility: visible;
+}
+.test.new button div:after {
+	content: "Needs impl";
+}
+.test.needsimpl button {
+	visibility: visible;
+}
+.test.needsimpl button div:after {
+	content: "Needs review";
+	visibility: visible;
+}
+.test.needsreview button {
+	visibility: visible;
+}
+.test.needsreview button div:after {
+	content: "Accept";
+	visibility: visible;
+}

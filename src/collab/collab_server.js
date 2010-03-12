@@ -611,7 +611,7 @@ function getRoomCallbacks(roomName) {
 
       });
       
-      workspace.onNewEditor(padId);
+      workspace.onNewEditor(padId, connectionId);
 
       if (isCommitPending) {
         // tell client that if it hasn't received an ACCEPT_COMMIT by now, it isn't coming.
@@ -788,5 +788,37 @@ function updateClientCodeCompletionProposals(connectionId, padId, offset, propos
     id: padId,
     offset: offset,
     proposals: proposals
+  });
+}
+
+function updateClientTestResult(connectionId, test, result) {
+  // XXX painful that we reconstruct this for every client
+  var testData = {
+    name: "" + test.name,
+    className: "" + test.className,
+    methodName: "" + test.methodName
+  };
+  var resultData = null;
+  if (result) {
+    resultData = {
+      resultName: "" + result.resultName(),
+      status: "" + result.status
+    };
+  }
+  sendMessage(connectionId, {
+    type: "TEST_RESULT",
+    test: testData,
+    result: resultData
+  });
+}
+
+function updateProjectClientsTestResult(projectName, test, result) {
+  var padIds = getAllPadsWithConnections().filter(function(padId) {
+    return projectName == padId.split("@", 2)[1].split("/", 3)[1];
+  });
+  padIds.forEach(function(padId) {
+    getRoomConnections(_padIdToRoom(padId)).forEach(function(connection) {
+      updateClientTestResult(connection.connectionId, test, result);
+    });
   });
 }
