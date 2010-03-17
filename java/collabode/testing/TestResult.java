@@ -13,7 +13,10 @@ import org.eclipse.jdt.junit.model.ITestElement.Result;
  */
 public class TestResult {
     private final Result result;
-    private final FailureTrace trace;
+    /**
+     * Test failure trace.
+     */
+    public final FailureTrace trace;
     /**
      * Test evolution status.
      * Represented in code by a collabode.* annotation.

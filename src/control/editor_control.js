@@ -101,12 +101,13 @@ function _render_file(project, file, projectfiles) {
       userId: userId,
       opts: {}
     });
-  })
+  });
   
   renderHtml("editor/file.ejs", {
     project: project,
     file: file,
-    projectfiles: projectfiles
+    projectfiles: projectfiles,
+    filetype: workspace.getContentTypeName(padId)
   });
   return true;
 }

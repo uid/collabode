@@ -1,4 +1,5 @@
 <% helpers.setHtmlTitle([ project.getName(), file.getProjectRelativePath() ]) %>
+<% filetype.split("/").forEach(helpers.addBodyClass) %>
 <% helpers.includeCss("editor_ejs.css") %>
 <% helpers.includeCometJs() %>
 <% helpers.includeJQuery() %>

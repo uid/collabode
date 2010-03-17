@@ -804,6 +804,16 @@ function updateClientTestResult(connectionId, test, result) {
       resultName: "" + result.resultName(),
       status: "" + result.status
     };
+    if (result.trace) {
+      resultData.trace = {
+         stackTrace: "" + result.trace.getTrace()
+      };
+      // XXX always seems to be null, even in the TestResult c'tor
+      if (result.trace.getExpected()) {
+        resultData.trace.expected = "" + result.trace.getExpected();
+        resultData.trace.actual = "" + result.trace.getActual();
+      }
+    }
   }
   sendMessage(connectionId, {
     type: "TEST_RESULT",

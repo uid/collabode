@@ -70,6 +70,10 @@ public class JavaPadDocument extends PadDocument implements IBuffer {
         });
     }
     
+    @Override public String getContentTypeName() {
+        return super.getContentTypeName() + "/java" + (file.getName().endsWith("Test.java") ? "Test" : "Impl");
+    }
+    
     private void notifyListeners(int offset, int length, String text) {
         for (IBufferChangedListener listener : listeners) {
             listener.bufferChanged(new BufferChangedEvent(this, offset, length, text));

@@ -231,23 +231,42 @@ body.fullwidth #editorpage { width: auto; margin-left: 6px; margin-right: 6px; }
 	top:10px;
 	right:13px;
 }
-.test.new button {
+.javaTest .test.new button {
 	visibility: visible;
 }
 .test.new button div:after {
 	content: "Needs impl";
 }
-.test.needsimpl button {
+.javaImpl .test.needsimpl button {
 	visibility: visible;
 }
 .test.needsimpl button div:after {
 	content: "Needs review";
-	visibility: visible;
 }
-.test.needsreview button {
+.javaTest .test.needsreview button {
 	visibility: visible;
 }
 .test.needsreview button div:after {
 	content: "Accept";
-	visibility: visible;
+}
+.test a {
+	text-align: center;
+	font-size: x-small;
+	position: absolute;
+	left: 0;
+	right: 0;
+	display: none;
+	cursor: pointer;
+}
+.test a div:after {
+	content: "details";
+}
+.test.hasDetails a {
+	display: block;
+}
+.test .testtrace {
+	display: none;
+	margin-top: 1.5em;
+	font-size: x-small;
+	white-space: pre;
 }

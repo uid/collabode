@@ -125,6 +125,10 @@ function codeComplete(padId, offset, connectionId) {
   }));
 }
 
+function getContentTypeName(padId) {
+  return _getDocument(padId).getContentTypeName();
+}
+
 function _reportTestResult(project, test, result) {
   collab_server.updateProjectClientsTestResult("" + project.getName(), test, result);
 }

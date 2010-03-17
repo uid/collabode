@@ -6,6 +6,7 @@ import java.io.IOException;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.DocumentEvent;
@@ -50,6 +51,22 @@ public class PadDocument extends Document {
     
     public IProject getProject() {
         return file.getProject();
+    }
+    
+    /**
+     * Returns informal names for this document's preferred content type(s).
+     * Multiple names will be separated by "/".
+     */
+    public String getContentTypeName() {
+        try {
+            IContentType type = file.getProject().getContentTypeMatcher().findContentTypeFor(new ByteArrayInputStream(get().getBytes()), file.getName());
+            return type.getId().replaceFirst(".*\\.", "");
+        } catch (IOException ioe) {
+            ioe.printStackTrace(); // XXX
+        } catch (CoreException ce) {
+            ce.printStackTrace(); // XXX
+        }
+        return "unknown";
     }
     
     /*
