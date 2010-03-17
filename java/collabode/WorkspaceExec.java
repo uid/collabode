@@ -83,6 +83,7 @@ public class WorkspaceExec {
         config.setAttribute("org.eclipse.jdt.junit.CONTAINER", "");
         config.setAttribute("org.eclipse.jdt.junit.TEST_KIND", "org.eclipse.jdt.junit.loader.junit4");
         
+        // XXX this doesn't work for tests
         URL policyUrl = Platform.getBundle("collabode.etherpad").getResource("config/security.policy");
         String policy = "'" + FileLocator.toFileURL(policyUrl).getPath() + "'";
         config.setAttribute(IJavaLaunchConfigurationConstants.ATTR_VM_ARGUMENTS,

@@ -74,6 +74,7 @@ public class ContinuousTesting implements Runnable {
                 IJavaProject javaProject = JavaCore.create(project);
                 if (JUnitCore.findTestTypes(javaProject, null).length == 0) {
                     ProjectTestsOwner.of(javaProject).empty();
+                    continue;
                 }
                 
                 toRun.removeAll(Collections.singleton(project));
@@ -100,6 +101,7 @@ public class ContinuousTesting implements Runnable {
         config.setAttribute("org.eclipse.jdt.junit.CONTAINER", project.getHandleIdentifier());
         config.setAttribute("org.eclipse.jdt.junit.TEST_KIND", "org.eclipse.jdt.junit.loader.junit4");
         
+        // XXX this doesn't work for tests
         URL policyUrl = Application.BUNDLE.getResource("config/security.policy");
         String policy = "'" + FileLocator.toFileURL(policyUrl).getPath() + "'";
         config.setAttribute(IJavaLaunchConfigurationConstants.ATTR_VM_ARGUMENTS,
