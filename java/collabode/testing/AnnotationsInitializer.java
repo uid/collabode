@@ -3,7 +3,6 @@ package collabode.testing;
 import java.io.IOException;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.*;
@@ -17,7 +16,7 @@ public class AnnotationsInitializer extends ClasspathContainerInitializer {
     
     public AnnotationsInitializer() throws IOException {
         Debug.here();
-        libPath = FileLocator.toFileURL(Application.BUNDLE.getResource("inject-bin")).getPath(); // XXX
+        libPath = Application.bundleResourcePath("inject-bin"); // XXX
     }
 
     public void initialize(final IPath containerPath, IJavaProject project) throws CoreException {

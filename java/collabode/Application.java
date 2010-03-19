@@ -1,6 +1,7 @@
 package collabode;
 
 import java.io.File;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -8,6 +9,7 @@ import java.util.Scanner;
 
 import org.eclipse.core.resources.*;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
@@ -28,7 +30,10 @@ public class Application implements IApplication {
         BUNDLE = Platform.getBundle("collabode.etherpad");
         
         setupDatabase();
-        net.appjet.oui.main.main(new String[] { "--configFile=./config/collabode-etherpad.localhost.properties" });
+        net.appjet.oui.main.main(new String[] {
+                "--modulePath=" + bundleResourcePath("src"),
+                "--useVirtualFileRoot=" + bundleResourcePath("src"),
+                "--configFile=" + bundleResourcePath("config/collabode.properties") });
         setupTesting();
         
         while ( ! "quit".equals(Console.readLine())); // XXX
@@ -38,11 +43,15 @@ public class Application implements IApplication {
 
     public void stop() {
     }
-
+    
+    public static String bundleResourcePath(String relativePath) throws IOException {
+        return FileLocator.toFileURL(BUNDLE.getResource(relativePath)).getPath();
+    }
+    
     private void setupDatabase() throws Exception {
         Class.forName("org.apache.derby.jdbc.EmbeddedDriver");
         Connection db = DriverManager.getConnection("jdbc:derby:pads;create=true");
-        Scanner schema = new Scanner(new File("config/schema.sql")).useDelimiter(";");
+        Scanner schema = new Scanner(new File(bundleResourcePath("config/schema.sql"))).useDelimiter(";");
         while (schema.hasNext()) {
             String stmt = schema.next().trim();
             if (stmt.isEmpty()) {

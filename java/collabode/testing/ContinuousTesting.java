@@ -1,7 +1,6 @@
 package collabode.testing;
 
 import java.io.IOException;
-import java.net.URL;
 import java.util.Collections;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -10,7 +9,6 @@ import java.util.concurrent.TimeUnit;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.*;
 import org.eclipse.jdt.core.IJavaProject;
@@ -102,8 +100,7 @@ public class ContinuousTesting implements Runnable {
         config.setAttribute("org.eclipse.jdt.junit.TEST_KIND", "org.eclipse.jdt.junit.loader.junit4");
         
         // XXX this doesn't work for tests
-        URL policyUrl = Application.BUNDLE.getResource("config/security.policy");
-        String policy = "'" + FileLocator.toFileURL(policyUrl).getPath() + "'";
+        String policy = "'" + Application.bundleResourcePath("config/security.policy") + "'";
         config.setAttribute(IJavaLaunchConfigurationConstants.ATTR_VM_ARGUMENTS,
                 "-Dorg.eclipse.osgi.framework.internal.core.FrameworkSecurityManager -Djava.security.policy=" + policy + " -ea");
         
