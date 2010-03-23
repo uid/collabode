@@ -27,7 +27,7 @@ function Testor() {
       
       node.append($('<button>').html('<div></div>').click(onTestUpdateStatus));
       
-      node.append($('<a>').html('<div></div>').click(onTestToggleTrace));
+      node.append($('<a>').html('<div></div>').click(function() { onTestToggleTrace(node); }));
       var trace = $('<div>').addClass('testtrace');
       trace.append($('<table><tr><td class="expected"></td><td class="actual"></td></tr><table><div class="stackTrace"></div>'));
       node.append(trace);
@@ -52,8 +52,7 @@ function Testor() {
   return testor;
 };
 
-function onTestToggleTrace(event) {
-  var div = event.currentTarget.parentElement;
+function onTestToggleTrace(div) {
   $('.testtrace', div).toggle("fast");
 }
 
