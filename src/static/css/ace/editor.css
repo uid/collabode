@@ -114,7 +114,7 @@ p {
 #sidedivinner .errorAnnotation { background-image: url("/static/img/eclipse/jdt.ui.obj.error.gif"); }
 
 #sidedivinner div p {
-	display: none; text-align: left;
+	text-align: left;
 	font-family: Arial, sans-serif;
 	position:absolute; color:#333; background:#ffe; border:1px solid #333; padding:1px 4px;
 	opacity:.95; -webkit-box-shadow: 0 4px 6px #999;

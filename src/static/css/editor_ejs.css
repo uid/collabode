@@ -1,6 +1,9 @@
-*,html.body,p { margin: 0; padding: 0; }
+*, html.body, p { margin: 0; padding: 0; }
+
 h1, h2, h3, h4, h5, h6 { font-size: 100%; font-weight: normal; font-style: normal;
   text-decoration: none; margin: 0; padding: 0; }
+
+a img { border: none; }
 
 .clear { clear: both; }
 

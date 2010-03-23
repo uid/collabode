@@ -904,8 +904,9 @@ function OUTER(gscope) {
       if (d.className == "") {
         d.className = annotation.severity + "Annotation annotation";
         var tip = document.createElement('p');
+        $(tip).css('display', 'none'); // XXX default style doesn't work in FF?
         tip.innerHTML = annotation.message;
-        d.appendChild(tip)
+        d.appendChild(tip);
         $(d).hover(function() {
           $(tip).fadeIn(100);
         }, function() {
