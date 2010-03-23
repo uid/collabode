@@ -87,10 +87,21 @@ body.fullwidth #editorpage { width: auto; margin-left: 6px; margin-right: 6px; }
 
 #padeditor { margin-left: 260px; zoom: 1; }
 
+#connstatusconnecting {
+	position: absolute; height: 22px; width: 22px;
+	background: url(/static/img/eclipse/wst.server.ui.obj.server.gif) no-repeat center center;
+}
+
+#connstatusdisconnected {
+	position: absolute; height: 22px; width: 22px;
+	background: url(/static/img/eclipse/wst.server.ui.lcl.launch_disco.gif) no-repeat center center;
+	display: none;
+}
+
 #syncstatussyncing {
 	position:absolute; height: 22px; width: 22px;
 	background: url(/static/img/eclipse/jdt.ui.lcl.sync.enabled.gif) no-repeat center center;
-	rxight: 18px; xtop: 2px; display: none;
+	display: none;
 }
 #syncstatusdone {
 	float:left; height: 22px; width: 22px;

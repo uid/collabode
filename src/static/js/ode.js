@@ -21,6 +21,17 @@ $(document).ready(function() {
         //$("#syncstatussyncing").css('display', 'none');
         //$("#syncstatusdone").css('display', 'block').fadeOut(1000);
       }
+    },
+    
+    onChannelStateChange: function(state, info) {
+      if (state == "CONNECTED") {
+        $("#connstatusconnecting").css('display', 'none');
+        $("#connstatusdisconnected").css('display', 'none');
+      } else if (state == "DISCONNECTED") {
+        $("#connstatusdisconnected").css('display', 'block');
+      } else {
+        $("#connstatusconnecting").css('display', 'block'); // XXX can this happen?
+      }
     }
     
   };
@@ -44,4 +55,5 @@ $(document).ready(function() {
                                testor);
     
   collab.setOnInternalAction(pad.onCollabAction);
+  collab.setOnChannelStateChange(pad.onChannelStateChange);
 });
