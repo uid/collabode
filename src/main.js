@@ -73,18 +73,18 @@ function handlePath() {
     get.addLocations([
         [PrefixMatcher('/static/'), forward(static_control)],
         ['/', editor_control.render_root],
-        [/^\/run\/(\w+)\/(.+)$/, run_control.render_run],
-        [/^\/test\/(\w+)\/(.+)$/, run_control.render_test],
-        [/^\/delete\/(\w+)\/(.+)$/, editor_control.render_confirm_delete],
-        [/^\/(\w+)\/?$/, editor_control.render_project],
-        [/^\/(\w+)\/(.+)$/, editor_control.render_path]
+        [_file('run'), run_control.render_run],
+        [_file('test'), run_control.render_test],
+        [_file('delete'), editor_control.render_confirm_delete],
+        [_proj(), editor_control.render_project],
+        [_file(), editor_control.render_path]
     ]);
     
     var post = new Dispatcher();
     post.addLocations([
-        [/^\/delete\/(\w+)\/(.+)$/, editor_control.delete_path],
-        [/^\/(\w+)\/?$/, editor_control.create_project],
-        [/^\/(\w+)\/(.+)$/, editor_control.create_path]
+        [_file('delete'), editor_control.delete_path],
+        [_proj(), editor_control.create_project],
+        [_file(), editor_control.create_path]
     ]);
     
     var dispatchers = { GET: get, POST: post };
@@ -94,4 +94,12 @@ function handlePath() {
     }
     
     // XXX 404
+}
+
+function _proj(verb) {
+  return new RegExp("^" + (verb ? "/" + verb : "") + "/([\\w-\\.]+)/?$")
+}
+
+function _file(verb) {
+  return new RegExp("^" + (verb ? "/" + verb : "") + "/([\\w-\\.]+)/(.+)$")
 }
