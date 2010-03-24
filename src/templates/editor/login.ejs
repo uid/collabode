@@ -1,0 +1,21 @@
+<% helpers.setHtmlTitle("Log in") %>
+<% helpers.includeCss("editor_ejs.css") %>
+
+<div id="editorpage">
+
+<%= helpers.renderPartial("docbar", { project: "Log in" }) %>
+
+<div id="padmain">
+  <div id="padeditor">
+    <form id="wizardcontainerbox" method="post">
+      <h1>Please log in</h1>
+      <p>Username: <input name="username"/></p>
+      
+      <div id="wizardbottom">
+        <button type="submit">Login</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+</div>

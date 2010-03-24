@@ -1,5 +1,5 @@
 <td>
-<img src="/static/img/eclipse/ui.obj.file.gif"><br/>
-<%= item.getName() %><br/>
+<a href="<%= item.getFullPath() %>"><img src="/static/img/eclipse/ui.obj.file.gif"><br/>
+<%= item.getName() %></a><br/>
 <a class="delete" href="/delete<%= item.getFullPath() %>">Delete</a>
 </td>

@@ -1,11 +1,20 @@
 import("fileutils.{readFile,fileLastModified}");
 import("ejs.EJS");
+import("sessions");
 
 import("helpers");
+
+function getSession() {
+  return sessions.getSession({
+    cookieName: "ode",
+    domain: request.domain.indexOf(".") < 0 ? undefined : "." + request.domain
+  });
+}
 
 function renderTemplateAsString(filename, data) {
   data = data || {};
   data.helpers = helpers; // global helpers
+  data.session = getSession();
 
   var f = "/templates/"+filename;
   if (! appjet.scopeCache.ejs) {

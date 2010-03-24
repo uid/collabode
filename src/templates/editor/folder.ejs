@@ -3,12 +3,7 @@
 
 <div id="editorpage">
 
-<div id="editortop">
-  <div id="docbar">
-    <div id="docbarproject"><span><%= project.getName() %></span></div>
-    <div id="docbarfile"><span><%= folder.getProjectRelativePath() %></span></div>
-  </div>
-</div>
+<%= helpers.renderPartial("docbar", { project: project.getName(), file: folder.getProjectRelativePath() }) %>
 
 <div id="sidebarbox">
   <div class="sidebarsection">

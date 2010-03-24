@@ -3,11 +3,7 @@
 
 <div id="editorpage">
 
-<div id="editortop">
-  <div id="docbar">
-    <div id="docbarproject"><span><%= project.getName() %></span></div>
-  </div>
-</div>
+<%= helpers.renderPartial("docbar", { project: project.getName() }) %>
 
 <div id="sidebarbox">
   <div class="sidebarsection">

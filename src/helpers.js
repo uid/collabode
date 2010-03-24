@@ -184,3 +184,7 @@ function renderView(name, item) {
     item: item
   });
 }
+
+function renderPartial(name, data) {
+  return renderTemplateAsString(name + ".ejs", data);
+}

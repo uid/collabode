@@ -16,6 +16,7 @@ function render_root() {
   renderHtml("editor/root.ejs", {
     projects: workspace.listProjects()
   });
+  return true;
 }
 
 function render_project(projectname) {

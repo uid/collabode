@@ -2,7 +2,10 @@ import("dispatch.{Dispatcher,PrefixMatcher,forward}");
 import("fastJSON");
 import("sqlbase.sqlcommon");
 
+import("utils");
+
 import("control.static_control");
+import("control.auth_control");
 import("control.editor_control");
 import("control.run_control");
 
@@ -67,33 +70,53 @@ serverhandlers.cometHandler = function(op, id, data) {
 };
 
 function handlePath() {
-    response.neverCache();
-    
-    var get = new Dispatcher();
-    get.addLocations([
-        [PrefixMatcher('/static/'), forward(static_control)],
-        ['/', editor_control.render_root],
-        [_file('run'), run_control.render_run],
-        [_file('test'), run_control.render_test],
-        [_file('delete'), editor_control.render_confirm_delete],
-        [_proj(), editor_control.render_project],
-        [_file(), editor_control.render_path]
-    ]);
-    
-    var post = new Dispatcher();
-    post.addLocations([
-        [_file('delete'), editor_control.delete_path],
-        [_proj(), editor_control.create_project],
-        [_file(), editor_control.create_path]
-    ]);
-    
-    var dispatchers = { GET: get, POST: post };
-    
-    if (dispatchers[request.method].dispatch()) {
-        return;
-    }
-    
-    // XXX 404
+  response.neverCache();
+
+  var noauth = {
+    GET: new Dispatcher(),
+    POST: new Dispatcher()
+  };
+  noauth.GET.addLocations([
+    [PrefixMatcher('/static/'), forward(static_control)],
+    ['/', editor_control.render_root],
+    [PrefixMatcher('/login:'), auth_control.render_login],
+    ['/logout', auth_control.logout]
+  ]);
+  noauth.POST.addLocations([
+    [/^\/login:(.*)$/, auth_control.login]
+  ]);
+  
+  if (noauth[request.method].dispatch()) {
+    return;
+  }
+  
+  if ( ! utils.getSession().userId) {
+    response.redirect('/login:' + request.path);
+    return;
+  }
+  
+  var authed = {
+    GET: new Dispatcher(),
+    POST: new Dispatcher()
+  }
+  authed.GET.addLocations([
+    [_file('run'), run_control.render_run],
+    [_file('test'), run_control.render_test],
+    [_file('delete'), editor_control.render_confirm_delete],
+    [_proj(), editor_control.render_project],
+    [_file(), editor_control.render_path]
+  ]);
+  authed.POST.addLocations([
+    [_file('delete'), editor_control.delete_path],
+    [_proj(), editor_control.create_project],
+    [_file(), editor_control.create_path]
+  ]);
+  
+  if (authed[request.method].dispatch()) {
+    return;
+  }
+  
+  // XXX 404
 }
 
 function _proj(verb) {
