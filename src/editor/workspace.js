@@ -80,6 +80,8 @@ function _updatePadStyle(username, file, len, ops) {
   });
 }
 
+const everyone = "pool.everyone";
+
 function accessDocumentPad(username, file) {
   Workspace.createDocument(username, file);
   

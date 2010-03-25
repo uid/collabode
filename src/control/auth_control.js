@@ -8,13 +8,16 @@ function render_login() {
 }
 
 function login(destination) {
-  getSession().userId = request.params.username.toLowerCase();
+  var username = request.params.username.replace(/\s+/g, '').toLowerCase();
+  getSession().userId = "u." + username;
+  getSession().userName = username;
   response.redirect(destination);
   return true;
 }
 
 function logout() {
   delete getSession().userId;
+  delete getSession().userName;
   response.redirect('/');
   return true;
 }

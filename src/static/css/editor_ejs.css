@@ -65,6 +65,16 @@ body.fullwidth #editorpage { width: auto; margin-left: 6px; margin-right: 6px; }
 	float:left; height:22px; width:22px; margin:0 4px;
 }
 
+#docbartools p { /* XXX should match annotation popups in ace/editor.css */
+	font-size: 11px; line-height: 16px;
+	text-align: left;
+	font-family: Arial, sans-serif;
+	position:absolute; color:#333; background:#ffe; border:1px solid #333; padding:1px 4px;
+	opacity:.95; -webkit-box-shadow: 0 4px 6px #999;
+	z-index: 100;
+	margin-top: 22px;
+}
+
 #sidebarbox {
 	position: absolute;
 	margin-top: 6px;

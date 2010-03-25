@@ -89,8 +89,7 @@ function render_path(projectname, filename) {
 }
 
 function _render_file(project, file, projectfiles) {
-  var userId = "anon"; // XXX
-  var padId = workspace.accessDocumentPad(userId, file);
+  var padId = workspace.accessDocumentPad(workspace.everyone, file);
   
   model.accessPadGlobal(padId, function(pad) {
     helpers.addClientVars({
@@ -99,7 +98,8 @@ function _render_file(project, file, projectfiles) {
       initialRevisionList: revisions.getRevisionList(pad),
       serverTimestamp: +(new Date),
       initialOptions: pad.getPadOptionsObj(),
-      userId: userId,
+      userId: getSession().userId,
+      userName: getSession().userName,
       opts: {}
     });
   });
