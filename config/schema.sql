@@ -100,8 +100,7 @@ CREATE TABLE PAD_SQLMETA (
   "creationTime" timestamp NOT NULL,
   "version" int NOT NULL,
   "headRev" int NOT NULL,
-  PRIMARY KEY  ("id"),
-  unique ("version")
+  PRIMARY KEY  ("id")
 );
 
 CREATE TABLE "pad_guests" (
