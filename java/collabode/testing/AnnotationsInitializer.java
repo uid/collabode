@@ -8,19 +8,16 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.*;
 
 import collabode.Application;
-import collabode.Debug;
 
 public class AnnotationsInitializer extends ClasspathContainerInitializer {
     
     private final String libPath;
     
     public AnnotationsInitializer() throws IOException {
-        Debug.here();
         libPath = Application.bundleResourcePath("inject-bin"); // XXX
     }
 
     public void initialize(final IPath containerPath, IJavaProject project) throws CoreException {
-        Debug.here();
         final IClasspathEntry[] entry = {
                 JavaCore.newLibraryEntry(new Path(libPath), null, null)
         };

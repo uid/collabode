@@ -44,7 +44,6 @@ public class ProjectTestsOwner {
      * Reports any change.
      */
     void update(ITestCaseElement elt) {
-        System.out.println("update " + elt);
         Test test = new Test(elt);
         TestResult result = new TestResult(elt, project);
         if ( ! results.containsKey(test)) {
