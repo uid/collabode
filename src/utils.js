@@ -1,14 +1,28 @@
 import("fileutils.{readFile,fileLastModified}");
 import("ejs.EJS");
 import("sessions");
+import("jsutils.eachProperty");
 
 import("helpers");
+
+jimport("net.appjet.oui.JarVirtualFile");
 
 function getSession() {
   return sessions.getSession({
     cookieName: "ode",
     domain: request.domain.indexOf(".") < 0 ? undefined : "." + request.domain
   });
+}
+
+function renderFirstTemplateAsString(filenames, data) {
+  var html = "";
+  eachProperty(filenames, function(i, filename) {
+    if (new JarVirtualFile("/templates/"+filename).exists()) {
+      html = renderTemplateAsString(filename, data);
+      return false;
+    }
+  });
+  return html;
 }
 
 function renderTemplateAsString(filename, data) {
@@ -38,4 +52,8 @@ function renderHtml(bodyFileName, data) {
   if (request.acceptsGzip) {
     response.setGzip(true);
   }
+}
+
+function camelToUnderscore(camel) {
+  return camel.replace(/[A-Z]/, function(m) { return '_'+m.toLowerCase(); });
 }

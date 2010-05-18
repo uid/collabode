@@ -1,5 +1,5 @@
 <% helpers.setHtmlTitle([ project.getName(), file.getProjectRelativePath() ]) %>
-<% filetype.split("/").forEach(helpers.addBodyClass) %>
+<% helpers.addBodyClass(filetype) %>
 <% helpers.includeCss("editor_ejs.css") %>
 <% helpers.includeCometJs() %>
 <% helpers.includeJQuery() %>
@@ -22,7 +22,6 @@
     <div id="syncstatussyncing" title="Saving"><!-- --></div>
     <div id="syncstatusdone" title="Saved"><!-- --></div>
     <a href="javascript:alert('save now')" id="savenow" title="Save now"></a>
-    <a href="javascript:alert('run')" id="run" title="Run"></a>
   </div>
 </div>
 
@@ -43,6 +42,10 @@
       </select>
     </div>
   </div>
+</div>
+
+<div id="additions">
+  <%= additions %>
 </div>
 
 </div>

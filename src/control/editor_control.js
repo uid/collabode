@@ -104,11 +104,17 @@ function _render_file(project, file, projectfiles) {
     });
   });
   
+  var filetype = workspace.getContentTypeName(padId);
+  var additions = renderFirstTemplateAsString([ "editor/file/" + camelToUnderscore(filetype) + ".ejs" ], {
+    project: project,
+    file: file
+  });
   renderHtml("editor/file.ejs", {
     project: project,
     file: file,
     projectfiles: projectfiles,
-    filetype: workspace.getContentTypeName(padId)
+    filetype: filetype,
+    additions: additions
   });
   return true;
 }

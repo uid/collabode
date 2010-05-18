@@ -208,6 +208,10 @@ body.fullwidth #editorpage { width: auto; margin-left: 6px; margin-right: 6px; }
 	background: url(/static/img/eclipse/ui.tool.delete.enabled.gif) no-repeat left;
 }
 
+#additions {
+	display: none;
+}
+
 .test {
 	border-width:1px;
 	border-style:solid;
@@ -276,19 +280,19 @@ body.fullwidth #editorpage { width: auto; margin-left: 6px; margin-right: 6px; }
 	top:10px;
 	right:13px;
 }
-.javaTest .test.new button {
+.editingTest .test.new button {
 	visibility: visible;
 }
 .test.new button div:after {
 	content: "Needs impl";
 }
-.javaImpl .test.needsimpl button {
+.editingImpl .test.needsimpl button {
 	visibility: visible;
 }
 .test.needsimpl button div:after {
 	content: "Needs review";
 }
-.javaTest .test.needsreview button {
+.editingTest .test.needsreview button {
 	visibility: visible;
 }
 .test.needsreview button div:after {

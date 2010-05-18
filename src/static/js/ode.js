@@ -1,4 +1,7 @@
 $(document).ready(function() {
+  $("#additions .docbarbutton").appendTo("#docbartools");
+  $("#additions .sidebarsection").appendTo("#sidebarbox");
+  
   var ace = new Ace2Editor();
   ace.init("editorcontainer", "", function() {
     $("#editorloadingbox").hide();

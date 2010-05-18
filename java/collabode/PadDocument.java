@@ -54,8 +54,7 @@ public class PadDocument extends Document {
     }
     
     /**
-     * Returns informal names for this document's preferred content type(s).
-     * Multiple names will be separated by "/".
+     * Returns an informal name for this document's preferred content type.
      */
     public String getContentTypeName() {
         try {
