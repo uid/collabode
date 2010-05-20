@@ -8,12 +8,9 @@ $(document).ready(function() {
     ace.focus();
   });
   
+  Layout.onResize = ace.adjustSize;
+  
   var pad = {
-      
-    onResize: function() {
-      $(".autoresized").height($(window).height() - $("#editorcontainerbox").offset().top - 60);
-      ace.adjustSize();
-    },
     
     onCollabAction: function(action) {
       if (action == "commitPerformed") {
@@ -38,10 +35,6 @@ $(document).ready(function() {
     }
     
   };
-  
-  $(window).bind('resize', pad.onResize);
-  pad.onResize();
-  setInterval(function() { pad.onResize(); }, 5000); // XXX just in case?
   
   var user = {
     userId: clientVars.userId,
