@@ -100,7 +100,8 @@ function handlePath() {
     POST: new Dispatcher()
   }
   authed.GET.addLocations([
-    [_file('run'), run_control.render_run],
+    [_file('runfile'), run_control.render_run_file],
+    [_file('run'), run_control.render_run_type],
     [_file('test'), run_control.render_test],
     [_file('delete'), editor_control.render_confirm_delete],
     [_proj(), editor_control.render_project],

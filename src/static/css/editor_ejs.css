@@ -120,6 +120,8 @@ body.fullwidth #editorpage { width: auto; margin-left: 6px; margin-right: 6px; }
 
 #padeditor { margin-left: 260px; zoom: 1; }
 
+body.nosidebar #padeditor { margin-left: 0; }
+
 #connstatusconnecting {
 	position: absolute; height: 22px; width: 22px;
 	background: url(/static/img/eclipse/wst.server.ui.obj.server.gif) no-repeat center center;
@@ -148,6 +150,9 @@ body.fullwidth #editorpage { width: auto; margin-left: 6px; margin-right: 6px; }
 }
 #run {
 	background: url(/static/img/eclipse/jdt.debug.ui.tool.run.disabled.gif) no-repeat center center;
+}
+#run.enabled {
+	background: url(/static/img/eclipse/jdt.debug.ui.tool.run.enabled.gif) no-repeat center center;
 }
 
 #editorcontainerbox {

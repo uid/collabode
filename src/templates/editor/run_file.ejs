@@ -1,0 +1,29 @@
+<% helpers.setHtmlTitle([ project.getName(), file.getProjectRelativePath() ]) %>
+<% helpers.addBodyClass("fullwidth") %>
+<% helpers.addBodyClass("nosidebar") %>
+<% helpers.includeCss("editor_ejs.css") %>
+<% helpers.includeJQuery() %>
+<% helpers.includeJs("layout.js") %>
+
+<div id="editorpage">
+
+<%= helpers.renderPartial("docbar", { project: project.getName(), file: typename }) %>
+
+<div id="docbaroverlay">
+  <div id="docbartools">
+    <a href="/runfile<%= file.getFullPath() %>" id="run" class="docbarbutton enabled" title="Run Again"></a>
+  </div>
+</div>
+
+<div id="padmain">
+  <div id="padeditor">
+    <div id="wizardcontainerbox" class="autoresized">
+      <h1>Console output</h1>
+      <p></p>
+      <iframe src="/run/<%= project.getName() %>/<%= typename %>" style="width:100%; height:90%; border:none">
+      </iframe>
+    </div>
+  </div>
+</div>
+
+</div>

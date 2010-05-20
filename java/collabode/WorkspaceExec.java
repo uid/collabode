@@ -8,20 +8,16 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import net.appjet.oui.ResponseWrapper;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.debug.core.DebugPlugin;
-import org.eclipse.debug.core.ILaunch;
-import org.eclipse.debug.core.ILaunchConfigurationType;
-import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
-import org.eclipse.debug.core.ILaunchManager;
-import org.eclipse.debug.core.ILaunchesListener2;
-import org.eclipse.debug.core.IStreamListener;
+import org.eclipse.debug.core.*;
 import org.eclipse.debug.core.model.IProcess;
 import org.eclipse.debug.core.model.IStreamMonitor;
+import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
@@ -33,7 +29,7 @@ import org.eclipse.jdt.junit.model.ITestRunSession;
 import org.eclipse.jdt.launching.IJavaLaunchConfigurationConstants;
 
 /**
- * Run main methods and execute tests.
+ * Run main methods and execute tests. XXX refactor?
  */
 public class WorkspaceExec {
     
@@ -41,6 +37,10 @@ public class WorkspaceExec {
     
     private static final LaunchesListener LISTENER = new LaunchesListener();
     private static final TestsListener RESULTS = new TestsListener();
+    
+    public static String getClass(IProject project, IFile file) {
+        return ((ICompilationUnit)JavaCore.create(file)).findPrimaryType().getFullyQualifiedName();
+    }
     
     /**
      * Run a main method. XXX refactor?
