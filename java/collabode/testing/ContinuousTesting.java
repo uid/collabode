@@ -2,9 +2,7 @@ package collabode.testing;
 
 import java.io.IOException;
 import java.util.Collections;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -33,7 +31,7 @@ public class ContinuousTesting implements Runnable {
     }
     
     private final BlockingQueue<IProject> toRun = new LinkedBlockingQueue<IProject>();
-    private final BlockingQueue<ILaunch> done = new LinkedBlockingQueue<ILaunch>();
+    private final ConcurrentMap<ILaunch, CountDownLatch> latches = new ConcurrentHashMap<ILaunch, CountDownLatch>();
     
     private ContinuousTesting() {
         DebugPlugin.getDefault().getLaunchManager().addLaunchListener(new ILaunchesListener2() {
@@ -42,7 +40,8 @@ public class ContinuousTesting implements Runnable {
             public void launchesChanged(ILaunch[] launches) { }
             public void launchesTerminated(ILaunch[] launches) {
                 for (ILaunch launch : launches) {
-                    done.add(launch);
+                    latches.putIfAbsent(launch, new CountDownLatch(0));
+                    latches.get(launch).countDown();
                 }
             }
         });
@@ -108,11 +107,10 @@ public class ContinuousTesting implements Runnable {
     }
     
     private void awaitTermination(ILaunch target) throws InterruptedException {
-        ILaunch launch = done.poll(1, TimeUnit.MINUTES);
-        if (launch == null) {
+        latches.putIfAbsent(target, new CountDownLatch(1));
+        boolean terminated = latches.get(target).await(1, TimeUnit.MINUTES);
+        if ( ! terminated) {
             throw new InterruptedException("launch took too long"); // XXX actually, terminate it
-        } else if ( ! target.equals(launch)) {
-            throw new InterruptedException("what happened here?"); // XXX shouldn't happen until launches are ||ized
         }
     }
 }
