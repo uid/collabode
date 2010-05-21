@@ -91,7 +91,7 @@ public class ContinuousTesting implements Runnable {
     private ILaunch launch(IJavaProject project) throws CoreException, IOException, InterruptedException {
         ILaunchManager mgr = DebugPlugin.getDefault().getLaunchManager();
         ILaunchConfigurationType type = mgr.getLaunchConfigurationType("org.eclipse.jdt.junit.launchconfig");
-        ILaunchConfigurationWorkingCopy config = type.newInstance(null, "Continuous Test: " + project.getElementName());
+        ILaunchConfigurationWorkingCopy config = type.newInstance(null, "Continuous Test " + project.getElementName());
         config.setAttribute(IJavaLaunchConfigurationConstants.ATTR_PROJECT_NAME, project.getElementName());
         config.setAttribute(IJavaLaunchConfigurationConstants.ATTR_MAIN_TYPE_NAME, "");
         config.setAttribute("org.eclipse.jdt.junit.KEEPRUNNING_ATTR", false);
