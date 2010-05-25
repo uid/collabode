@@ -131,7 +131,7 @@ public class PadDocument extends Document {
     public synchronized void revise(String text) {
         try {
             revising.set(true);
-            set(text);
+            set(text.substring(0, text.length()-1));
         } finally {
             revising.set(false);
         }
