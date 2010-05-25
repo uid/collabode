@@ -913,6 +913,7 @@ function OUTER(gscope) {
           $(tip).fadeOut(100);
         });
       } else {
+        $(d).toggleClass(annotation.severity + "Annotation", true);
         $('p', d).append("<br/>"+annotation.message);
       }
     });
