@@ -13,9 +13,9 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.application.WorkbenchAdvisor;
 import org.osgi.framework.Bundle;
-
-import scala.Console;
 
 import collabode.testing.ContinuousTesting;
 
@@ -36,9 +36,12 @@ public class Application implements IApplication {
                 "--configFile=" + bundleResourcePath("config/collabode.properties") });
         setupTesting();
         
-        while ( ! "quit".equals(Console.readLine())); // XXX
+        PlatformUI.createAndRunWorkbench(PlatformUI.createDisplay(), new WorkbenchAdvisor() {
+            @Override public boolean openWindows() { return true; } // XXX no window
+            public String getInitialWindowPerspectiveId() { return null; }
+        });
         
-        return null;
+        return IApplication.EXIT_OK;
     }
 
     public void stop() {
