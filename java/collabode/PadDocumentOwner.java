@@ -48,8 +48,6 @@ public class PadDocumentOwner extends WorkingCopyOwner {
         } else {
             documents.put(path, new PadDocument(this, file));
         }
-        
-        PadFunctions.create.apply(username, file, documents.get(path).get());
     }
     
     @Override public synchronized IBuffer createBuffer(final ICompilationUnit workingCopy) {

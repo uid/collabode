@@ -92,6 +92,7 @@ function accessPadGlobal(padId, padFunc, rwMode) {
   return doWithPadLock(padId, function() {
     return sqlcommon.inTransaction(function() {
       var meta = _getPadMetaData(padId); // null if pad doesn't exist yet
+      var pdsyncing = false;
 
       if (meta && ! meta.status) {
         meta.status = { validated: false };
@@ -129,7 +130,7 @@ function accessPadGlobal(padId, padFunc, rwMode) {
 
         updateCoarseChangesets(true);
         
-        if (textChanged) { // XXX avoids infinite loop on style updates
+        if ( ( ! pad.pdsyncing()) && textChanged) { // XXX avoids infinite loop
           execution.scheduleTask("dbwriter_infreq", "reviseDocument", 0, [padId]);
         }
       }
@@ -324,6 +325,12 @@ function accessPadGlobal(padId, padFunc, rwMode) {
       var revmeta = _getPadStringArray(padId, "revmeta");
       return new Date(revmeta.getJSONEntry(r).t);
     },
+    pdsync: function(padSyncFunc) {
+      pdsyncing = true;
+      padSyncFunc();
+      pdsyncing = false;
+    },
+    pdsyncing: function() { return pdsyncing; },
     // note: calls like appendRevision will NOT notify clients of the change!
     // you must go through collab_server.
     // Also, be sure to run cleanText() on any text to strip out carriage returns

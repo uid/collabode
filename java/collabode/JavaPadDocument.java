@@ -68,6 +68,8 @@ public class JavaPadDocument extends PadDocument implements IBuffer {
                 syntaxColor(event.fOffset, event.fLength);
             }
         });
+        
+        syntaxColor(0, getLength());
     }
     
     private void notifyListeners(int offset, int length, String text) {
@@ -96,7 +98,7 @@ public class JavaPadDocument extends PadDocument implements IBuffer {
         // XXX need to update with an initial keep operation
         // XXX also assumes consecutive regions, is that always true?
         
-        PadFunctions.updateStyle.apply(owner.username, file, getLength(), new Iterator<ChangeSetOp>() {
+        PadFunctions.syncStyle.apply(owner.username, file, getLength(), new Iterator<ChangeSetOp>() {
             private ChangeSetOp rest = null;
             public boolean hasNext() {
                 return rest != null || it.hasNext();

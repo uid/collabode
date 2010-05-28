@@ -13,10 +13,9 @@ jimport("collabode.testing.ProjectTestsOwner");
 jimport("java.lang.System");
 
 function onStartup() {
-  PadFunctions.bind(scalaFn(3, _createPad),
-                    //scalaFn(3, _setPadContents),
+  PadFunctions.bind(scalaFn(3, _pdsyncPadText),
+                    scalaFn(4, _pdsyncPadStyle),
                     scalaFn(3, _reportPadProblems),
-                    scalaFn(4, _updatePadStyle),
                     scalaFn(3, _reportTestResult));
 }
 
@@ -36,24 +35,28 @@ function _padIdFor(username, file) {
   return username + "@" + file.getFullPath();
 }
 
-function _createPad(username, file, initialText) {
+function _pdsyncPadText(username, file, txt) { // XXX should take revisions, not full text
   model.accessPadGlobal(_padIdFor(username, file), function(pad) {
-    if (pad.exists()) {
-      collab_server.setPadText(pad, initialText);
-    } else {
-      pad.create(initialText);
-    }
+    pad.pdsync(function() {
+      collab_server.setPadText(pad, txt);
+    });
   });
-  return true;
 }
 
-//function _setPadContents(username, file, newText) {
-//  //System.out.println("_setPadContents " + username + " " + file);
-//  model.accessPadGlobal(_padIdFor(username, file), function(pad) {
-//    collab_server.setPadText(pad, newText);
-//  });
-//  return true;
-//}
+function _pdsyncPadStyle(username, file, len, ops) {
+  model.accessPadGlobal(_padIdFor(username, file), function(pad) {
+    var apool = pad.pool();
+    var builder = Changeset.builder(pad.text().length); // XXX ignoring len
+    while (ops.hasNext()) {
+      var op = ops.next();
+      builder.keep(op.chars, op.lines, op.attribs.map(function(a) { return a.slice(); }), apool);
+    }
+    var changeset = builder.toString();
+    pad.pdsync(function () {
+      collab_server.applyChangesetToPad(pad, changeset, "#syntaxcolor");
+    });
+  });
+}
 
 function _reportPadProblems(username, file, problems) {
   model.accessPadGlobal(_padIdFor(username, file), function(pad) {
@@ -67,31 +70,18 @@ function _reportPadProblems(username, file, problems) {
   });
 }
 
-function _updatePadStyle(username, file, len, ops) {
-  model.accessPadGlobal(_padIdFor(username, file), function(pad) {
-    var apool = pad.pool();
-    var builder = Changeset.builder(pad.text().length); // XXX ignoring len
-    while (ops.hasNext()) {
-      var op = ops.next();
-      builder.keep(op.chars, op.lines, op.attribs.map(function(a) { return a.slice(); }), apool);
-    }
-    var changeset = builder.toString();
-    collab_server.applyChangesetToPad(pad, changeset, "#syntaxcolor");
-  });
-}
-
 const everyone = "pool.everyone";
 
 function accessDocumentPad(username, file) {
-  Workspace.createDocument(username, file);
-  
   var padId = _padIdFor(username, file);
   
   model.accessPadGlobal(padId, function(pad) {
     if ( ! pad.exists()) {
-      System.err.println("  accessing nonexistent pad " + padId);
+      pad.create();
     }
   });
+  
+  Workspace.createDocument(username, file);
   
   return padId;
 }
@@ -109,7 +99,6 @@ function taskReviseDocument(padId) {
 
 function onNewEditor(padId, connectionId) {
   var doc = _getDocument(padId);
-  doc.emptyRevise(); // XXX
   ProjectTestsOwner.of(doc.getProject()).reportResults(scalaFn(2, function(test, result) {
     collab_server.updateClientTestResult(connectionId, test, result);
   }));

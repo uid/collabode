@@ -47,6 +47,8 @@ public class PadDocument extends Document {
                 commit(false);
             }
         });
+        
+        PadFunctions.syncText.apply(owner.username, file, get());
     }
     
     public IProject getProject() {
@@ -107,19 +109,6 @@ public class PadDocument extends Document {
             file.setContents(new ByteArrayInputStream(get().getBytes()), false, true, null);
         } catch (CoreException ce) {
             ce.printStackTrace(); // XXX
-        }
-    }
-    
-    /**
-     * Perform an empty revision. XXX
-     * @throws BadLocationException 
-     */
-    public void emptyRevise() throws BadLocationException {
-        try {
-            revising.set(true);
-            replace(0, 0, "");
-        } finally {
-            revising.set(false);
         }
     }
     
