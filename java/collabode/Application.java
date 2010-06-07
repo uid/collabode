@@ -13,6 +13,8 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.application.WorkbenchAdvisor;
 import org.osgi.framework.Bundle;
@@ -25,6 +27,7 @@ public class Application implements IApplication {
      * The Collabode bundle.
      */
     public static Bundle BUNDLE;
+    public static Shell SHELL;
 
     public Object start(IApplicationContext context) throws Exception {
         BUNDLE = Platform.getBundle("collabode.etherpad");
@@ -36,9 +39,11 @@ public class Application implements IApplication {
                 "--configFile=" + bundleResourcePath("config/collabode.properties") });
         setupTesting();
         
-        PlatformUI.createAndRunWorkbench(PlatformUI.createDisplay(), new WorkbenchAdvisor() {
+        final Display display = PlatformUI.createDisplay();
+        PlatformUI.createAndRunWorkbench(display, new WorkbenchAdvisor() {
             @Override public boolean openWindows() { return true; } // XXX no window
             public String getInitialWindowPerspectiveId() { return null; }
+            @Override public void postStartup() { SHELL = new Shell(display); } // XXX maybe one window
         });
         
         return IApplication.EXIT_OK;
