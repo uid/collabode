@@ -20,6 +20,6 @@ public class Debug {
     }
     
     private static String clean(StackTraceElement point) {
-        return point.toString().replace(Debug.class.getPackage().getName() + ".", "");
+        return point.toString().replaceAll(Debug.class.getPackage().getName() + "(\\.[a-z]+)*\\.", "");
     }
 }
