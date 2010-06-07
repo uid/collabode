@@ -2,6 +2,8 @@ package collabode;
 
 import java.io.IOException;
 
+import net.appjet.ajstdlib.execution;
+
 import org.eclipse.core.resources.*;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -11,12 +13,9 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.launching.JavaRuntime;
-import org.eclipse.jdt.ui.PreferenceConstants;
-import org.eclipse.jdt.ui.text.JavaTextTools;
 
 public class Workspace {
     private static IWorkspace WORKSPACE;
-    private static JavaTextTools JAVA_TEXT_TOOLS;
     
     public static synchronized IWorkspace getWorkspace() {
         if (WORKSPACE == null) {
@@ -24,14 +23,6 @@ public class Workspace {
             WORKSPACE = ResourcesPlugin.getWorkspace();
         }
         return WORKSPACE;
-    }
-    
-    public static synchronized JavaTextTools getJavaTextTools() {
-        if (JAVA_TEXT_TOOLS == null) {
-            // XXX maybe need to PreferenceConstants.initializeDefaultValues?
-            JAVA_TEXT_TOOLS = new JavaTextTools(PreferenceConstants.getPreferenceStore());
-        }
-        return JAVA_TEXT_TOOLS;
     }
     
     public static IProject[] listProjects() {
@@ -87,5 +78,12 @@ public class Workspace {
                 // XXX collabode inject
         };
         javaProject.setRawClasspath(entries, null);
+    }
+    
+    /**
+     * Schedule a JavaScript task for execution with no delay.
+     */
+    static void scheduleTask(String taskName, Object... args) {
+        execution.scheduleTaskInPool("dbwriter_infreq", taskName, 0, args); // XXX maybe a different pool?
     }
 }

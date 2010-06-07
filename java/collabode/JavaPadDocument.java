@@ -8,10 +8,9 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.*;
 import org.eclipse.jdt.core.compiler.IProblem;
-import org.eclipse.jdt.ui.text.IJavaPartitions;
+import org.eclipse.jdt.core.dom.AST;
+import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jface.text.*;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.StyleRange;
 
 import scala.Function1;
 
@@ -24,6 +23,8 @@ public class JavaPadDocument extends PadDocument implements IBuffer {
     
     private boolean closed = false;
     private final Set<IBufferChangedListener> listeners = new HashSet<IBufferChangedListener>();
+    
+    private final Set<JavaPadReconcileListener> reconciles = new HashSet<JavaPadReconcileListener>();
     
     /**
      * {@link IProblemRequestor} for this document. Returned by
@@ -58,18 +59,13 @@ public class JavaPadDocument extends PadDocument implements IBuffer {
         super(owner, file);
         this.workingCopy = workingCopy;
         
-        Workspace.getJavaTextTools().setupJavaDocumentPartitioner(this, IJavaPartitions.JAVA_PARTITIONING);
-        
-        super.addDocumentListener(new IDocumentListener() {
+        super.addPrenotifiedDocumentListener(new IDocumentListener() {
             public void documentAboutToBeChanged(DocumentEvent event) { }
             public void documentChanged(final DocumentEvent event) {
                 notifyListeners(event.fOffset, event.fLength, event.fText);
                 reconcileWorkingCopy(false);
-                syntaxColor(event.fOffset, event.fLength);
             }
         });
-        
-        syntaxColor(0, getLength());
     }
     
     private void notifyListeners(int offset, int length, String text) {
@@ -78,60 +74,31 @@ public class JavaPadDocument extends PadDocument implements IBuffer {
         }
     }
     
+    public void addReconcileListener(JavaPadReconcileListener listener) {
+        reconciles.add(listener);
+        reconcileWorkingCopy(true);
+    }
+    
     private void reconcileWorkingCopy(boolean forceProblems) {
         try {
-            workingCopy.reconcile(ICompilationUnit.NO_AST, forceProblems, owner, null);
+            CompilationUnit ast = workingCopy.reconcile(AST.JLS3, forceProblems, owner, null);
+            notifyListeners(ast);
         } catch (JavaModelException jme) {
             jme.printStackTrace(); // XXX
         }
     }
     
-    private void syntaxColor(int offset, int length) {
-        if (offset >= getLength()) { return; }
-        length = Math.min(length, getLength() - offset); // XXX needed to handle deletions?
-        
-        TextPresentation pres = owner.presenter.createRepairDescription(new Region(offset, length), this);
-        
-        final Iterator<?> it = pres.getAllStyleRangeIterator();
-        
-        // XXX assumes that we're starting at the beginning of the document
-        // XXX need to update with an initial keep operation
-        // XXX also assumes consecutive regions, is that always true?
-        
-        PadFunctions.syncStyle.apply(owner.username, file, getLength(), new Iterator<ChangeSetOp>() {
-            private ChangeSetOp rest = null;
-            public boolean hasNext() {
-                return rest != null || it.hasNext();
-            }
-            public ChangeSetOp next() {
-                if (rest != null) {
-                    ChangeSetOp ret = rest;
-                    rest = null;
-                    return ret;
-                }
-                
-                StyleRange sr = (StyleRange)it.next();
-                try {
-                    String[][] attributes = new String[][] {
-                            {"bold", sr.fontStyle == SWT.BOLD ? "true" : ""},
-                            {"italic", sr.fontStyle == SWT.ITALIC ? "true" : ""}
-                    };
-                    String text = get(sr.start, sr.length);
-                    int lastNewline = text.lastIndexOf('\n');
-                    if (lastNewline < 0) {
-                        return new ChangeSetOp('=', 0, sr.length, attributes);
-                    } else {
-                        rest = new ChangeSetOp('=', 0, sr.length - lastNewline - 1, attributes);
-                        return new ChangeSetOp('=', getNumberOfLines(sr.start, lastNewline), lastNewline + 1, attributes);
-                    }
-                } catch (BadLocationException ble) {
-                    throw new NoSuchElementException(ble.getMessage()); // XXX
-                }
-            }
-            public void remove() {
-                throw new UnsupportedOperationException();
-            }
-        });
+    private void notifyListeners(CompilationUnit ast) {
+        for (JavaPadReconcileListener listener : reconciles) {
+            listener.reconciled(this, ast);
+        }
+    }
+    
+    /**
+     * Update syntax highlighting.
+     */
+    public void changeTextPresentation(TextPresentation presentation) {
+        Workspace.scheduleTask("pdsyncPadStyle", owner.username, file, new ChangeSetOpIterator(this, presentation));
     }
     
     /*

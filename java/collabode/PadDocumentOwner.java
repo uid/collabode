@@ -7,6 +7,8 @@ import java.util.concurrent.ConcurrentMap;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.jdt.core.*;
 
+import collabode.hilite.PadSemanticHighlighter;
+
 /**
  * Stores users' in-memory versions of documents.
  * Also acts as a {@link WorkingCopyOwner} for {@linkplain ICompilationUnit working copies}.
@@ -26,7 +28,6 @@ public class PadDocumentOwner extends WorkingCopyOwner {
     }
     
     final String username;
-    final PadPresentationReconciler presenter = new PadSourceViewerConfig().getPresentationReconciler();
     private final ConcurrentMap<String, PadDocument> documents = new ConcurrentHashMap<String, PadDocument>();
     
     private PadDocumentOwner(String username) {
@@ -45,6 +46,8 @@ public class PadDocumentOwner extends WorkingCopyOwner {
         
         if (JavaCore.isJavaLikeFileName(file.getName())) {
             JavaCore.createCompilationUnitFrom(file).getWorkingCopy(this, null);
+            // now that the Java model is settled, install the highlighter, which causes reconciliation
+            new PadSemanticHighlighter(get(path, JavaPadDocument.class));
         } else {
             documents.put(path, new PadDocument(this, file));
         }
@@ -53,7 +56,7 @@ public class PadDocumentOwner extends WorkingCopyOwner {
     @Override public synchronized IBuffer createBuffer(final ICompilationUnit workingCopy) {
         String path = workingCopy.getPath().toString();
         if (documents.containsKey(path)) {
-            return (JavaPadDocument)documents.get(path);
+            return get(path, JavaPadDocument.class);
         }
         
         JavaPadDocument doc;
@@ -68,7 +71,7 @@ public class PadDocumentOwner extends WorkingCopyOwner {
     }
     
     @Override public IProblemRequestor getProblemRequestor(ICompilationUnit workingCopy) {
-        return ((JavaPadDocument)documents.get(workingCopy.getPath().toString())).problems;
+        return get(workingCopy.getPath().toString(), JavaPadDocument.class).problems;
     }
     
     /**
@@ -77,5 +80,14 @@ public class PadDocumentOwner extends WorkingCopyOwner {
      */
     public PadDocument get(String path) throws IOException {
         return documents.get(path);
+    }
+    
+    /**
+     * Obtain the document of a known type for the given path.
+     * Must already have been {@link #create}d, and of this type.
+     */
+    @SuppressWarnings("unchecked")
+    public <T extends PadDocument> T get(String path, Class<T> clazz) {
+        return (T)documents.get(path);
     }
 }

@@ -14,7 +14,6 @@ jimport("java.lang.System");
 
 function onStartup() {
   PadFunctions.bind(scalaFn(3, _pdsyncPadText),
-                    scalaFn(4, _pdsyncPadStyle),
                     scalaFn(3, _reportPadProblems),
                     scalaFn(3, _reportTestResult));
 }
@@ -39,21 +38,6 @@ function _pdsyncPadText(username, file, txt) { // XXX should take revisions, not
   model.accessPadGlobal(_padIdFor(username, file), function(pad) {
     pad.pdsync(function() {
       collab_server.setPadText(pad, txt);
-    });
-  });
-}
-
-function _pdsyncPadStyle(username, file, len, ops) {
-  model.accessPadGlobal(_padIdFor(username, file), function(pad) {
-    var apool = pad.pool();
-    var builder = Changeset.builder(pad.text().length); // XXX ignoring len
-    while (ops.hasNext()) {
-      var op = ops.next();
-      builder.keep(op.chars, op.lines, op.attribs.map(function(a) { return a.slice(); }), apool);
-    }
-    var changeset = builder.toString();
-    pad.pdsync(function () {
-      collab_server.applyChangesetToPad(pad, changeset, "#syntaxcolor");
     });
   });
 }
@@ -91,9 +75,66 @@ function _getDocument(padId) {
   return PadDocumentOwner.of(username_filename[0]).get(username_filename[1]);
 }
 
-function taskReviseDocument(padId) {
-  model.accessPadGlobal(padId, function(pad) {
-    _getDocument(padId).revise(pad.text()); // XXX need to implement partial revision
+function taskPdsyncDocumentText(padId, cs) {
+  var doc = _getDocument(padId);
+  
+  var unpacked = Changeset.unpack(cs);
+  var csIter = Changeset.opIterator(unpacked.ops);
+  var bankIter = Changeset.stringIterator(unpacked.charBank);
+  var ops = [];
+  
+  // combine consecutive |LxN and xN ops since we don't care about L,
+  // and combine -'s followed by +'s into a single replacement
+  var last = null;
+  while (csIter.hasNext()) {
+    var op = csIter.next();
+    if (last == op.opcode) {
+      ops[ops.length-1].chars += op.chars;
+    } else if ((last == '-') && (op.opcode == '+')) {
+      var del = ops.pop();
+      ops.push({ opcode: 'r', delchars: del.chars, inschars: op.chars });
+      last = 'r';
+    } else if ((last == 'r') && (op.opcode == '+')) {
+      ops[ops.length-1].inschars += op.chars;
+    } else {
+      ops.push({ opcode: op.opcode, chars: op.chars });
+      last = op.opcode;
+    }
+  }
+  
+  var pos = 0;
+  ops.forEach(function(op) {
+    switch (op.opcode) {
+    case 'r':
+      doc.pdsyncReplace(pos, op.delchars, bankIter.take(op.inschars));
+      pos += op.inschars - op.delchars;
+      break;
+    case '+':
+      doc.pdsyncReplace(pos, 0, bankIter.take(op.chars));
+      pos += op.chars;
+      break;
+    case '-':
+      doc.pdsyncReplace(pos, op.chars, "");
+      break;
+    case '=':
+      pos += op.chars;
+      break;
+    }
+  });
+}
+
+function taskPdsyncPadStyle(username, file, iterator) {
+  model.accessPadGlobal(_padIdFor(username, file), function(pad) {
+    var apool = pad.pool();
+    var builder = Changeset.builder(pad.text().length); // XXX ignoring len
+    while (iterator.hasNext()) {
+      var op = iterator.next();
+      builder.keep(op.chars, op.lines, op.attribs.map(function(a) { return a.slice(); }), apool);
+    }
+    var changeset = builder.toString();
+    pad.pdsync(function () {
+      collab_server.applyChangesetToPad(pad, changeset, "#syntaxcolor");
+    });
   });
 }
 

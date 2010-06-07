@@ -79,6 +79,7 @@ domline.createDomLine = function(nonEmpty, doesWrap, optBrowser, optDocument) {
     }
     var href = null;
     var simpleTags = null;
+    var styles = null;
     if (cls.indexOf('url') >= 0) {
       cls = cls.replace(/(^| )url:(\S+)/g, function(x0, space, url) {
 	href = url;
@@ -92,6 +93,13 @@ domline.createDomLine = function(nonEmpty, doesWrap, optBrowser, optDocument) {
 	return space+tag;
       });
     }
+    if (cls.indexOf('foreground') >= 0) {
+      cls = cls.replace(/(^| )foreground:(\S+)/g, function(x0, space, color) {
+        if (! styles) styles = [];
+        styles.push("color:rgb(" + color + ");");
+        return space+"foreground";
+      });
+    }
     if ((! txt) && cls) {
       lineClass = domline.addToLineClass(lineClass, cls);
     }
@@ -102,6 +110,11 @@ domline.createDomLine = function(nonEmpty, doesWrap, optBrowser, optDocument) {
 	extraOpenTags = extraOpenTags+'<a href="'+
 	  href.replace(/\"/g, '&quot;')+'">';
 	extraCloseTags = '</a>'+extraCloseTags;
+      }
+      if (styles) {
+        extraOpenTags = extraOpenTags+'<span style="'+
+          styles.join(' ')+'">';
+        extraCloseTags = '</span>'+extraCloseTags;
       }
       if (simpleTags) {
 	simpleTags.sort();

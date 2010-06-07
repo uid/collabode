@@ -1,5 +1,7 @@
 package collabode;
 
+import java.util.List;
+
 public class ChangeSetOp {
     public final char opcode; // XXX actually ignored
     public final int lines;
@@ -11,6 +13,13 @@ public class ChangeSetOp {
         this.lines = lines;
         this.chars = chars;
         this.attribs = attribs;
+    }
+    
+    ChangeSetOp(char opcode, int lines, int chars, List<String[]> attribs) {
+        this.opcode = opcode;
+        this.lines = lines;
+        this.chars = chars;
+        this.attribs = attribs.toArray(new String[0][]);
     }
 
     @Override public String toString() {

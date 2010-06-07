@@ -38,7 +38,7 @@ public class PadDocument extends Document {
         this.owner = owner;
         this.file = file;
         
-        super.addDocumentListener(new IDocumentListener() {
+        super.addPrenotifiedDocumentListener(new IDocumentListener() {
             public void documentAboutToBeChanged(DocumentEvent event) { }
             public void documentChanged(DocumentEvent event) {
                 if ( ! revising.get()) {
@@ -113,17 +113,16 @@ public class PadDocument extends Document {
     }
     
     /**
-     * Replaces the content of the document with the given text, because the
-     * pad content changed.
-     * @param text the new content of the pad/document
+     * Updates the content of the document, because the pad content changed.
      */
-    public synchronized void revise(String text) {
+    public synchronized void pdsyncReplace(int pos, int length, String text) {
         try {
             revising.set(true);
-            set(text.substring(0, text.length()-1));
+            replace(pos, length, text);
+        } catch (BadLocationException ble) {
+            ble.printStackTrace(); // XXX badly out of sync
         } finally {
             revising.set(false);
         }
     }
 }
-

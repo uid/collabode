@@ -37,8 +37,11 @@ serverhandlers.requestHandler = function() {
 serverhandlers.tasks.writePad = function(padId) {
     dbwriter.taskWritePad(padId);
 };
-serverhandlers.tasks.reviseDocument = function(padId) {
-    workspace.taskReviseDocument(padId);
+serverhandlers.tasks.pdsyncDocumentText = function(padId, cs) {
+    workspace.taskPdsyncDocumentText(padId, cs);
+};
+serverhandlers.tasks.pdsyncPadStyle = function(username, file, iterator) {
+    workspace.taskPdsyncPadStyle(username, file, iterator);
 };
 
 serverhandlers.cometHandler = function(op, id, data) {
