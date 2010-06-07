@@ -3313,7 +3313,8 @@ function OUTER(gscope) {
 	  evt.preventDefault();
 	  specialHandled = true;
 	}*/
-	if ((!specialHandled) && isTypeForCmdKey &&
+	if ((!specialHandled) &&
+	    (isTypeForCmdKey || (browser.mozilla && ! browser.windows)) &&
 	    String.fromCharCode(which) == " " &&
 	    (evt.metaKey || evt.ctrlKey)) {
 	  // cmd-Space (code completion)
@@ -4137,12 +4138,22 @@ function OUTER(gscope) {
       bindEventHandler(document.documentElement, "compositionstart", handleCompositionEvent);
       bindEventHandler(document.documentElement, "compositionend", handleCompositionEvent);
     }
+    if (browser.mozilla && ! browser.windows) {
+      bindEventHandler(document, "contextmenu", handleFFMacContextMenu);
+    }
 
     /*bindEventHandler(window, "mousemove", function(e) {
       if (e.pageX < 10) {
 	window.DEBUG_DONT_INCORP = (e.pageX < 2);
       }
     });*/
+  }
+  
+  function handleFFMacContextMenu(evt) {
+    if (evt.target == document.getElementsByTagName('html')[0]) {
+      // this was a cmd-Space context menu, don't show it
+      evt.preventDefault();
+    }
   }
 
   function handleIEOuterClick(evt) {
