@@ -3314,7 +3314,7 @@ function OUTER(gscope) {
 	  specialHandled = true;
 	}*/
 	if ((!specialHandled) &&
-	    (isTypeForCmdKey || (browser.mozilla && ! browser.windows)) &&
+	    ((browser.mozilla && ! browser.windows) ? (type == "keydown") : isTypeForCmdKey) &&
 	    String.fromCharCode(which) == " " &&
 	    (evt.metaKey || evt.ctrlKey)) {
 	  // cmd-Space (code completion)
