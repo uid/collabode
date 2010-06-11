@@ -19,9 +19,10 @@ jimport("java.util.concurrent.ConcurrentHashMap");
 jimport("java.lang.System");
 
 var PADPAGE_ROOMTYPE = "padpage";
+var EXTENDED = "collab_server_extended_handlers";
 
 function onStartup() {
-
+  appjet.cache[EXTENDED] = {};
 }
 
 function _padIdToRoom(padId) {
@@ -275,11 +276,11 @@ function broadcastServerMessage(msgObj) {
   });
 }
 
-function appendPadText(pad, txt) {
+function appendPadText(pad, txt, optTxtAPairs) {
   txt = model.cleanText(txt);
   var oldFullText = pad.text();
   _applyChangesetToPad(pad, Changeset.makeSplice(oldFullText,
-                                                 oldFullText.length-1, 0, txt));
+                                                 oldFullText.length-1, 0, txt, optTxtAPairs, pad.pool()));
 }
 
 function setPadText(pad, txt) {
@@ -724,6 +725,11 @@ function _handleCometMessage(connection, msg) {
       }
     });
   }
+  else if (msg.type == "EXTENDED_MESSAGE") {
+    appjet.cache[EXTENDED][msg.payload.type](_roomToPadId(connection.roomName),
+                                             connection.connectionId,
+                                             msg.payload);
+  }
   else if (msg.type == "REQUEST_CODE_COMPLETION") {
     workspace.codeComplete(_roomToPadId(connection.roomName), msg.offset, connection.connectionId);
   }
@@ -766,6 +772,20 @@ function _correctMarkersInPad(atext, apool) {
     offset = pos+1;
   });
   return builder.toString();
+}
+
+function setExtendedHandler(type, handler) {
+  appjet.cache[EXTENDED][type] = handler;
+}
+
+function sendConnectionExtendedMessage(connectionId, msg) {
+  sendMessage(connectionId, { type: "EXTENDED_MESSAGE", payload: msg });
+}
+
+function sendPadExtendedMessage(pad, msg) {
+  _getPadConnections(pad).forEach(function(connection) {
+    sendConnectionExtendedMessage(connection.connectionId, msg);
+  });
 }
 
 function updateClientAnnotations(connectionId, type, annotations) {

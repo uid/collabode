@@ -59,7 +59,8 @@ function getCollabClient(ace2editor, serverVars, initialUserInfo, options, testo
     onClientMessage: function() {},
     onInternalAction: function() {},
     onConnectionTrouble: function() {},
-    onServerMessage: function() {}
+    onServerMessage: function() {},
+    onExtendedMessage: {}
   };
 
   $(window).bind("unload", function() {
@@ -341,6 +342,11 @@ function getCollabClient(ace2editor, serverVars, initialUserInfo, options, testo
     else if (msg.type == "SERVER_MESSAGE") {
       callbacks.onServerMessage(msg.payload);
     }
+    else if (msg.type == "EXTENDED_MESSAGE") {
+      if (callbacks.onExtendedMessage[msg.payload.type]) {
+        callbacks.onExtendedMessage[msg.payload.type](msg.payload);
+      }
+    }
     else if (msg.type == "ANNOTATIONS") {
       editor.setAnnotations(msg.annotationType, msg.annotations);
     }
@@ -490,6 +496,10 @@ function getCollabClient(ace2editor, serverVars, initialUserInfo, options, testo
   function sendClientMessage(msg) {
     sendMessage({ type: "CLIENT_MESSAGE", payload: msg });
   }
+  
+  function sendExtendedMessage(msg) {
+    sendMessage({ type: "EXTENDED_MESSAGE", payload: msg });
+  }
 
   function getCurrentRevisionNumber() {
     return rev;
@@ -613,9 +623,11 @@ function getCollabClient(ace2editor, serverVars, initialUserInfo, options, testo
     setOnInternalAction: function(cb) { callbacks.onInternalAction = cb; },
     setOnConnectionTrouble: function(cb) { callbacks.onConnectionTrouble = cb; },
     setOnServerMessage: function(cb) { callbacks.onServerMessage = cb; },
+    setOnExtendedMessage: function(type, cb) { callbacks.onExtendedMessage[type] = cb; },
     updateUserInfo: defer(updateUserInfo),
     getConnectedUsers: getConnectedUsers,
     sendClientMessage: sendClientMessage,
+    sendExtendedMessage: sendExtendedMessage,
     getCurrentRevisionNumber: getCurrentRevisionNumber,
     getDiagnosticInfo: getDiagnosticInfo,
     getMissedChanges: getMissedChanges,
