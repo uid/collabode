@@ -83,7 +83,7 @@ public class Workspace {
     /**
      * Schedule a JavaScript task for execution with no delay.
      */
-    static void scheduleTask(String taskName, Object... args) {
+    public static void scheduleTask(String taskName, Object... args) {
         execution.scheduleTaskInPool("dbwriter_infreq", taskName, 0, args); // XXX maybe a different pool?
     }
 }

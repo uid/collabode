@@ -148,11 +148,17 @@ body.nosidebar #padeditor { margin-left: 0; }
 #savenow.enabled {
 	background: url(/static/img/eclipse/ui.tool.save.enabled.gif) no-repeat center center;
 }
-#run {
+#console.enabled {
+	background: url(/static/img/eclipse/ui.console.view.gif) no-repeat center center;
+}
+#launch {
 	background: url(/static/img/eclipse/jdt.debug.ui.tool.run.disabled.gif) no-repeat center center;
 }
-#run.enabled {
+#launch.enabled {
 	background: url(/static/img/eclipse/jdt.debug.ui.tool.run.enabled.gif) no-repeat center center;
+}
+#terminate.enabled {
+	background: url(/static/img/eclipse/debug.ui.lcl.terminate.enabled.gif) no-repeat center center;
 }
 
 #editorcontainerbox {

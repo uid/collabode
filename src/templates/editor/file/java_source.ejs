@@ -1,4 +1,4 @@
 <% var isTest = file.getName().match(/Test\.java$/) %>
 <% helpers.addBodyClass('editing' + (isTest ? 'Test' : 'Impl')) %>
 
-<a href="/runfile<%= file.getFullPath() %>" target="java_run_<%= file.getName() %>" id="run" class="docbarbutton <%= isTest ? '' : 'enabled' %>" title="Run"></a>
+<a href="/console<%= file.getFullPath() %>" target="java_console_<%= file.getName() %>" id="console" class="docbarbutton <%= isTest ? '' : 'enabled' %>" title="Show Console"></a>

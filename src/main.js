@@ -6,8 +6,8 @@ import("utils");
 
 import("control.static_control");
 import("control.auth_control");
+import("control.console_control");
 import("control.editor_control");
-import("control.run_control");
 
 import("collab.collabroom_server");
 import("collab.collab_server");
@@ -42,6 +42,12 @@ serverhandlers.tasks.pdsyncDocumentText = function(padId, cs) {
 };
 serverhandlers.tasks.pdsyncPadStyle = function(username, file, iterator) {
     workspace.taskPdsyncPadStyle(username, file, iterator);
+};
+serverhandlers.tasks.runningStateChange = function(username, file, state) {
+    workspace.taskRunningStateChange(username, file, state);
+};
+serverhandlers.tasks.runningOutput = function(username, file, text, attribs) {
+    workspace.taskRunningOutput(username, file, text, attribs);
 };
 
 serverhandlers.cometHandler = function(op, id, data) {
@@ -103,9 +109,7 @@ function handlePath() {
     POST: new Dispatcher()
   }
   authed.GET.addLocations([
-    [_file('runfile'), run_control.render_run_file],
-    [_file('run'), run_control.render_run_type],
-    [_file('test'), run_control.render_test],
+    [_file('console'), console_control.render_console],
     [_file('delete'), editor_control.render_confirm_delete],
     [_proj(), editor_control.render_project],
     [_file(), editor_control.render_path]

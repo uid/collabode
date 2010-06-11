@@ -1,0 +1,39 @@
+<% helpers.setHtmlTitle([ project.getName(), file.getProjectRelativePath() + " console" ]) %>
+<% helpers.addBodyClass("fullwidth") %>
+<% helpers.addBodyClass("nosidebar") %>
+<% helpers.includeCss("editor_ejs.css") %>
+<% helpers.includeCometJs() %>
+<% helpers.includeJQuery() %>
+<% helpers.includeJs("json2.js") %>
+<% helpers.includeJs("ace/ace2_outer.js") %>
+<% helpers.includeJs("collab_client.js") %>
+<% helpers.includeJs("ode_console.js") %>
+<% helpers.includeJs("layout.js") %>
+
+<div id="editorpage">
+
+<%= helpers.renderPartial("docbar", { project: project.getName(), file: file.getName() + " &nbsp;Console" }) %>
+
+<div id="docbaroverlay">
+  <div id="docbartools">
+    <div id="connstatusconnecting" title="Connecting"><!-- --></div>
+    <div id="connstatusdisconnected" title="Disconnected">
+      <p>Disconnected from the server<br/>Output will not be updated</p>
+    </div>
+    <div id="syncstatusdone" title="Updated"><!-- --></div>
+    <a href="#" id="launch" class="docbarbutton enabled" style="display: none" title="Launch"></a>
+    <a href="#" id="terminate" class="docbarbutton enabled" style="display: none" title="Terminate"></a>
+    <div id="runstatus"></div>
+  </div>
+</div>
+
+<div id="padmain">
+  <div id="padeditor">
+    <div id="editorcontainerbox" class="autoresized">
+      <div id="editorloadingbox">Loading...</div>
+      <div id="editorcontainer"><!-- --></div>
+    </div>
+  </div>
+</div>
+
+</div>

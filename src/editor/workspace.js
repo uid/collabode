@@ -8,6 +8,7 @@ import("pad.model");
 jimport("collabode.PadFunctions");
 jimport("collabode.PadDocumentOwner");
 jimport("collabode.Workspace");
+jimport("collabode.running.FileRunOwner");
 jimport("collabode.testing.ProjectTestsOwner");
 
 jimport("java.lang.System");
@@ -16,6 +17,8 @@ function onStartup() {
   PadFunctions.bind(scalaFn(3, _pdsyncPadText),
                     scalaFn(3, _reportPadProblems),
                     scalaFn(3, _reportTestResult));
+  collab_server.setExtendedHandler("RUN_REQUEST", _onRunRequest);
+  collab_server.setExtendedHandler("TESTS_REQUEST", _onTestsRequest);
 }
 
 function listProjects() {
@@ -61,7 +64,7 @@ function accessDocumentPad(username, file) {
   
   model.accessPadGlobal(padId, function(pad) {
     if ( ! pad.exists()) {
-      pad.create();
+      pad.create(true);
     }
   });
   
@@ -139,10 +142,17 @@ function taskPdsyncPadStyle(username, file, iterator) {
 }
 
 function onNewEditor(padId, connectionId) {
-  var doc = _getDocument(padId);
-  ProjectTestsOwner.of(doc.getProject()).reportResults(scalaFn(2, function(test, result) {
-    collab_server.updateClientTestResult(connectionId, test, result);
-  }));
+}
+
+function _onTestsRequest(padId, connectionId, msg) {
+  switch (msg.action) {
+  case 'state':
+    var doc = _getDocument(padId);
+    ProjectTestsOwner.of(doc.getProject()).reportResults(scalaFn(2, function(test, result) {
+      collab_server.updateClientTestResult(connectionId, test, result); // XXX change to extended req
+    }));
+    break;
+  }
 }
 
 function codeComplete(padId, offset, connectionId) {
@@ -163,4 +173,67 @@ function getContentTypeName(padId) {
 
 function _reportTestResult(project, test, result) {
   collab_server.updateProjectClientsTestResult("" + project.getName(), test, result);
+}
+
+function _runningPadIdFor(username, file) {
+  return username + "*run*" + file.getFullPath();
+}
+
+function _runningUserFileFor(padId) {
+  var uf = padId.split("*run*", 2);
+  return { username: uf[0], filename: uf[1] };
+}
+
+function accessRunFilePad(username, file) {
+  var padId = _runningPadIdFor(username, file);
+  
+  model.accessPadGlobal(padId, function(pad) {
+    if ( ! pad.exists()) {
+      pad.create(false);
+    }
+  });
+  
+  return padId;
+}
+
+function _onRunRequest(padId, connectionId, msg) {
+  var uf = _runningUserFileFor(padId);
+  var owner = FileRunOwner.of(uf.username);
+  
+  switch (msg.action) {
+  case 'state':
+    collab_server.sendConnectionExtendedMessage(connectionId, {
+      type: "RUN_STATE_CHANGE",
+      state: owner.state(uf.filename)
+    });
+    break;
+  case 'launch':
+    owner.run(uf.filename);
+    break;
+  case 'terminate':
+    owner.stop(uf.filename);
+    break;
+  }
+}
+
+function taskRunningStateChange(username, file, state) {
+  var gray = [ [ 'foreground', '150,150,150' ] ];
+  model.accessPadGlobal(_runningPadIdFor(username, file), function(pad) {
+    switch(state) {
+    case 'launching':
+      collab_server.setPadText(pad, "");
+      collab_server.appendPadText(pad, " [ Started " + new Date() + " ]\n", gray);
+      break;
+    case 'terminated':
+      collab_server.appendPadText(pad, " [ Stopped " + new Date() + " ]\n", gray);
+      break;
+    }
+    collab_server.sendPadExtendedMessage(pad, { type: "RUN_STATE_CHANGE", state: state });
+  });
+}
+
+function taskRunningOutput(username, file, text, attribs) {
+  model.accessPadGlobal(_runningPadIdFor(username, file), function(pad) {
+    collab_server.appendPadText(pad, text, attribs.map(function(a) { return a.slice(); }));
+  });
 }

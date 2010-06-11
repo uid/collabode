@@ -130,7 +130,7 @@ function accessPadGlobal(padId, padFunc, rwMode) {
 
         updateCoarseChangesets(true);
         
-        if ( ( ! pad.pdsyncing()) && textChanged) { // XXX avoids infinite loop
+        if (meta.pdlinked && ( ! pad.pdsyncing()) && textChanged) { // XXX avoids infinite loop
           execution.scheduleTask("dbwriter_infreq", "pdsyncDocumentText", 0, [ padId, theChangeset ]);
         }
       }
@@ -206,8 +206,9 @@ function accessPadGlobal(padId, padFunc, rwMode) {
     // done in "read" mode also sets dirty = true.
     getId: function() { return padId; },
     exists: function() { return !!meta; },
-    create: function(optText) {
+    create: function(isPdlinked, optText) {
       meta = {};
+      meta.pdlinked = isPdlinked ? true : false;
       meta.head = -1; // incremented below by addRevision
       pad.tempObj().atext = Changeset.makeAText("\n");
       meta.padId = padId,
