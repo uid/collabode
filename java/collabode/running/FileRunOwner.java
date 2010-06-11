@@ -34,9 +34,6 @@ public class FileRunOwner {
     
     final String username;
     private final ConcurrentMap<String, ILaunch> launches = new ConcurrentHashMap<String, ILaunch>();
-    // fast-terminating launches may not be in `launches` yet when `launchesTerminated` is called
-    private IFile currentFile = null;
-    private ILaunch currentLaunch = null;
     
     private FileRunOwner(String rusername) {
         this.username = rusername;
@@ -45,16 +42,19 @@ public class FileRunOwner {
             public void launchesAdded(ILaunch[] launches) { }
             public void launchesChanged(ILaunch[] launches) { }
             public void launchesTerminated(ILaunch[] terminated) {
-                for (ILaunch launch : terminated) {
-                    if (launch == currentLaunch) {
-                        Workspace.scheduleTask("runningStateChange", username, currentFile, "terminated");
-                    } else if (launches.containsValue(launch)) {
-                        IFile file = (IFile)Workspace.getWorkspace().getRoot().findMember(launch.getAttribute(PATH));
-                        Workspace.scheduleTask("runningStateChange", username, file, "terminated");
-                    }
-                }
+                FileRunOwner.this.launchesTerminated(terminated);
             }
         });
+    }
+    
+    private void launchesTerminated(ILaunch[] terminated) {
+        for (ILaunch launch : terminated) {
+            String path = launch.getAttribute(PATH);
+            if (path != null && launches.remove(path) == launch) {
+                IFile file = (IFile)Workspace.getWorkspace().getRoot().findMember(path);
+                Workspace.scheduleTask("runningStateChange", username, file, "terminated");
+            }
+        }
     }
     
     /**
@@ -66,15 +66,15 @@ public class FileRunOwner {
             return;
         }
         
-        currentFile = (IFile)Workspace.getWorkspace().getRoot().findMember(path);
+        IFile file = (IFile)Workspace.getWorkspace().getRoot().findMember(path);
         
-        Workspace.scheduleTask("runningStateChange", username, currentFile, "launching");
+        Workspace.scheduleTask("runningStateChange", username, file, "launching");
         
-        IType main = ((ICompilationUnit)JavaCore.create(currentFile)).findPrimaryType();
+        IType main = ((ICompilationUnit)JavaCore.create(file)).findPrimaryType();
         ILaunchManager mgr = DebugPlugin.getDefault().getLaunchManager();
         ILaunchConfigurationType type = mgr.getLaunchConfigurationType(IJavaLaunchConfigurationConstants.ID_JAVA_APPLICATION);
         ILaunchConfigurationWorkingCopy config = type.newInstance(null, username + " Run " + main.getTypeQualifiedName());
-        config.setAttribute(IJavaLaunchConfigurationConstants.ATTR_PROJECT_NAME, currentFile.getProject().getName());
+        config.setAttribute(IJavaLaunchConfigurationConstants.ATTR_PROJECT_NAME, file.getProject().getName());
         config.setAttribute(IJavaLaunchConfigurationConstants.ATTR_MAIN_TYPE_NAME, main.getFullyQualifiedName());
         
         String policy = "'" + Application.bundleResourcePath("config/security.policy") + "'";
@@ -82,16 +82,20 @@ public class FileRunOwner {
                 "-Dorg.eclipse.osgi.framework.internal.core.FrameworkSecurityManager " + // XXX does nothing?
                 "-Djava.security.manager -Djava.security.policy=" + policy + " -ea");
         
-        currentLaunch = config.launch(ILaunchManager.RUN_MODE, null);
-        currentLaunch.setAttribute(PATH, path);
+        ILaunch launch = config.launch(ILaunchManager.RUN_MODE, null);
+        launch.setAttribute(PATH, path);
         
-        Workspace.scheduleTask("runningStateChange", username, currentFile, "launched");
+        Workspace.scheduleTask("runningStateChange", username, file, "launched");
         
-        for (IProcess proc : currentLaunch.getProcesses()) {
-            new StreamListener(proc.getStreamsProxy().getOutputStreamMonitor(), currentFile, STDOUT);
-            new StreamListener(proc.getStreamsProxy().getErrorStreamMonitor(), currentFile, STDERR);
+        for (IProcess proc : launch.getProcesses()) {
+            new StreamListener(proc.getStreamsProxy().getOutputStreamMonitor(), file, STDOUT);
+            new StreamListener(proc.getStreamsProxy().getErrorStreamMonitor(), file, STDERR);
         }
-        launches.put(path, currentLaunch);
+        
+        launches.put(path, launch);
+        if (launch.isTerminated()) {
+            launchesTerminated(new ILaunch[] { launch });
+        }
     }
     
     /**
@@ -130,13 +134,11 @@ public class FileRunOwner {
                 write(monitor.getContents());
                 return;
             }
-            if (text == null || text.length() == 0) {
-                return;
-            }
             write(text);
         }
         
         private void write(String text) {
+            if (text == null || text.length() == 0) { return; }
             Workspace.scheduleTask("runningOutput", username, file, text, attribs);
         }
     }
