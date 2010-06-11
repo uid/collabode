@@ -61,7 +61,9 @@ public class PadDocument extends Document {
     public String getContentTypeName() {
         try {
             IContentType type = file.getProject().getContentTypeMatcher().findContentTypeFor(new ByteArrayInputStream(get().getBytes()), file.getName());
-            return type.getId().replaceFirst(".*\\.", "");
+            if (type != null) {
+                return type.getId().replaceFirst(".*\\.", "");
+            }
         } catch (IOException ioe) {
             ioe.printStackTrace(); // XXX
         } catch (CoreException ce) {
