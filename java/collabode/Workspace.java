@@ -1,6 +1,7 @@
 package collabode;
 
 import java.io.IOException;
+import java.util.Hashtable;
 
 import net.appjet.ajstdlib.execution;
 
@@ -8,10 +9,7 @@ import org.eclipse.core.resources.*;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.preferences.InstanceScope;
-import org.eclipse.jdt.core.IClasspathEntry;
-import org.eclipse.jdt.core.IJavaProject;
-import org.eclipse.jdt.core.JavaCore;
-import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.core.*;
 import org.eclipse.jdt.launching.JavaRuntime;
 
 public class Workspace {
@@ -20,6 +18,10 @@ public class Workspace {
     public static synchronized IWorkspace getWorkspace() {
         if (WORKSPACE == null) {
             new InstanceScope().getNode(ResourcesPlugin.PI_RESOURCES).putBoolean(ResourcesPlugin.PREF_AUTO_REFRESH, true);
+            Hashtable options = JavaCore.getOptions();
+            options.put(JavaCore.CODEASSIST_VISIBILITY_CHECK, "enabled");
+            options.put(JavaCore.CODEASSIST_FORBIDDEN_REFERENCE_CHECK, "enabled");
+            JavaCore.setOptions(options);
             WORKSPACE = ResourcesPlugin.getWorkspace();
         }
         return WORKSPACE;

@@ -10,9 +10,12 @@ import org.eclipse.jdt.core.*;
 import org.eclipse.jdt.core.compiler.IProblem;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.CompilationUnit;
+import org.eclipse.jdt.ui.text.java.*;
 import org.eclipse.jface.text.*;
+import org.eclipse.ui.PlatformUI;
 
 import scala.Function1;
+import collabode.complete.JavaPadCompletionProposal;
 
 /**
  * A Java document synchronized with an EtherPad pad.
@@ -230,55 +233,48 @@ public class JavaPadDocument extends PadDocument implements IBuffer {
      * @param reporter called with an array of {@link CompletionProposal}s
      */
     public void codeComplete(int offset, final Function1<Object[],Boolean> reporter) {
-        try {
-            workingCopy.codeComplete(offset, new PadCompletionRequestor() {
-                public void report(List<CompletionProposal> relevant) {
-                    reporter.apply(relevant.toArray());
-                }
-            });
-        } catch (JavaModelException jme) {
-            jme.printStackTrace(); // XXX
-        }
-    }
-}
-
-/**
- * Code completion proposal receiver. Accepts completion proposals, determines
- * relevant ones, and reports them.
- * XXX Need better proposal ranking.
- */
-abstract class PadCompletionRequestor extends CompletionRequestor {
-    private static final Comparator<CompletionProposal> COMPARE = new Comparator<CompletionProposal>() {
-        public int compare(CompletionProposal cp1, CompletionProposal cp2) {
-            int delta = cp2.getRelevance() - cp1.getRelevance();
-            if (delta != 0) {
-                return delta;
-            }
-            delta = cp2.getKind() - cp1.getKind();
-            if (delta != 0) {
-                return delta;
-            }
-            return new String(cp1.getCompletion()).compareTo(new String(cp2.getCompletion()));
-        }
-    };
-    
-    final SortedSet<CompletionProposal> proposals = new TreeSet<CompletionProposal>(COMPARE);
-    
-    public void accept(CompletionProposal proposal) {
-        proposals.add(proposal);
-    }
-    
-    @Override public void endReporting() {
-        List<CompletionProposal> relevant = new ArrayList<CompletionProposal>();
-        int ii = 0;
-        for (Iterator<CompletionProposal> it = proposals.iterator(); ii < 20 && it.hasNext(); ii++) {
-            relevant.add(it.next());
-        }
-        report(relevant);
+        ProposalRetriever getter = new ProposalRetriever(offset, reporter);
+        PlatformUI.getWorkbench().getDisplay().asyncExec(getter);
     }
     
     /**
-     * Called with proposals to display. XXX
+     * Code completion proposal receiver. Accepts completion proposals, determines
+     * relevant ones, and reports them.
      */
-    public abstract void report(List<CompletionProposal> relevant);
+    private class ProposalRetriever implements Runnable {
+        public CompletionProposalComparator COMPARE = new CompletionProposalComparator();
+        public int offset;
+        public Function1<Object[],Boolean> reporter;
+        
+        public ProposalRetriever(int o, Function1<Object[],Boolean> r) {
+            offset = o;
+            reporter = r;
+        }
+        
+        public void run() {
+            SortedSet<IJavaCompletionProposal> sortedProposals = new TreeSet<IJavaCompletionProposal>(COMPARE);
+            CompletionProposalCollector collector = new CompletionProposalCollector(workingCopy);
+            JavaContentAssistInvocationContext context = new JavaContentAssistInvocationContext(workingCopy);
+            collector.setInvocationContext(context);
+            try {
+                workingCopy.codeComplete(offset, collector);
+                IJavaCompletionProposal[] proposals = collector.getJavaCompletionProposals();
+                JavaPadCompletionProposal[] padProposals = new JavaPadCompletionProposal[proposals.length];
+                for (int i=0; i<proposals.length;i++){
+                    sortedProposals.add(proposals[i]);
+                }
+                Iterator<IJavaCompletionProposal> iter = sortedProposals.iterator();
+                int i = 0;
+                JavaPadCompletionProposal jpProposal;
+                while(iter.hasNext()){
+                    jpProposal = new JavaPadCompletionProposal(iter.next());
+                    padProposals[i] = jpProposal;
+                    i++;
+                }
+                reporter.apply(padProposals);
+            } catch (JavaModelException jme) {
+                jme.printStackTrace();
+            }
+        }
+    }
 }

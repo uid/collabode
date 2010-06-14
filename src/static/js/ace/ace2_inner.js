@@ -919,8 +919,9 @@ function OUTER(gscope) {
     });
   };
   
-  editorInfo.ace_setRequestCodeCompletion = function(handler) {
+  editorInfo.ace_setRequestCodeCompletion = function($, handler) {
     setRequestCodeCompletion(handler);
+    codecomplete.init($);
   }
   
   editorInfo.ace_showCodeCompletionProposals = function($, offset, proposals) {
@@ -930,51 +931,14 @@ function OUTER(gscope) {
     }
     var focusLine = (rep.selFocusAtStart ? rep.selStart[0] : rep.selEnd[0]);
     
-    var list = $('#codecompletion');
-    proposals.forEach(function(p, i) {
-      list.append('<option value="'+i+'">'+p.completion+'</option>');
-    });
+    // show codecompletion widget
+    var top = rep.lines.atIndex(focusLine+1).lineNode.offsetTop + iframe.offsetTop - outerWin.scrollY;
+    var left = getSelectionPointX(getSelection().endPoint) + iframe.offsetLeft - outerWin.scrollX;
+    codecomplete.showCC(proposals,top,left,rep);
     
-    function hide() {
-      list.unbind();
-      list.fadeOut(100, function() { list.empty(); });
-      focus();
-    }
+
     
-    function choose() {
-      var proposal = proposals[$(':selected', list).val()];
-      hide();
-      inCallStack("codecompletion", function() {
-        fastIncorp(101);
-        performDocumentReplaceCharRange(proposal.start, proposal.end, proposal.completion);
-        var pos = lineAndColumnFromChar(proposal.start + proposal.completion.length);
-        performSelectionChange(pos, pos, false);
-      });
-    }
-    
-    $(list).bind('keypress', function(event) {
-      if (event.keyCode == 27 || event.keyCode == 8) {
-        event.preventDefault();
-        hide();
-      }
-    });
-    $(list).bind('keyup', function(event) {
-      if (event.keyCode == '13') {
-        event.preventDefault();
-        choose();
-      } else if (event.keyCode == 27 || event.keyCode == 8) {
-        event.preventDefault();
-        hide();
-      }
-    });
-    $(list).bind('blur', hide);
-    $('option', list).bind('dblclick', choose);
-    
-    list.css({
-      display: 'block',
-      top: rep.lines.atIndex(focusLine+1).lineNode.offsetTop + iframe.offsetTop - outerWin.scrollY,
-      left: getSelectionPointX(getSelection().endPoint) + iframe.offsetLeft - outerWin.scrollX
-    }).focus().val(0);
+
   };
 
   function now() { return (new Date()).getTime(); }
@@ -2883,6 +2847,15 @@ function OUTER(gscope) {
     inCallStack("handleClick", function() {
       idleWorkTimer.atMost(200);
     });
+    
+    // handler for codecompletion widget
+    if (evt.type == "click" && codecomplete.active) {
+      codecomplete.handleClick(evt);
+      if (codecomplete.stopClick) {
+        evt.preventDefault();
+        return;
+      }
+    }
 
     // only want to catch left-click
     if ((! evt.ctrlKey) && (evt.button != 2) && (evt.button != 3)) {
@@ -3198,8 +3171,38 @@ function OUTER(gscope) {
     var isTypeForCmdKey = ((browser.msie || browser.safari) ? (type == "keydown") : (type == "keypress"));
 
     var stopped = false;
+    
+    // makes the code assist text replacement
+    function makeReplace() {
+      if (codecomplete.replace) {
+        fastIncorp(101);
+        performDocumentReplaceCharRange(codecomplete.start, codecomplete.end, codecomplete.replacementString);
+        var pos = lineAndColumnFromChar(codecomplete.start + codecomplete.replacementString.length);
+        performSelectionChange(pos, pos, false);
+      }
+    }
 
     inCallStack("handleKeyEvent", function() {
+    
+    // handler for codecompletion widget
+    if (codecomplete.active){
+     if (type == "keydown") {
+       codecomplete.keyHandlerCC(keyCode,evt);
+       makeReplace();
+     }
+    } 
+    
+    // decides whether to allow default key behavior
+    if (codecomplete.stopKey){
+      if (type == "keypress" || type == "keydown") {
+        evt.preventDefault();
+        return;
+      } else {
+        evt.preventDefault();
+        codecomplete.stopKey = false;
+        return;
+      }
+    }
 
       if (type == "keypress" ||
 	  (isTypeForSpecialKey && keyCode == 13/*return*/)) {
