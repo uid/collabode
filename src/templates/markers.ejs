@@ -1,0 +1,4 @@
+<h2><%= markers.length %> marker<%= markers.length == 1 ? '' : 's' %></h2>
+<div id="markers">
+  <%= helpers.renderList("markers", markers, null, { list: 'table', item: 'tr' }) %>
+</div>

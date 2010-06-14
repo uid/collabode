@@ -8,6 +8,7 @@ import("editor.workspace");
 import("pad.model");
 import("pad.revisions");
 
+jimport("org.eclipse.core.resources.IMarker");
 jimport("org.eclipse.core.resources.IResource");
 
 jimport("java.lang.System");
@@ -35,7 +36,8 @@ function render_project(projectname) {
   
   renderHtml("editor/project.ejs", {
     project: project,
-    projectfiles: projectfiles
+    projectfiles: projectfiles,
+    markers: _find_markers(project)
   });
   return true;
 }
@@ -82,10 +84,50 @@ function render_path(projectname, filename) {
     renderHtml("editor/folder.ejs", {
       project: project,
       folder: resource,
-      projectfiles: tree(resource)
+      projectfiles: tree(resource),
+      markers: _find_markers(resource)
     });
     return true;
   }
+}
+
+function _find_markers(resource) {
+  function name(severity) {
+    switch (severity) {
+    case IMarker.SEVERITY_INFO: return 'info';
+    case IMarker.SEVERITY_WARNING: return 'warning';
+    case IMarker.SEVERITY_ERROR: return 'error';
+    }
+    return 'note';
+  }
+  function objectify(m) {
+    return {
+      id: m.getId(),
+      severity: m.getAttribute(IMarker.SEVERITY, -1),
+      severityName: name(m.getAttribute(IMarker.SEVERITY)),
+      message: m.getAttribute(IMarker.MESSAGE),
+      resource: m.getResource(),
+      lineNumber: m.getAttribute(IMarker.LINE_NUMBER, 0),
+      equals: function() { return false; },
+      getClass: function() { return { getSimpleName: function() { return 'marker' } }; }
+    };
+  }
+  function compare(m1, m2) {
+    var result = 0;
+    [
+      function() { return m2.severity - m1.severity; },
+      function() { return m1.resource.getFullPath().toString().localeCompare(m2.resource.getFullPath().toString()); },
+      function() { return m1.lineNumber - m2.lineNumber; },
+      function() { return m1.id - m2.id; }
+    ].forEach(function(f) {
+      if (result == 0) { result = f(); }
+    });
+    return result;
+  }
+  
+  var markers = resource.findMarkers(null, true, IResource.DEPTH_INFINITE).map(objectify);
+  markers.sort(compare);
+  return markers;
 }
 
 function _render_file(project, file, projectfiles) {
