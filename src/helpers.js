@@ -167,16 +167,19 @@ function isHeaderVisible() {
     return _hd().showHeader;
 }
 
-function renderList(name, list, here) {
+function renderList(name, list, here, wrap) {
+  if ( ! wrap) {
+    wrap = { item: 'li', list: 'ul' };
+  }
   var r = [];
   list.forEach(function(item) {
     if (item instanceof Array) {
-      r.push(renderList(name, item, here))
+      r.push(renderList(name, item, here, wrap))
     } else {
-      r.push((item.equals(here) ? '<li class="here">' : '<li>') + renderView(name, item) + '</li>');
+      r.push('<'+wrap.item+(item.equals(here) ? ' class="here">' : '>') + renderView(name, item) + '</'+wrap.item+'>');
     }
   });
-  return '<ul>' + r.join('\n') + '</ul>';
+  return '<'+wrap.list+'>' + r.join('\n') + '</'+wrap.list+'>';
 }
 
 function renderView(name, item) {
