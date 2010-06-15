@@ -922,7 +922,7 @@ function OUTER(gscope) {
   editorInfo.ace_setRequestCodeCompletion = function($, handler) {
     setRequestCodeCompletion(handler);
     codecomplete.init($);
-  }
+  };
   
   editorInfo.ace_showCodeCompletionProposals = function($, offset, proposals) {
     if ( ! (isCaret() && (caretDocChar() == offset))) {
@@ -934,11 +934,7 @@ function OUTER(gscope) {
     // show codecompletion widget
     var top = rep.lines.atIndex(focusLine+1).lineNode.offsetTop + iframe.offsetTop - outerWin.scrollY;
     var left = getSelectionPointX(getSelection().endPoint) + iframe.offsetLeft - outerWin.scrollX;
-    codecomplete.showCC(proposals,top,left,rep);
-    
-
-    
-
+    codecomplete.showCC(proposals, top, left, rep);
   };
 
   function now() { return (new Date()).getTime(); }
@@ -3184,25 +3180,25 @@ function OUTER(gscope) {
 
     inCallStack("handleKeyEvent", function() {
     
-    // handler for codecompletion widget
-    if (codecomplete.active){
-     if (type == "keydown") {
-       codecomplete.keyHandlerCC(keyCode,evt);
-       makeReplace();
-     }
-    } 
+      // handler for codecompletion widget
+      if (codecomplete.active){
+        if (type == "keydown") {
+          codecomplete.keyHandlerCC(keyCode,evt);
+          makeReplace();
+        }
+      } 
     
-    // decides whether to allow default key behavior
-    if (codecomplete.stopKey){
-      if (type == "keypress" || type == "keydown") {
-        evt.preventDefault();
-        return;
-      } else {
-        evt.preventDefault();
-        codecomplete.stopKey = false;
-        return;
+      // decides whether to allow default key behavior
+      if (codecomplete.stopKey){
+        if (type == "keypress" || type == "keydown") {
+          evt.preventDefault();
+          return;
+        } else {
+          evt.preventDefault();
+          codecomplete.stopKey = false;
+          return;
+        }
       }
-    }
 
       if (type == "keypress" ||
 	  (isTypeForSpecialKey && keyCode == 13/*return*/)) {
