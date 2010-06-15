@@ -242,39 +242,43 @@ public class JavaPadDocument extends PadDocument implements IBuffer {
      * relevant ones, and reports them.
      */
     private class ProposalRetriever implements Runnable {
-        public CompletionProposalComparator COMPARE = new CompletionProposalComparator();
         public int offset;
         public Function1<Object[],Boolean> reporter;
         
-        public ProposalRetriever(int o, Function1<Object[],Boolean> r) {
-            offset = o;
-            reporter = r;
+        ProposalRetriever(int offset, Function1<Object[],Boolean> reporter) {
+            this.offset = offset;
+            this.reporter = reporter;
         }
         
         public void run() {
-            SortedSet<IJavaCompletionProposal> sortedProposals = new TreeSet<IJavaCompletionProposal>(COMPARE);
             CompletionProposalCollector collector = new CompletionProposalCollector(workingCopy);
-            JavaContentAssistInvocationContext context = new JavaContentAssistInvocationContext(workingCopy);
-            collector.setInvocationContext(context);
+            collector.setInvocationContext(new JavaContentAssistInvocationContext(workingCopy));
             try {
                 workingCopy.codeComplete(offset, collector);
-                IJavaCompletionProposal[] proposals = collector.getJavaCompletionProposals();
-                JavaPadCompletionProposal[] padProposals = new JavaPadCompletionProposal[proposals.length];
-                for (int i=0; i<proposals.length;i++){
-                    sortedProposals.add(proposals[i]);
-                }
-                Iterator<IJavaCompletionProposal> iter = sortedProposals.iterator();
-                int i = 0;
-                JavaPadCompletionProposal jpProposal;
-                while(iter.hasNext()){
-                    jpProposal = new JavaPadCompletionProposal(iter.next());
-                    padProposals[i] = jpProposal;
-                    i++;
-                }
-                reporter.apply(padProposals);
             } catch (JavaModelException jme) {
-                jme.printStackTrace();
+                jme.printStackTrace(); // XXX
+                return;
             }
+            
+            IJavaCompletionProposal[] proposals = collector.getJavaCompletionProposals();
+            
+            SortedSet<IJavaCompletionProposal> sortedProposals = new TreeSet<IJavaCompletionProposal>(COMPARE);
+            for (IJavaCompletionProposal proposal : proposals){
+                sortedProposals.add(proposal);
+            }
+            List<JavaPadCompletionProposal> padProposals = new ArrayList<JavaPadCompletionProposal>(proposals.length);
+            for (IJavaCompletionProposal proposal : sortedProposals) {
+                padProposals.add(new JavaPadCompletionProposal(proposal));
+            }
+            
+            reporter.apply(padProposals.toArray());
         }
     }
+    
+    private static final Comparator<IJavaCompletionProposal> COMPARE = new Comparator<IJavaCompletionProposal>() {
+        private final CompletionProposalComparator compare = new CompletionProposalComparator();
+        public int compare(IJavaCompletionProposal p1, IJavaCompletionProposal p2) {
+            return compare.compare(p1, p2);
+        }
+    };
 }

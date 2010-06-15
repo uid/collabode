@@ -18,13 +18,18 @@ public class Workspace {
     public static synchronized IWorkspace getWorkspace() {
         if (WORKSPACE == null) {
             new InstanceScope().getNode(ResourcesPlugin.PI_RESOURCES).putBoolean(ResourcesPlugin.PREF_AUTO_REFRESH, true);
-            Hashtable options = JavaCore.getOptions();
+            Hashtable<String,String> options = getJavaCoreOptions();
             options.put(JavaCore.CODEASSIST_VISIBILITY_CHECK, "enabled");
             options.put(JavaCore.CODEASSIST_FORBIDDEN_REFERENCE_CHECK, "enabled");
             JavaCore.setOptions(options);
             WORKSPACE = ResourcesPlugin.getWorkspace();
         }
         return WORKSPACE;
+    }
+    
+    @SuppressWarnings("unchecked")
+    public static Hashtable<String,String> getJavaCoreOptions() {
+        return JavaCore.getOptions();
     }
     
     public static IProject[] listProjects() {
