@@ -183,6 +183,14 @@ body.nosidebar #padeditor { margin-left: 0; }
 }
 #codecompletion option { }
 
+#ac-widget {position:absolute; width:240px; height:159px; overflow:auto; background-color:white;
+    visibility:hidden; border-style:solid; border-color:gray; border-width:1px;  box-shadow: 5px 5px 5px #888;
+    -o-box-shadow: 5px 5px 5px #888; -icab-box-shadow: 5px 5px 5px #888; -khtml-box-shadow: 5px 5px 5px #888;
+    -moz-box-shadow: 3px 3px 6px #888; -webkit-box-shadow: 5px 5px 5px #888;}
+#ac-widget-list {display:block; list-style-type:none; padding-left:0px; white-space:nowrap; margin-bottom:0px; }
+.ac-widget-item {height:8px; padding-left:2px; padding-top:2px; padding-bottom:6px; margin-bottom:0px;}
+.ac-selected {background-color:#3875d7; color:#e8e8e8;}
+
 #wizardcontainerbox {
 	border: 1px solid #c4c4c4;
 	background:#fff; overflow: hidden; position: relative;

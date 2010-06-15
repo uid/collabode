@@ -159,9 +159,10 @@ function codeComplete(padId, offset, connectionId) {
   _getDocument(padId).codeComplete(offset, scalaFn(1, function(proposals) {
     collab_server.updateClientCodeCompletionProposals(connectionId, padId, offset, proposals.map(function(proposal) {
       return {
-        completion: "" + new java.lang.String(proposal.getCompletion()),
-        start: proposal.getReplaceStart(),
-        end: proposal.getReplaceEnd()
+        completion: "" + proposal.displayString,
+        replacement: "" + proposal.replacementString,
+        length: proposal.replacementLength,
+        offset: proposal.replacementOffset
       };
     }));
   }));
