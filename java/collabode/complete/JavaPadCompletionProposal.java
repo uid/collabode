@@ -6,10 +6,10 @@ import org.eclipse.jdt.ui.text.java.IJavaCompletionProposal;
 @SuppressWarnings("restriction")
 public class JavaPadCompletionProposal {
     
-    private final String displayString;
-    private final String replacementString;
-    private final int replacementLength;
-    private final int replacementOffset;
+    public final String displayString;
+    public final String replacementString;
+    public final int replacementLength;
+    public final int replacementOffset;
     
     public JavaPadCompletionProposal(IJavaCompletionProposal proposal) {
         AbstractJavaCompletionProposal jproposal = (AbstractJavaCompletionProposal)proposal;
@@ -17,21 +17,5 @@ public class JavaPadCompletionProposal {
         displayString = jproposal.getDisplayString();
         replacementLength = jproposal.getReplacementLength();
         replacementOffset = jproposal.getReplacementOffset();
-    }
-    
-    public String getDisplayString() {
-        return displayString;
-    }
-    
-    public String getReplacementString() {
-        return replacementString;
-    }
-    
-    public int getReplacementLength() {
-        return replacementLength;
-    }
-    
-    public int getReplacementOffset() {
-        return replacementOffset;
     }
 }
