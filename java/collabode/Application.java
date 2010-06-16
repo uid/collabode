@@ -2,15 +2,11 @@ package collabode;
 
 import java.io.File;
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.Scanner;
 
 import org.eclipse.core.resources.*;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.FileLocator;
-import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.*;
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
 import org.eclipse.swt.widgets.Display;
@@ -57,22 +53,13 @@ public class Application implements IApplication {
     }
     
     private void setupDatabase() throws Exception {
-        Class.forName("org.apache.derby.jdbc.EmbeddedDriver");
-        Connection db = DriverManager.getConnection("jdbc:derby:pads;create=true");
+        Class.forName("org.hsqldb.jdbc.JDBCDriver");
+        Connection db = DriverManager.getConnection("jdbc:hsqldb:mem:pads", "u", "");
         Scanner schema = new Scanner(new File(bundleResourcePath("config/schema.sql"))).useDelimiter(";");
         while (schema.hasNext()) {
             String stmt = schema.next().trim();
-            if (stmt.isEmpty()) {
-                continue;
-            }
-            try {
-                db.createStatement().execute(stmt);
-            } catch (SQLException sqle) {
-                if (!sqle.getSQLState().equals("X0Y32")) {
-                    System.out.println(stmt);
-                    throw sqle;
-                }
-            }
+            if (stmt.isEmpty()) { continue; }
+            db.createStatement().execute(stmt);
         }
         db.close();
     }

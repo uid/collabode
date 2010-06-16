@@ -19,8 +19,8 @@ import("editor.workspace");
 jimport("java.lang.System.out.println");
 
 serverhandlers.startupHandler = function() {
-    sqlcommon.init("org.apache.derby.jdbc.EmbeddedDriver",
-                   "jdbc:derby:pads");
+    sqlcommon.init("org.hsqldb.jdbc.JDBCDriver",
+                   "jdbc:hsqldb:mem:pads", "u", "");
     
     model.onStartup();
     collab_server.onStartup();

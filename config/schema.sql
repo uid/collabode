@@ -1,96 +1,96 @@
 CREATE TABLE PAD_APOOL (
   ID varchar(128) NOT NULL,
-  JSON long varchar NOT NULL,
+  JSON longvarchar NOT NULL,
   PRIMARY KEY  (ID)
 );
 
 CREATE TABLE PAD_AUTHORS_META (
   ID varchar(128) NOT NULL,
-  NUMID int NOT NULL generated always as identity,
+  NUMID int generated always as identity NOT NULL,
   PRIMARY KEY  (ID)
 );
 
 CREATE TABLE PAD_AUTHORS_TEXT (
   NUMID int default NULL,
   PAGESTART int default NULL,
-  OFFSETS varchar(256) NOT NULL default ',,,,,,,,,,,,,,,,,,,',
-  DATA long varchar NOT NULL,
+  OFFSETS varchar(256) default ',,,,,,,,,,,,,,,,,,,' NOT NULL,
+  DATA longvarchar NOT NULL,
   unique (NUMID,PAGESTART)
 );
 
 CREATE TABLE PAD_META (
   ID varchar(128) NOT NULL,
-  JSON long varchar NOT NULL,
+  JSON longvarchar NOT NULL,
   PRIMARY KEY  (ID)
 );
 
 CREATE TABLE PAD_REVMETA_META (
   ID varchar(128) NOT NULL,
-  NUMID int NOT NULL generated always as identity,
+  NUMID int generated always as identity NOT NULL,
   PRIMARY KEY  (ID)
 );
 
 CREATE TABLE PAD_REVMETA_TEXT (
   NUMID int default NULL,
   PAGESTART int default NULL,
-  OFFSETS varchar(256) NOT NULL default ',,,,,,,,,,,,,,,,,,,',
-  DATA long varchar NOT NULL,
+  OFFSETS varchar(256) default ',,,,,,,,,,,,,,,,,,,' NOT NULL,
+  DATA longvarchar NOT NULL,
   unique (NUMID,PAGESTART)
 );
 
 CREATE TABLE PAD_REVS1000_META (
   ID varchar(128) NOT NULL,
-  NUMID int NOT NULL generated always as identity,
+  NUMID int generated always as identity NOT NULL,
   PRIMARY KEY  (ID)
 );
 
 CREATE TABLE PAD_REVS1000_TEXT (
   NUMID int default NULL,
   PAGESTART int default NULL,
-  OFFSETS varchar(256) NOT NULL default ',,,,,,,,,,,,,,,,,,,',
-  DATA long varchar NOT NULL,
+  OFFSETS varchar(256) default ',,,,,,,,,,,,,,,,,,,' NOT NULL,
+  DATA longvarchar NOT NULL,
   UNIQUE (NUMID,PAGESTART)
 );
 
 CREATE TABLE PAD_REVS100_META (
   ID varchar(128) NOT NULL,
-  NUMID int NOT NULL generated always as identity,
+  NUMID int generated always as identity NOT NULL,
   PRIMARY KEY  (ID)
 );
 
 CREATE TABLE PAD_REVS100_TEXT (
   NUMID int default NULL,
   PAGESTART int default NULL,
-  OFFSETS varchar(256) NOT NULL default ',,,,,,,,,,,,,,,,,,,',
-  DATA long varchar NOT NULL,
+  OFFSETS varchar(256) default ',,,,,,,,,,,,,,,,,,,' NOT NULL,
+  DATA longvarchar NOT NULL,
   unique (NUMID,PAGESTART)
 );
 
 CREATE TABLE PAD_REVS10_META (
   ID varchar(128) NOT NULL,
-  NUMID int NOT NULL generated always as identity,
+  NUMID int generated always as identity NOT NULL,
   PRIMARY KEY  (ID)
 );
 
 CREATE TABLE PAD_REVS10_TEXT (
   NUMID int default NULL,
   PAGESTART int default NULL,
-  OFFSETS varchar(256) NOT NULL default ',,,,,,,,,,,,,,,,,,,',
-  DATA long varchar NOT NULL,
+  OFFSETS varchar(256) default ',,,,,,,,,,,,,,,,,,,' NOT NULL,
+  DATA longvarchar NOT NULL,
   unique (NUMID,PAGESTART)
 );
 
 CREATE TABLE PAD_REVS_META (
   ID varchar(128) NOT NULL,
-  NUMID int NOT NULL generated always as identity,
+  NUMID int generated always as identity NOT NULL,
   PRIMARY KEY  (ID)
 );
 
 CREATE TABLE PAD_REVS_TEXT (
   NUMID int default NULL,
   PAGESTART int default NULL,
-  OFFSETS varchar(256) NOT NULL default ',,,,,,,,,,,,,,,,,,,',
-  DATA long varchar NOT NULL,
+  OFFSETS varchar(256) default ',,,,,,,,,,,,,,,,,,,' NOT NULL,
+  DATA longvarchar NOT NULL,
   unique (NUMID,PAGESTART)
 );
 
@@ -104,8 +104,8 @@ CREATE TABLE PAD_SQLMETA (
 );
 
 CREATE TABLE "pad_guests" (
-  "id" int NOT NULL generated always as identity,
-  "data" long varchar,
+  "id" int generated always as identity NOT NULL,
+  "data" longvarchar,
   "userId" varchar(63) NOT NULL,
   "lastActiveDate" timestamp NOT NULL,
   "privateKey" varchar(63) NOT NULL,
@@ -116,7 +116,7 @@ CREATE TABLE "pad_guests" (
 );
 
 CREATE TABLE "pro_domains" (
-  "id" int NOT NULL generated always as identity,
+  "id" int generated always as identity NOT NULL,
   "extDomain" varchar(128) default NULL,
   "orgName" varchar(128) default NULL,
   "subDomain" varchar(128) NOT NULL,
