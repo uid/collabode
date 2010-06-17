@@ -1,0 +1,11 @@
+<h1><%= launch.getType().getName() %> Launch Configuration</h1>
+<h2><%= launch.getName() %></h2>
+
+<table>
+<% for (var it = launch.getAttributes().entrySet().iterator(); it.hasNext(); ) { %>
+<tr>
+  <td><%= it.next().getKey() %></td>
+  <td><%= it.next().getValue() %></td>
+</tr>
+<% } %>
+</table>

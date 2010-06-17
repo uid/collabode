@@ -3,6 +3,8 @@ function Layout() { }
 Layout.onResize = function() { };
 
 $(document).ready(function() {
+  $("#additions .docbarbutton").appendTo("#docbartools");
+  $("#additions .sidebarsection").appendTo("#sidebarbox");
   
   function onResize() {
     $(".autoresized").each(function(i) {

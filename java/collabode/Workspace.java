@@ -9,6 +9,8 @@ import org.eclipse.core.resources.*;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.eclipse.debug.core.DebugPlugin;
+import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.jdt.core.*;
 import org.eclipse.jdt.launching.JavaRuntime;
 
@@ -57,6 +59,10 @@ public class Workspace {
     
     public static void createDocument(String username, IFile file) throws IOException, JavaModelException {
         PadDocumentOwner.of(username).create(file);
+    }
+    
+    public static ILaunchConfiguration accessLaunchConfig(IFile file) {
+        return DebugPlugin.getDefault().getLaunchManager().getLaunchConfiguration(file);
     }
     
     private static void addJavaNature(IProject project) throws CoreException {

@@ -1,0 +1,34 @@
+<% helpers.setHtmlTitle([ project.getName(), file.getProjectRelativePath() ]) %>
+<% helpers.addBodyClass(extension) %>
+<% helpers.includeCss("editor_ejs.css") %>
+<% helpers.includeJQuery() %>
+<% helpers.includeJs("layout.js") %>
+
+<div id="editorpage">
+
+<%= helpers.renderPartial("docbar", { project: project.getName(), file: file.getName() }) %>
+
+<div id="docbaroverlay">
+  <div id="docbartools">
+  </div>
+</div>
+
+<div id="sidebarbox" class="autoresized">
+  <div class="sidebarsection">
+    <%= helpers.renderList("explorer", projectfiles, file) %>
+  </div>
+</div>
+
+<div id="padmain">
+  <div id="padeditor">
+    <div id="wizardcontainerbox">
+      <%= wizard %>
+    </div>
+  </div>
+</div>
+
+<div id="additions">
+  <%= additions() %>
+</div>
+
+</div>

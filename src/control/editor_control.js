@@ -132,34 +132,61 @@ function _find_markers(resource) {
   return markers;
 }
 
-function _render_file(project, file, projectfiles) {
-  var padId = workspace.accessDocumentPad(workspace.everyone, file);
+var _renderers = {
+  launch: function(project, file) {
+    return {
+      launch: Workspace.accessLaunchConfig(file)
+    };
+  },
   
-  model.accessPadGlobal(padId, function(pad) {
-    helpers.addClientVars({
-      padId: padId,
-      collab_client_vars: collab_server.getCollabClientVars(pad),
-      initialRevisionList: revisions.getRevisionList(pad),
-      serverTimestamp: +(new Date),
-      initialOptions: pad.getPadOptionsObj(),
-      userId: getSession().userId,
-      userName: getSession().userName,
-      opts: {}
+  _file: function(project, file) {
+    var padId = workspace.accessDocumentPad(workspace.everyone, file);
+    
+    model.accessPadGlobal(padId, function(pad) {
+      helpers.addClientVars({
+        padId: padId,
+        collab_client_vars: collab_server.getCollabClientVars(pad),
+        initialRevisionList: revisions.getRevisionList(pad),
+        serverTimestamp: +(new Date),
+        initialOptions: pad.getPadOptionsObj(),
+        userId: getSession().userId,
+        userName: getSession().userName,
+        opts: {}
+      });
     });
-  });
+    
+    return {
+      filetype: workspace.getContentTypeName(padId)
+    }
+  }
+};
+
+function _render_file(project, file, projectfiles) {
+  var extension = null;
+  var lastdot = file.getName().lastIndexOf('.');
+  if (lastdot > 0) {
+    extension = file.getName().substr(lastdot+1);
+  }
   
-  var filetype = workspace.getContentTypeName(padId);
-  var additions = renderFirstTemplateAsString([ "editor/file/" + camelToUnderscore(filetype) + ".ejs" ], {
-    project: project,
-    file: file
-  });
-  renderHtml("editor/file.ejs", {
-    project: project,
-    file: file,
-    projectfiles: projectfiles,
-    filetype: filetype,
-    additions: additions
-  });
+  var data = {
+      project: project,
+      file: file,
+      projectfiles: projectfiles,
+      extension: extension
+  };
+  data.additions = function() {
+    return renderFirstTemplateAsString([ "editor/add/" + extension + ".ejs" ], data);
+  };
+  
+  if (extension && _renderers[extension]) {
+    data.__proto__ = _renderers[extension](project, file);
+    data.wizard = renderTemplateAsString("editor/wizard/" + extension + ".ejs", data);
+    renderHtml("editor/wizard.ejs", data);
+    return true;
+  }
+  
+  data.__proto__ = _renderers._file(project, file);
+  renderHtml("editor/file.ejs", data);
   return true;
 }
 
