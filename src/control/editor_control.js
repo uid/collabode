@@ -8,6 +8,8 @@ import("editor.workspace");
 import("pad.model");
 import("pad.revisions");
 
+jimport("collabode.Workspace");
+
 jimport("org.eclipse.core.resources.IMarker");
 jimport("org.eclipse.core.resources.IResource");
 
@@ -15,23 +17,23 @@ jimport("java.lang.System");
 
 function render_root() {
   renderHtml("editor/root.ejs", {
-    projects: workspace.listProjects()
+    projects: Workspace.listProjects()
   });
   return true;
 }
 
 function render_project(projectname) {
-  var project = workspace.accessProject(projectname);
+  var project = Workspace.accessProject(projectname);
   
   if ( ! project.exists()) {
     renderHtml("editor/project_create.ejs", {
       project: project,
-      projects: workspace.listProjects()
+      projects: Workspace.listProjects()
     });
     return true;
   }    
   
-  var projectfiles = workspace.listProjects().slice();
+  var projectfiles = Workspace.listProjects().slice();
   projectfiles.splice(projectfiles.indexOf(project)+1, 0, project.members());
   
   renderHtml("editor/project.ejs", {
@@ -43,16 +45,16 @@ function render_project(projectname) {
 }
 
 function create_project(projectname) {
-  var project = workspace.createProject(projectname);
+  var project = Workspace.createProject(projectname);
   response.redirect(request.url);
   return true;
 }
 
 function render_path(projectname, filename) {
-  var project = workspace.accessProject(projectname);
+  var project = Workspace.accessProject(projectname);
   var resource = project.findMember(filename);
   
-  var projectfiles = workspace.listProjects().slice();
+  var projectfiles = Workspace.listProjects().slice();
   
   if (resource == null) {
     renderHtml("editor/none.ejs", {
@@ -162,19 +164,19 @@ function _render_file(project, file, projectfiles) {
 }
 
 function render_confirm_delete(projectname, filename) {
-  var project = workspace.accessProject(projectname);
+  var project = Workspace.accessProject(projectname);
   var resource = project.findMember(filename);
   
   renderHtml("editor/path_delete.ejs", {
     project: project,
-    projects: workspace.listProjects(),
+    projects: Workspace.listProjects(),
     resource: resource
   });
   return true;
 }
 
 function create_path(projectname, filename) {
-  var project = workspace.accessProject(projectname);
+  var project = Workspace.accessProject(projectname);
   var folder = project.findMember(filename);
   
   if (folder.getType() != IResource.FOLDER) {
@@ -217,7 +219,7 @@ function _create_path_file(project, parent, filename) {
 }
 
 function delete_path(projectname, filename) {
-  var project = workspace.accessProject(projectname);
+  var project = Workspace.accessProject(projectname);
   var resource = project.findMember(filename);
   var parentpath = ''+resource.getParent().getFullPath();
   

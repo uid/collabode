@@ -21,18 +21,6 @@ function onStartup() {
   collab_server.setExtendedHandler("TESTS_REQUEST", _onTestsRequest);
 }
 
-function listProjects() {
-  return Workspace.listProjects();
-}
-
-function accessProject(projectname) {
-  return Workspace.accessProject(projectname);
-}
-
-function createProject(projectname) {
-  return Workspace.createProject(projectname);
-}
-
 function _padIdFor(username, file) {
   return username + "@" + file.getFullPath();
 }
