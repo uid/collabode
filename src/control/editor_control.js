@@ -169,10 +169,10 @@ function _render_file(project, file, projectfiles) {
   }
   
   var data = {
-      project: project,
-      file: file,
-      projectfiles: projectfiles,
-      extension: extension
+    project: project,
+    file: file,
+    projectfiles: projectfiles,
+    extension: extension
   };
   data.additions = function() {
     return renderFirstTemplateAsString([ "editor/add/" + extension + ".ejs" ], data);
