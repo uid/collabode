@@ -213,6 +213,8 @@ function taskRunningStateChange(username, file, state) {
       collab_server.setPadText(pad, "");
       collab_server.appendPadText(pad, " [ Started " + new Date() + " ]\n", gray);
       break;
+    case 'failed':
+      collab_server.appendPadText(pad, " [ Failed to launch ]\n", gray);
     case 'terminated':
       collab_server.appendPadText(pad, " [ Stopped " + new Date() + " ]\n", gray);
       break;

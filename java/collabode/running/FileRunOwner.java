@@ -52,24 +52,67 @@ public class FileRunOwner {
             String path = launch.getAttribute(PATH);
             if (path != null && launches.remove(path) == launch) {
                 IFile file = (IFile)Workspace.getWorkspace().getRoot().findMember(path);
-                Workspace.scheduleTask("runningStateChange", username, file, "terminated");
+                state(file, "terminated");
             }
         }
     }
     
+    private void state(IFile file, String state) {
+        Workspace.scheduleTask("runningStateChange", username, file, state);
+    }
+    
     /**
-     * Run the main method of the primary class in a file.
+     * Run a file, for appropriate definition of run.
      */
-    public synchronized void run(String path) throws CoreException, IOException {
+    public synchronized void run(String path) {
         if (launches.containsKey(path) && ! launches.get(path).isTerminated()) {
             System.err.println("Already running " + path); // XXX
             return;
         }
         
         IFile file = (IFile)Workspace.getWorkspace().getRoot().findMember(path);
+        ILaunchConfiguration config;
+        if (file.getFileExtension().equals("launch")) {
+            config = DebugPlugin.getDefault().getLaunchManager().getLaunchConfiguration(file);
+        } else {
+            try {
+                config = javaMainLaunchConfig(file);
+            } catch (Exception e) {
+                e.printStackTrace(); // XXX
+                state(file, "failed");
+                return;
+            }
+        }
         
-        Workspace.scheduleTask("runningStateChange", username, file, "launching");
+        state(file, "launching");
         
+        ILaunch launch;
+        try {
+            launch = config.launch(ILaunchManager.RUN_MODE, null);
+        } catch (CoreException ce) {
+            ce.printStackTrace(); // XXX
+            state(file, "failed");
+            return;
+        }
+        launch.setAttribute(PATH, path);
+        
+        state(file, "launched");
+        
+        for (IProcess proc : launch.getProcesses()) {
+            new StreamListener(proc.getStreamsProxy().getOutputStreamMonitor(), file, STDOUT);
+            new StreamListener(proc.getStreamsProxy().getErrorStreamMonitor(), file, STDERR);
+        }
+        
+        launches.put(path, launch);
+        if (launch.isTerminated()) {
+            launchesTerminated(new ILaunch[] { launch });
+        }
+    }
+    
+    /**
+     * Run the main method of the primary class in a file.
+     */
+    private ILaunchConfigurationWorkingCopy javaMainLaunchConfig(IFile file) throws CoreException, IOException {
         IType main = ((ICompilationUnit)JavaCore.create(file)).findPrimaryType();
         ILaunchManager mgr = DebugPlugin.getDefault().getLaunchManager();
         ILaunchConfigurationType type = mgr.getLaunchConfigurationType(IJavaLaunchConfigurationConstants.ID_JAVA_APPLICATION);
@@ -82,20 +125,7 @@ public class FileRunOwner {
                 "-Dorg.eclipse.osgi.framework.internal.core.FrameworkSecurityManager " + // XXX does nothing?
                 "-Djava.security.manager -Djava.security.policy=" + policy + " -ea");
         
-        ILaunch launch = config.launch(ILaunchManager.RUN_MODE, null);
-        launch.setAttribute(PATH, path);
-        
-        Workspace.scheduleTask("runningStateChange", username, file, "launched");
-        
-        for (IProcess proc : launch.getProcesses()) {
-            new StreamListener(proc.getStreamsProxy().getOutputStreamMonitor(), file, STDOUT);
-            new StreamListener(proc.getStreamsProxy().getErrorStreamMonitor(), file, STDERR);
-        }
-        
-        launches.put(path, launch);
-        if (launch.isTerminated()) {
-            launchesTerminated(new ILaunch[] { launch });
-        }
+        return config;
     }
     
     /**
