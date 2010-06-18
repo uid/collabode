@@ -110,13 +110,16 @@ function handlePath() {
   }
   authed.GET.addLocations([
     [_file('console'), console_control.render_console],
+    [_proj('delete'), editor_control.render_confirm_delete],
     [_file('delete'), editor_control.render_confirm_delete],
     [_proj(), editor_control.render_project],
     [_file(), editor_control.render_path]
   ]);
   authed.POST.addLocations([
+    [_proj('delete'), editor_control.delete_path],
     [_file('delete'), editor_control.delete_path],
-    [_proj(), editor_control.create_project],
+    ['/', editor_control.create_project],
+    [_proj(), editor_control.create_path],
     [_file(), editor_control.create_path]
   ]);
   
@@ -128,7 +131,7 @@ function handlePath() {
 }
 
 function _proj(verb) {
-  return new RegExp("^" + (verb ? "/" + verb : "") + "/([\\w-\\.]+)/?$")
+  return new RegExp("^" + (verb ? "/" + verb : "") + "/([\\w-\\.]+)/?()$")
 }
 
 function _file(verb) {

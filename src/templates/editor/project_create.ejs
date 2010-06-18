@@ -13,9 +13,10 @@
 
 <div id="padmain">
   <div id="padeditor">
-    <form id="wizardcontainerbox" method="post">
+    <form id="wizardcontainerbox" method="post" action="/">
       <h1>Create a Java project</h1>
       <p>Project name: <%= project.getName() %></p>
+      <input type="hidden" name="projectname" value="<%= project.getName() %>"/>
       
       <div id="wizardbottom">
         <button type="submit">Create project</button>

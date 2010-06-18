@@ -13,7 +13,7 @@
 
 <div id="padmain">
   <div id="padeditor">
-    <div id="wizardcontainerbox">
+    <form id="wizardcontainerbox" method="post">
       <h1>Java project</h1>
       <p><a href="/<%= project.getName() %>/.project">Edit project configuration XML</a></p>
       <p><a href="/<%= project.getName() %>/.classpath">Edit classpath configuration XML</a></p>
@@ -21,7 +21,7 @@
       <div><%= helpers.renderPartial("filegrid", { members: project.members() }) %></div>
       <div><%= helpers.renderPartial("create", { inside: "project" }) %></div>
       <div><%= helpers.renderPartial("markers", { markers: markers }) %></div>
-    </div>
+    </form>
   </div>
 </div>
 

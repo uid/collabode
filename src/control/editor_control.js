@@ -12,6 +12,7 @@ jimport("collabode.Workspace");
 
 jimport("org.eclipse.core.resources.IMarker");
 jimport("org.eclipse.core.resources.IResource");
+jimport("org.eclipse.core.resources.IContainer");
 
 jimport("java.lang.System");
 
@@ -44,9 +45,10 @@ function render_project(projectname) {
   return true;
 }
 
-function create_project(projectname) {
+function create_project() {
+  var projectname = request.params["projectname"];
   var project = Workspace.createProject(projectname);
-  response.redirect(request.url);
+  response.redirect(''+project.getFullPath());
   return true;
 }
 
@@ -206,7 +208,7 @@ function create_path(projectname, filename) {
   var project = Workspace.accessProject(projectname);
   var folder = project.findMember(filename);
   
-  if (folder.getType() != IResource.FOLDER) {
+  if ( ! (folder instanceof IContainer)) { // XXX
     return true;
   }
   
