@@ -19,6 +19,7 @@ function onStartup() {
                     scalaFn(3, _reportTestResult));
   collab_server.setExtendedHandler("RUN_REQUEST", _onRunRequest);
   collab_server.setExtendedHandler("TESTS_REQUEST", _onTestsRequest);
+  collab_server.setExtendedHandler("FORMAT_REQUEST", _onFormatRequest);
 }
 
 function _padIdFor(username, file) {
@@ -98,7 +99,7 @@ function taskPdsyncDocumentText(padId, cs) {
     switch (op.opcode) {
     case 'r':
       doc.pdsyncReplace(pos, op.delchars, bankIter.take(op.inschars));
-      pos += op.inschars - op.delchars;
+      pos += op.inschars;
       break;
     case '+':
       doc.pdsyncReplace(pos, 0, bankIter.take(op.chars));
@@ -116,17 +117,38 @@ function taskPdsyncDocumentText(padId, cs) {
 
 function taskPdsyncPadStyle(username, file, iterator) {
   model.accessPadGlobal(_padIdFor(username, file), function(pad) {
-    var apool = pad.pool();
-    var builder = Changeset.builder(pad.text().length); // XXX ignoring len
-    while (iterator.hasNext()) {
-      var op = iterator.next();
-      builder.keep(op.chars, op.lines, op.attribs.map(function(a) { return a.slice(); }), apool);
-    }
-    var changeset = builder.toString();
+    var changeset = _makeChangeSetStr(pad, iterator);
     pad.pdsync(function () {
       collab_server.applyChangesetToPad(pad, changeset, "#syntaxcolor");
     });
   });
+}
+
+function _makeChangeSetStr(pad, iterator) {
+  var apool = pad.pool();
+  var builder = Changeset.builder(pad.text().length); // XXX ignoring len
+  while (iterator.hasNext()) {
+    var op = iterator.next();
+    switch (op.opcode) {
+    case '=':
+      builder.keepText(op.text, op.attribs.map(function(a) { return a.slice(); }), apool);
+      break; 
+    case '-':
+      var lastNewLinePos = op.text.lastIndexOf('\n');
+      if (lastNewLinePos < 0) {
+        builder.remove(op.text.length, 0);
+      } else {
+        // XXX faster to use regex for last newline plus doc.getNumberOfLines in Java?
+        builder.remove(lastNewLinePos + 1, op.text.match(/\n/g).length);
+        builder.remove(op.text.length - lastNewLinePos - 1, 0);
+      }
+      break;
+    case '+':
+      builder.insert(op.text, op.attribs.map(function(a) { return a.slice(); }), apool);
+      break;
+    }
+  }
+  return builder.toString();
 }
 
 function onNewEditor(padId, connectionId) {
@@ -203,6 +225,18 @@ function _onRunRequest(padId, connectionId, msg) {
     owner.stop(uf.filename);
     break;
   }
+}
+
+function _onFormatRequest(padId, connectionId, msg) {
+  var iterator = _getDocument(padId).formatDocument();
+  model.accessPadGlobal(padId, function(pad) {
+    var cs = _makeChangeSetStr(pad, iterator);
+    collab_server.sendConnectionExtendedMessage(connectionId, {
+      type: "APPLY_CHANGESET_AS_USER",
+      changeset: cs,
+      apool: pad.pool()
+    });
+  });
 }
 
 function taskRunningStateChange(username, file, state) {

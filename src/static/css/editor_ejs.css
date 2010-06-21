@@ -160,6 +160,9 @@ body.nosidebar #padeditor { margin-left: 0; }
 #terminate.enabled {
 	background: url(/static/img/eclipse/debug.ui.lcl.terminate.enabled.gif) no-repeat center center;
 }
+#format.enabled {
+    background: url(/static/img/eclipse/jdt.junit.lcl.cfilter.enabled.gif) no-repeat center center;
+}
 
 #editorcontainerbox {
   border-left: 1px solid #c4c4c4; border-right: 1px solid #c4c4c4;

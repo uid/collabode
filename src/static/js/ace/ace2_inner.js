@@ -885,6 +885,13 @@ function OUTER(gscope) {
     return undefined;
   };
   
+  editorInfo.ace_applyChangesetAsUser = function(cs) {
+    inCallStack("undoable", function() {
+      fastIncorp(101);
+      performDocumentApplyChangeset(cs, false);
+    });
+  };
+  
   editorInfo.ace_setAnnotations = function($, type, annotations) {
     var divs = editorInfo.frame.contentDocument.getElementById('sidedivinner').getElementsByTagName('div');
     for (var ii = 0; ii < divs.length; ii++) {

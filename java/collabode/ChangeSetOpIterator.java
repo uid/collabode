@@ -7,6 +7,7 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.TextPresentation;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyleRange;
+import org.eclipse.text.edits.*;
 
 public class ChangeSetOpIterator implements Iterator<ChangeSetOp> {
     private Queue<ChangeSetOp> rest = new LinkedList<ChangeSetOp>();
@@ -15,19 +16,38 @@ public class ChangeSetOpIterator implements Iterator<ChangeSetOp> {
         StyleRange first = presentation.getFirstStyleRange();
         if (first != null) {
             // initial keep, neither adds nor removes attributes
-            queue(doc, 0, first.start, new ArrayList<String[]>());
+            queue(doc, 0, first.start);
         }
         for (Iterator<?> it = presentation.getAllStyleRangeIterator(); it.hasNext(); ) {
             queue(doc, (StyleRange)it.next());
         }
     }
     
+    ChangeSetOpIterator(final IDocument doc, TextEdit edit) {
+        edit.accept(new TextEditVisitor() {
+            int last = 0;
+            
+            @Override public boolean visit(ReplaceEdit edit) {
+                queue(doc, edit, last);
+                last = edit.getOffset() + edit.getLength();
+                return true;
+            }
+            
+            @Override public boolean visit(MultiTextEdit edit) {
+                return true;
+            }
+        
+            @Override public boolean visitNode(TextEdit edit) {
+                throw new IllegalArgumentException("No visit for " + edit);
+            }
+        });
+    }
+        
     public boolean hasNext() {
         return ! rest.isEmpty();
     }
     
     public ChangeSetOp next() {
-        //System.out.println(this + " " + rest.peek());
         return rest.remove();
     }
     
@@ -45,21 +65,28 @@ public class ChangeSetOpIterator implements Iterator<ChangeSetOp> {
                     sr.foreground.getRed() + "," + sr.foreground.getGreen() + "," + sr.foreground.getBlue()
             });
         };
-        queue(doc, sr.start, sr.length, attribs);
+        queue(doc, sr.start, sr.length, attribs.toArray(new String[0][]));
     }
     
-    private void queue(IDocument doc, int start, int length, List<String[]> attribs) {
-        if (length == 0) { return; }
+    private void queue(IDocument doc, int start, int length, String[]... attribs) {
         try {
-            String text = doc.get(start, length);
-            int lastNewline = text.lastIndexOf('\n');
-            if (lastNewline < 0) {
-                rest.add(new ChangeSetOp('=', 0, length, attribs));
-                return;
+            // XXX faster to use regex for last newline plus doc.getNumberOfLines?
+            rest.add(new ChangeSetOp("=", doc.get(start, length), attribs));
+        } catch (BadLocationException ble) {
+            throw new NoSuchElementException(ble.getMessage()); // XXX
+        }
+    }
+    
+    private void queue(IDocument doc, ReplaceEdit edit, int last) {
+        try {
+            rest.add(new ChangeSetOp("=", doc.get(last, edit.getOffset()-last)));
+            
+            if (edit.getLength() > 0) {
+                rest.add(new ChangeSetOp("-", doc.get(edit.getOffset(), edit.getLength())));
             }
-            rest.add(new ChangeSetOp('=', doc.getNumberOfLines(start, lastNewline), lastNewline + 1, attribs));
-            if (lastNewline < length - 1) {
-                rest.add(new ChangeSetOp('=', 0, length - lastNewline - 1, attribs));
+            
+            if ( ! edit.getText().isEmpty()) {
+                rest.add(new ChangeSetOp("+", edit.getText()));
             }
         } catch (BadLocationException ble) {
             throw new NoSuchElementException(ble.getMessage()); // XXX

@@ -10,8 +10,10 @@ import org.eclipse.jdt.core.*;
 import org.eclipse.jdt.core.compiler.IProblem;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.CompilationUnit;
+import org.eclipse.jdt.core.formatter.CodeFormatter;
 import org.eclipse.jdt.ui.text.java.*;
 import org.eclipse.jface.text.*;
+import org.eclipse.text.edits.*;
 import org.eclipse.ui.PlatformUI;
 
 import scala.Function1;
@@ -281,4 +283,13 @@ public class JavaPadDocument extends PadDocument implements IBuffer {
             return compare.compare(p1, p2);
         }
     };
+    
+    /**
+     * Formats the document's code.
+     */
+    public ChangeSetOpIterator formatDocument() throws MalformedTreeException, BadLocationException {
+        CodeFormatter formatter = ToolFactory.createCodeFormatter(null);
+        TextEdit edit = formatter.format(CodeFormatter.K_COMPILATION_UNIT, this.get(), 0, this.getLength(), 0, null);
+        return new ChangeSetOpIterator(this, edit);
+    }
 }

@@ -119,6 +119,10 @@ function Ace2Editor() {
     info.ace_execCommand(cmd, arg1);
   });
   
+  editor.applyChangesetAsUser = function(cs) { // XXX no existing function to call?
+    info.ace_applyChangesetAsUser(cs);
+  };
+  
   editor.setAnnotations = pendingInit(function(type, annotations) {
     info.ace_setAnnotations($, type, annotations);
   });

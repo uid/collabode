@@ -43,4 +43,11 @@ $(document).ready(function() {
       $("#connstatusconnecting").css('display', 'block');
     }
   });
+  collab.setOnExtendedMessage("APPLY_CHANGESET_AS_USER", function(msg) {
+    ace.applyChangesetAsUser(msg.changeset);
+  });
+  $("#format").click(function() {
+    collab.sendExtendedMessage({ type: "FORMAT_REQUEST", action: 'format'});
+    return false;
+  });
 });

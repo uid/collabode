@@ -12,6 +12,7 @@ import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.jdt.core.*;
+import org.eclipse.jdt.core.formatter.DefaultCodeFormatterConstants;
 import org.eclipse.jdt.launching.JavaRuntime;
 
 public class Workspace {
@@ -21,8 +22,11 @@ public class Workspace {
         if (WORKSPACE == null) {
             new InstanceScope().getNode(ResourcesPlugin.PI_RESOURCES).putBoolean(ResourcesPlugin.PREF_AUTO_REFRESH, true);
             Hashtable<String,String> options = getJavaCoreOptions();
+            // code completion
             options.put(JavaCore.CODEASSIST_VISIBILITY_CHECK, "enabled");
             options.put(JavaCore.CODEASSIST_FORBIDDEN_REFERENCE_CHECK, "enabled");
+            // code formatting
+            options.put(DefaultCodeFormatterConstants.FORMATTER_TAB_CHAR, "space");
             JavaCore.setOptions(options);
             WORKSPACE = ResourcesPlugin.getWorkspace();
         }
