@@ -43,11 +43,22 @@ $(document).ready(function() {
       $("#connstatusconnecting").css('display', 'block');
     }
   });
+  
   collab.setOnExtendedMessage("APPLY_CHANGESET_AS_USER", function(msg) {
     ace.applyChangesetAsUser(msg.changeset);
   });
+  collab.setOnExtendedMessage("ORGIMPORTS_PROMPT", function(msg) {
+    // XXX present the UI, then eventually send the message with choices
+    alert("ORGIMPORTS_PROMPT"); // XXX
+    collab.sendExtendedMessage({ type: "ORGIMPORTS_RESOLVED" }); // XXX
+  });
+  
   $("#format").click(function() {
-    collab.sendExtendedMessage({ type: "FORMAT_REQUEST", action: 'format'});
+    collab.sendExtendedMessage({ type: "FORMAT_REQUEST" });
+    return false;
+  });
+  $("#orgimports").click(function() {
+    collab.sendExtendedMessage({ type: "ORGIMPORTS_REQUEST" });
     return false;
   });
 });

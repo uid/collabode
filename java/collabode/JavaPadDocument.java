@@ -5,19 +5,23 @@ import java.util.*;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.*;
 import org.eclipse.jdt.core.*;
 import org.eclipse.jdt.core.compiler.IProblem;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.formatter.CodeFormatter;
+import org.eclipse.jdt.core.search.TypeNameMatch;
 import org.eclipse.jdt.ui.text.java.*;
 import org.eclipse.jface.text.*;
-import org.eclipse.text.edits.*;
+import org.eclipse.text.edits.MalformedTreeException;
+import org.eclipse.text.edits.TextEdit;
 import org.eclipse.ui.PlatformUI;
 
 import scala.Function1;
+import scala.Function2;
 import collabode.complete.JavaPadCompletionProposal;
+import collabode.orgimport.PadImportOrganizer;
 
 /**
  * A Java document synchronized with an EtherPad pad.
@@ -291,5 +295,37 @@ public class JavaPadDocument extends PadDocument implements IBuffer {
         CodeFormatter formatter = ToolFactory.createCodeFormatter(null);
         TextEdit edit = formatter.format(CodeFormatter.K_COMPILATION_UNIT, this.get(), 0, this.getLength(), 0, null);
         return new ChangeSetOpIterator(this, edit);
+    }
+    
+    /**
+     * Performs organize imports.
+     */
+    public void organizeImports(final String connectionId,
+                                final Function2<TypeNameMatch[][],ISourceRange[],Boolean> prompter,
+                                final Function1<ChangeSetOpIterator,Boolean> reporter) {
+        Debug.here(); // XXX
+        new Thread(new Runnable() {
+            public void run() {
+                try {
+                    TextEdit edit = PadImportOrganizer.of(connectionId).createTextEdit(workingCopy, prompter);
+                    System.out.println("Organize imports success: " + edit);
+                    reporter.apply(new ChangeSetOpIterator(JavaPadDocument.this, edit));
+                } catch (OperationCanceledException oce) {
+                    System.err.println("Organize imports canceled"); // XXX
+                    // XXX nothing to do
+                } catch (CoreException ce) {
+                    ce.printStackTrace(); // XXX
+                }
+            }
+        }).start();
+    }
+    
+    /**
+     * Provide resolution of ambiguous names.
+     * Should only be called during {@link #organizeImports}.
+     */
+    public void organizeImportsResolved(String connectionId, TypeNameMatch[] userChoices) {
+        Debug.here(); // XXX
+        PadImportOrganizer.of(connectionId).chose(userChoices);
     }
 }

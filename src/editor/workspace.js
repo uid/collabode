@@ -20,6 +20,8 @@ function onStartup() {
   collab_server.setExtendedHandler("RUN_REQUEST", _onRunRequest);
   collab_server.setExtendedHandler("TESTS_REQUEST", _onTestsRequest);
   collab_server.setExtendedHandler("FORMAT_REQUEST", _onFormatRequest);
+  collab_server.setExtendedHandler("ORGIMPORTS_REQUEST", _onOrganizeImportsRequest);
+  collab_server.setExtendedHandler("ORGIMPORTS_RESOLVED", _onOrganizeImportsResolved);
 }
 
 function _padIdFor(username, file) {
@@ -237,6 +239,35 @@ function _onFormatRequest(padId, connectionId, msg) {
       apool: pad.pool()
     });
   });
+}
+
+function _onOrganizeImportsRequest(padId, connectionId, msg) {
+  System.out.println("_onOrganizeImportsRequest"); // XXX
+  _getDocument(padId).organizeImports(connectionId,
+    scalaFn(2, function(openChoices, ranges) {
+      System.out.println("_onOrganizeImportsRequest prompter"); // XXX
+      collab_server.sendConnectionExtendedMessage(connectionId, {
+        type: "ORGIMPORTS_PROMPT",
+        // XXX openChoices and ranges encoded into the msg
+      });
+    }),
+    scalaFn(1, function(iterator) {
+      System.out.println("_onOrganizeImportsRequest reporter"); // XXX
+      model.accessPadGlobal(padId, function(pad) {
+        var cs = _makeChangeSetStr(pad, iterator);
+        collab_server.sendConnectionExtendedMessage(connectionId, {
+          type: "APPLY_CHANGESET_AS_USER",
+          changeset: cs,
+          apool: pad.pool()
+        });
+      });
+    })
+  );
+}
+
+function _onOrganizeImportsResolved(padId, connectionId, msg) {
+  System.out.println("_onOrganizeImportsResolved"); // XXX
+  _getDocument(padId).organizeImportsResolved(connectionId, null); // XXX msg.whatever
 }
 
 function taskRunningStateChange(username, file, state) {

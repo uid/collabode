@@ -163,6 +163,9 @@ body.nosidebar #padeditor { margin-left: 0; }
 #format.enabled {
     background: url(/static/img/eclipse/jdt.junit.lcl.cfilter.enabled.gif) no-repeat center center;
 }
+#orgimports.enabled {
+    background: url(/static/img/eclipse/ant.ui.obj.import.gif) no-repeat center center;
+}
 
 #editorcontainerbox {
   border-left: 1px solid #c4c4c4; border-right: 1px solid #c4c4c4;
