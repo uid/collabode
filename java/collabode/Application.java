@@ -14,6 +14,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.application.WorkbenchAdvisor;
 import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleException;
 
 import collabode.testing.ContinuousTesting;
 
@@ -39,7 +40,14 @@ public class Application implements IApplication {
         PlatformUI.createAndRunWorkbench(display, new WorkbenchAdvisor() {
             @Override public boolean openWindows() { return true; } // XXX no window
             public String getInitialWindowPerspectiveId() { return null; }
-            @Override public void postStartup() { SHELL = new Shell(display); } // XXX maybe one window
+            @Override public void postStartup() {
+                SHELL = new Shell(display); // XXX maybe one window
+                try {
+                    Platform.getBundle("org.eclipse.jdt.ui").start();
+                } catch (BundleException be) {
+                    be.printStackTrace(); // XXX
+                }
+            }
         });
         
         return IApplication.EXIT_OK;
