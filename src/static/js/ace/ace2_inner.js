@@ -896,7 +896,8 @@ function OUTER(gscope) {
   };
   
   editorInfo.ace_setAnnotations = function($, type, annotations) {
-    var divs = editorInfo.frame.contentDocument.getElementById('sidedivinner').getElementsByTagName('div');
+    var document = editorInfo.frame.contentDocument||editorInfo.frame.contentWindow.document;
+    var divs = document.getElementById('sidedivinner').getElementsByTagName('div');
     for (var ii = 0; ii < divs.length; ii++) {
       var d = divs.item(ii);
       if (d.className != "") {
@@ -905,7 +906,7 @@ function OUTER(gscope) {
         $('p', d).remove();
       }
     }
-    annotations.forEach(function(annotation) {
+    forEach(annotations, function(annotation) {
       var d = divs.item(annotation.lineNumber-1);
       if (d == null) {
         updateLineNumbers();

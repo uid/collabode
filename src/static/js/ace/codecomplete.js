@@ -54,7 +54,7 @@ codecomplete.init = function($) {
   }
 
   codecomplete.populateCC = function(items) {
-    items.forEach(function(p,i) {
+    forEach(items, function(p,i) {
       $("#ac-widget-list").append($('<li class="ac-widget-item">').text(p.completion));
     });
   }

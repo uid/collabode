@@ -9,7 +9,7 @@ $(document).ready(function() {
   
   var user = {
     userId: clientVars.userId,
-    name: clientVars.userName,
+    name: clientVars.userName
     // ip, colorId, userAgent
   };
   
@@ -35,7 +35,7 @@ $(document).ready(function() {
     if (state == "CONNECTED") {
       $("#connstatusconnecting").css('display', 'none');
       $("#connstatusdisconnected").css('display', 'none');
-      setTimeout(collab.sendExtendedMessage, 0, { type: "TESTS_REQUEST", action: 'state' });
+      setTimeout(function() { collab.sendExtendedMessage({ type: "TESTS_REQUEST", action: "state" }); }, 0);
     } else if (state == "DISCONNECTED") {
       $("#connstatusconnecting").css('display', 'none');
       $("#connstatusdisconnected").css('display', 'block');

@@ -140,12 +140,12 @@ function Ace2Editor() {
   // source here.
 
   var $$INCLUDE_CSS = function(fileNames) {
-    return fileNames.split(" ").map(function (fileName) {
+    return map(fileNames.split(" "), function (fileName) {
       return '<link rel="stylesheet" type="text/css" href="/static/css/ace/'+fileName+'"/>';
     }).join();
   };
   var $$INCLUDE_JS = function(fileNames) {
-    return fileNames.split(" ").map(function (fileName) {
+    return map(fileNames.split(" "), function (fileName) {
       return '\x3cscript type="text/javascript" src="/static/js/ace/'+fileName+'">\x3c/script>';
     }).join();
   };
@@ -153,14 +153,14 @@ function Ace2Editor() {
   var $$INCLUDE_CSS_DEV = $$INCLUDE_CSS;
 
   var $$INCLUDE_CSS_Q = function(fileNames) {
-    return fileNames.split(" ").map(function (fileName) {
+    return map(fileNames.split(" "), function (fileName) {
       return '\'<link rel="stylesheet" type="text/css" href="/static/css/ace/'+fileName+'"/>\'';
-    }).join();
+    }).join('+');
   };
   var $$INCLUDE_JS_Q = function(fileNames) {
-    return fileNames.split(" ").map(function (fileName) {
+    return map(fileNames.split(" "), function (fileName) {
       return '\'\\x3cscript type="text/javascript" src="/static/js/ace/'+fileName+'">\\x3c/script>\'';
-    }).join();
+    }).join('+');
   };
   var $$INCLUDE_JS_Q_DEV = $$INCLUDE_JS_Q;
   var $$INCLUDE_CSS_Q_DEV = $$INCLUDE_CSS_Q;

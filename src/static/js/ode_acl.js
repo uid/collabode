@@ -9,7 +9,7 @@ $(document).ready(function() {
   
   var user = {
     userId: clientVars.userId,
-    name: clientVars.userName,
+    name: clientVars.userName
     // ip, colorId, userAgent
   };
   
