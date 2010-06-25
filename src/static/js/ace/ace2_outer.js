@@ -100,6 +100,8 @@ function Ace2Editor() {
   };
   editor.applyPreparedChangesetToBase = pendingInit(
     function() { info.ace_applyPreparedChangesetToBase(); });
+  editor.revertToBase = pendingInit(
+    function() { info.ace_revertToBase(); });
   editor.setUserChangeNotificationCallback = pendingInit(function(callback) {
     info.ace_setUserChangeNotificationCallback(callback);
   });

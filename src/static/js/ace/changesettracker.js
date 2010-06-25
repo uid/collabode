@@ -159,6 +159,22 @@ function makeChangesetTracker(scheduler, apool, aceCallbacksProvider) {
       baseAText = Changeset.applyToAText(submittedChangeset, baseAText, apool);
       submittedChangeset = null;
     },
+    revertToBase: function() {
+      if (! submittedChangeset) {
+        throw new Error("revertToBase: no submitted changes to revert");
+      }
+      aceCallbacksProvider.withCallbacks("revertToBase", function(callbacks) {
+        applyingNonUserChanges = true;
+        try {
+          callbacks.setDocumentAttributedText(baseAText);
+          userChangeset = Changeset.identity(baseAText.text.length);
+          submittedChangeset = null;
+        }
+        finally {
+          applyingNonUserChanges = false;
+        }
+      });
+    },
     setUserChangeNotificationCallback: function (callback) {
       changeCallback = callback;
     },

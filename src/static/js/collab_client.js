@@ -301,6 +301,16 @@ function getCollabClient(ace2editor, serverVars, initialUserInfo, options, testo
       });
       handleUserChanges();
     }
+    else if (msg.type == "REJECT_COMMIT") {
+      var newRev = msg.newRev;
+      if (newRev != rev) {
+        dmesg("bad message revision on REJECT_COMMIT: "+newRev+" not "+rev);
+        // XXX keep going?
+      }
+      editor.revertToBase();
+      setStateIdle();
+      handleUserChanges();
+    }
     else if (msg.type == "NO_COMMIT_PENDING") {
       if (state == "COMMITTING") {
         // server missed our commit message; abort that commit

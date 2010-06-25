@@ -854,6 +854,9 @@ function OUTER(gscope) {
   editorInfo.ace_applyPreparedChangesetToBase = function() {
     changesetTracker.applyPreparedChangesetToBase();
   };
+  editorInfo.ace_revertToBase = function() {
+    changesetTracker.revertToBase();
+  };
   editorInfo.ace_setUserChangeNotificationCallback = function(f) {
     changesetTracker.setUserChangeNotificationCallback(f);
   };
