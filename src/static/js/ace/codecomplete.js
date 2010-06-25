@@ -27,6 +27,7 @@ codecomplete.init = function($) {
       $("#ac-widget").scrollTop(0);
       codecomplete.setHighlight();
       codecomplete.active = true;
+      codecomplete.ignoreSpace = false;
       
       // set the replacement start
       codecomplete.start = proposals[0].offset;
@@ -188,7 +189,7 @@ codecomplete.keyHandlerCC = function(keyCode, evt) {
     codecomplete.hideCC();
     codecomplete.replace = true;
     codecomplete.stopKey = true;
-  } else if (keyCode == 59 || keyCode == 32 || keyCode == 190) { // semicolon, period, and space
+  } else if (keyCode == 59 || keyCode == 190 || (keyCode == 32 && !evt.ctrlKey)) { // semicolon, period, and space
     codecomplete.setReplacement();
     codecomplete.hideCC();
     codecomplete.replace = true;

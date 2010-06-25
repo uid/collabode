@@ -943,8 +943,10 @@ function OUTER(gscope) {
     var focusLine = (rep.selFocusAtStart ? rep.selStart[0] : rep.selEnd[0]);
     
     // show codecompletion widget
-    var top = rep.lines.atIndex(focusLine+1).lineNode.offsetTop + iframe.offsetTop - outerWin.scrollY;
-    var left = getSelectionPointX(getSelection().endPoint) + iframe.offsetLeft - outerWin.scrollX;
+    var scrollY = outerWin.scrollY||outerWin.document.documentElement.scrollTop; // fix to work in IE
+    var scrollX = outerWin.scrollX||outerWin.document.documentElement.scrollLeft; // fix to work in IE
+    var top = rep.lines.atIndex(focusLine+1).lineNode.offsetTop + iframe.offsetTop - scrollY;
+    var left = getSelectionPointX(getSelection().endPoint) + iframe.offsetLeft - scrollX;
     codecomplete.showCC(proposals, top, left, rep);
   };
 
