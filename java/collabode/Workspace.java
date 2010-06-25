@@ -13,7 +13,10 @@ import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.jdt.core.*;
 import org.eclipse.jdt.core.formatter.DefaultCodeFormatterConstants;
+import org.eclipse.jdt.junit.JUnitCore;
 import org.eclipse.jdt.launching.JavaRuntime;
+
+import collabode.testing.AnnotationsInitializer;
 
 public class Workspace {
     private static IWorkspace WORKSPACE;
@@ -90,9 +93,9 @@ public class Workspace {
         javaProject.setOutputLocation(binFolder.getFullPath(), null);
         IClasspathEntry[] entries = new IClasspathEntry[] {
                 JavaRuntime.getDefaultJREContainerEntry(),
+                JavaCore.newContainerEntry(JUnitCore.JUNIT4_CONTAINER_PATH),
+                JavaCore.newContainerEntry(AnnotationsInitializer.PATH),
                 JavaCore.newSourceEntry(srcFolder.getFullPath())
-                // XXX JUnit 4
-                // XXX collabode inject
         };
         javaProject.setRawClasspath(entries, null);
     }

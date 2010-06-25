@@ -2,14 +2,14 @@ package collabode.testing;
 
 import java.io.IOException;
 
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.*;
 import org.eclipse.jdt.core.*;
 
 import collabode.Application;
 
 public class AnnotationsInitializer extends ClasspathContainerInitializer {
+    
+    public static final IPath PATH = new Path("collabode.ANNOTATIONS_CONTAINER");
     
     private final String libPath;
     
