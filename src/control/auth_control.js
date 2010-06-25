@@ -12,7 +12,7 @@ jimport("collabode.Workspace");
 
 jimport("java.lang.System");
 
-const localhost = '0:0:0:0:0:0:0:1%0';
+const localhost = /^0:0:0:0:0:0:0:1(%0)?$/;
 
 function render_acl() {
   var padId = workspace.accessAclPad();
@@ -46,7 +46,7 @@ function do_login(clazz, username, destination) {
 function render_login(username, destination) {
   if (username != '') {
     do_login('r', username, destination);
-  } else if (request.clientAddr == localhost) {
+  } else if (request.clientAddr.match(localhost)) {
     do_login('u', 'admin', destination);
   } else {
     renderHtml("editor/login.ejs", { });
