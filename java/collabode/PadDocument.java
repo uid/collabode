@@ -7,10 +7,8 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.content.IContentType;
-import org.eclipse.jface.text.BadLocationException;
-import org.eclipse.jface.text.Document;
-import org.eclipse.jface.text.DocumentEvent;
-import org.eclipse.jface.text.IDocumentListener;
+import org.eclipse.jface.text.*;
+import org.eclipse.text.edits.ReplaceEdit;
 import org.mortbay.util.IO;
 
 /**
@@ -116,15 +114,26 @@ public class PadDocument extends Document {
     
     /**
      * Updates the content of the document, because the pad content changed.
+     * XXX change to a TextEdit and use apply()?
      */
-    public synchronized void pdsyncReplace(int pos, int length, String text) {
+    public synchronized void pdsyncApply(ReplaceEdit[] edits) {
         try {
             revising.set(true);
-            replace(pos, length, text);
+            for (ReplaceEdit edit : edits) {
+                replace(edit.getOffset(), edit.getLength(), edit.getText());
+            }
         } catch (BadLocationException ble) {
             ble.printStackTrace(); // XXX badly out of sync
         } finally {
             revising.set(false);
         }
+    }
+    
+    /**
+     * Returns true iff the edits are allowed.
+     * This implementation always permits edits. XXX should it?
+     */
+    public synchronized boolean isAllowed(ReplaceEdit[] edits, String[] permissions) {
+        return true;
     }
 }

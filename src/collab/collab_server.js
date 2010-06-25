@@ -139,6 +139,19 @@ function applyUserChanges(pad, baseRev, changeset, optSocketId, optAuthor) {
   if (optAuthor) {
     thisAuthor = optAuthor;
   }
+  
+  if (pad._meta.pdlinked && ( ! workspace.isChangesetAllowed(pad.getId(), changeset, thisAuthor))) {
+    if (optSocketId) {
+      var connectionId = getSocketConnectionId(optSocketId);
+      if (connectionId) {
+        sendMessage(connectionId, {
+          type: "REJECT_COMMIT",
+          newRev: pad.getHeadRevisionNumber()
+        });
+      }
+    }
+    return;
+  }
 
   pad.appendRevision(changeset, thisAuthor);
   var newRev = pad.getHeadRevisionNumber();

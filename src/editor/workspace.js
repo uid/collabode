@@ -11,6 +11,8 @@ jimport("collabode.Workspace");
 jimport("collabode.running.FileRunOwner");
 jimport("collabode.testing.ProjectTestsOwner");
 
+jimport("org.eclipse.text.edits.ReplaceEdit");
+
 jimport("java.lang.System");
 
 function onStartup() {
@@ -64,15 +66,93 @@ function accessDocumentPad(username, file) {
   return padId;
 }
 
+function _userFileFor(padId) {
+  var uf = padId.split("@", 2);
+  return { username: uf[0], filename: uf[1] };
+}
+
 function _getDocument(padId) {
-  var username_filename = padId.split("@", 2);
-  return PadDocumentOwner.of(username_filename[0]).get(username_filename[1]);
+  var uf = _userFileFor(padId);
+  return PadDocumentOwner.of(uf.username).get(uf.filename);
+}
+
+function restricted(userId) {
+  return userId[0] != 'u';
+}
+
+function accessAclPad() {
+  var padId = "*acl*";
+  
+  model.accessPadGlobal(padId, function(pad) {
+    if ( ! pad.exists()) {
+      pad.create(false);
+    }
+  });
+  
+  return padId;
+}
+
+function _isAllowedBySomeAcl(userId, allowed) {
+  var ret = false;
+  model.accessPadGlobal(accessAclPad(), function(pad) {
+    var lines = pad.text().split('\n');
+    for (idx in lines) {
+      if ( ! lines.hasOwnProperty(idx)) { continue; }
+      var line = lines[idx];
+      if (line == '') { continue; }
+      var acl = line.split(/\s+/);
+      if (acl.length < 2) { continue; }
+      if (acl[0] != userId) { continue; }
+      
+      ret = ret || allowed(acl);
+      
+      if (ret) { break; }
+    }
+  });
+  return ret;
+}
+
+function isRenderAllowed(projectname, filename, userId) {
+  var path = '/'+((filename == '') ? projectname : projectname+'/'+filename);
+  return _isAllowedBySomeAcl(userId, function(acl) {
+    if (acl[1].length > path.length) {
+      return acl[1].indexOf(path) == 0;
+    } else {
+      return path.indexOf(acl[1]) == 0;
+    }
+  });
+}
+
+function isChangesetAllowed(padId, changeset, author) {
+  if (author == '') { return true; } // XXX always internal?
+  if (author[0] == '#') { return true; } // XXX always internal?
+  if ( ! restricted(author)) { return true; }
+  
+  var uf = _userFileFor(padId);
+  return _isAllowedBySomeAcl(author, function(acl) {
+    if (acl[1] != uf.filename) { return false; }
+    var doc = _getDocument(padId);
+    return doc.isAllowed(_makeReplaceEdits(doc, changeset), acl.slice(2));
+  });
 }
 
 function taskPdsyncDocumentText(padId, cs) {
   var doc = _getDocument(padId);
-  
-  var unpacked = Changeset.unpack(cs);
+  doc.pdsyncApply(_makeReplaceEdits(doc, cs));
+}
+
+function taskPdsyncPadStyle(username, file, iterator) {
+  model.accessPadGlobal(_padIdFor(username, file), function(pad) {
+    var changeset = _makeChangeSetStr(pad, iterator);
+    pad.pdsync(function () {
+      collab_server.applyChangesetToPad(pad, changeset, "#syntaxcolor");
+    });
+  });
+}
+
+function _makeReplaceEdits(doc, changeset) {
+  var edits = [];
+  var unpacked = Changeset.unpack(changeset);
   var csIter = Changeset.opIterator(unpacked.ops);
   var bankIter = Changeset.stringIterator(unpacked.charBank);
   var ops = [];
@@ -100,30 +180,23 @@ function taskPdsyncDocumentText(padId, cs) {
   ops.forEach(function(op) {
     switch (op.opcode) {
     case 'r':
-      doc.pdsyncReplace(pos, op.delchars, bankIter.take(op.inschars));
+      edits.push(new ReplaceEdit(pos, op.delchars, bankIter.take(op.inschars)));
       pos += op.inschars;
       break;
     case '+':
-      doc.pdsyncReplace(pos, 0, bankIter.take(op.chars));
+      edits.push(new ReplaceEdit(pos, 0, bankIter.take(op.chars)));
       pos += op.chars;
       break;
     case '-':
-      doc.pdsyncReplace(pos, op.chars, "");
+      edits.push(new ReplaceEdit(pos, op.chars, ""));
       break;
     case '=':
       pos += op.chars;
       break;
     }
   });
-}
-
-function taskPdsyncPadStyle(username, file, iterator) {
-  model.accessPadGlobal(_padIdFor(username, file), function(pad) {
-    var changeset = _makeChangeSetStr(pad, iterator);
-    pad.pdsync(function () {
-      collab_server.applyChangesetToPad(pad, changeset, "#syntaxcolor");
-    });
-  });
+  
+  return edits;
 }
 
 function _makeChangeSetStr(pad, iterator) {

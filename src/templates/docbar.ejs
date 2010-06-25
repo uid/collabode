@@ -3,7 +3,8 @@
     <div id="docbarproject"><span><%= project %></span></div>
     <div id="docbarfile"><span><%= typeof file == "undefined" ? "" : file %></span></div>
 <% if (session.userId) { %>
-    <div id="docbaruser"><a href="/logout" id="logout" title="Log out"></a> <%= session.userName %></div>
+    <div id="docbaruser"><a href="/logout" id="logout" title="Log out"></a>
+    <%= session.restricted ? '<s>'+session.userName+'</s>' : session.userName %></div>
 <% } %>
   </div>
 </div>

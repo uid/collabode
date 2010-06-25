@@ -14,8 +14,7 @@ import org.eclipse.jdt.core.formatter.CodeFormatter;
 import org.eclipse.jdt.core.search.TypeNameMatch;
 import org.eclipse.jdt.ui.text.java.*;
 import org.eclipse.jface.text.*;
-import org.eclipse.text.edits.MalformedTreeException;
-import org.eclipse.text.edits.TextEdit;
+import org.eclipse.text.edits.*;
 import org.eclipse.ui.PlatformUI;
 
 import scala.Function1;
@@ -230,6 +229,57 @@ public class JavaPadDocument extends PadDocument implements IBuffer {
         } catch (JavaModelException jme) {
             jme.printStackTrace(); // XXX
         }
+    }
+    
+    /**
+     * Returns true iff the edits are allowed.
+     * <tt>type:Name</tt> only permits edits within the body of a type <i>Name</i>.
+     * <tt>method:name</tt> only permits edits within the body of a method <i>name</i>(...).
+     */
+    @Override public synchronized boolean isAllowed(ReplaceEdit[] edits, String[] permissions) {
+        try {
+            for (String permission: permissions) {
+                String[] spec = permission.split(":");
+                if (spec[0].equals("type")) {
+                    if ( ! isEditingElement(edits, IJavaElement.TYPE, spec[1])) {
+                        return false;
+                    }
+                } else if (spec[0].equals("method")) {
+                    if ( ! isEditingElement(edits, IJavaElement.METHOD, spec[1])) {
+                        return false;
+                    }
+                } else {
+                    return false; // unknown permission
+                }
+            }
+        } catch (JavaModelException jme) {
+            jme.printStackTrace(); // XXX
+            return false;
+        }
+        return super.isAllowed(edits, permissions);
+    }
+    
+    /**
+     * Returns true iff all the edits are within the <i>body</i> of an element
+     * of the given type with the given name.
+     */
+    private boolean isEditingElement(ReplaceEdit[] edits, int type, String name) throws JavaModelException {
+        for (ReplaceEdit edit : edits) {
+            IJavaElement elt = workingCopy.getElementAt(edit.getOffset());
+            while (elt != null && (elt.getElementType() != type || ! elt.getElementName().equals(name))) {
+                elt = elt.getParent();
+            }
+            if (elt == null) { return false; } // outside required element
+            
+            ISourceReference ref = (ISourceReference)elt;
+            ISourceRange range = ref.getSourceRange();
+            int start = range.getOffset() + ref.getSource().indexOf('{');
+            int end = range.getOffset() + ref.getSource().lastIndexOf('}');
+            if (edit.getOffset() <= start || edit.getOffset() + edit.getLength() > end) {
+                return false; // inside element, but outside body
+            }
+        }
+        return true;
     }
     
     /**

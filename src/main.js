@@ -88,46 +88,68 @@ function handlePath() {
   noauth.GET.addLocations([
     [PrefixMatcher('/static/'), forward(static_control)],
     ['/', editor_control.render_root],
-    [PrefixMatcher('/login:'), auth_control.render_login],
+    [/^\/login:([\w]+)(\/.*)$/, auth_control.render_login],
+    [/^\/login()(\/.*)$/, auth_control.render_login],
     ['/logout', auth_control.logout]
   ]);
   noauth.POST.addLocations([
-    [/^\/login:(.*)$/, auth_control.login]
+    [/^\/login(\/.*)$/, auth_control.login]
   ]);
   
   if (noauth[request.method].dispatch()) {
     return;
   }
   
-  if ( ! utils.getSession().userId) {
-    response.redirect('/login:' + request.path);
+  var userId = utils.getSession().userId;
+  if ( ! userId) {
+    response.redirect('/login' + request.path);
     return;
   }
+  
+  function allow(handler) {
+    return function() { return handler.apply(this, arguments); };
+  }
+  function deny(handler) {
+    return function() { utils.renderError(403); return true; };
+  }
+  function check(handler) {
+    return function(projectname, filename) {
+      if (workspace.isRenderAllowed(projectname, filename, userId)) {
+        return handler.apply(this, arguments);
+      } else {
+        return deny()(); // what is this, Perl?
+      }
+    };
+  }
+  
+  var u = workspace.restricted(userId) ? deny : allow;
+  var r = workspace.restricted(userId) ? check : allow;
   
   var authed = {
     GET: new Dispatcher(),
     POST: new Dispatcher()
   }
   authed.GET.addLocations([
-    [_file('console'), console_control.render_console],
-    [_proj('delete'), editor_control.render_confirm_delete],
-    [_file('delete'), editor_control.render_confirm_delete],
-    [_proj(), editor_control.render_project],
-    [_file(), editor_control.render_path]
+    ['/acl', u(auth_control.render_acl)],
+    [_file('console'), r(console_control.render_console)],
+    [_proj('delete'), u(editor_control.render_confirm_delete)],
+    [_file('delete'), u(editor_control.render_confirm_delete)],
+    [_proj(), r(editor_control.render_project)],
+    [_file(), r(editor_control.render_path)]
   ]);
   authed.POST.addLocations([
-    [_proj('delete'), editor_control.delete_path],
-    [_file('delete'), editor_control.delete_path],
-    ['/', editor_control.create_project],
-    [_proj(), editor_control.create_path],
-    [_file(), editor_control.create_path]
+    [_proj('delete'), u(editor_control.delete_path)],
+    [_file('delete'), u(editor_control.delete_path)],
+    ['/', u(editor_control.create_project)],
+    [_proj(), u(editor_control.create_path)],
+    [_file(), u(editor_control.create_path)]
   ]);
   
   if (authed[request.method].dispatch()) {
     return;
   }
   
-  // XXX 404
+  utils.renderError(404);
 }
 
 function _proj(verb) {
