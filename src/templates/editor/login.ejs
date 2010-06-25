@@ -8,8 +8,15 @@
 <div id="padmain">
   <div id="padeditor">
     <form id="wizardcontainerbox" method="post">
-      <h1>Please log in</h1>
-      <p>Username: <input name="username"/></p>
+      <%= data.failure ? H1({ style: 'color:rgb(200,0,0);' }, failure) + BR() : '' %>
+      <table>
+        <tr><td colspan="2"><h1>Please log in</h1></td></tr>
+        <tr><td>Username:&nbsp;</td><td><input name="username"/></td></tr>
+        <tr><td>Password:&nbsp;</td><td><input name="password" type="password"/></td></tr>
+        
+        <tr><td colspan="2"><br/><h1>or enter with restricted access</h1></td></tr>
+        <tr><td>Username:&nbsp;</td><td><input name="rusername"/></td></tr>
+      </table>
       
       <div id="wizardbottom">
         <button type="submit">Login</button>

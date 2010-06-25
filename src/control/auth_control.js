@@ -1,4 +1,5 @@
 import("helpers");
+import("stringutils.md5");
 import("utils.*");
 
 import("collab.collab_server");
@@ -37,6 +38,7 @@ function render_acl() {
 }
 
 function do_login(clazz, username, destination) {
+  username = username.replace(/\s+/g, '').toLowerCase();
   getSession().userId = clazz + '.' + username;
   getSession().userName = username;
   getSession().restricted = workspace.restricted(getSession().userId);
@@ -55,8 +57,14 @@ function render_login(username, destination) {
 }
 
 function login(destination) {
-  var username = request.params.username.replace(/\s+/g, '').toLowerCase();
-  do_login('r', username, destination);
+  var p = request.params;
+  if (p.rusername != '') {
+    do_login('r', p.rusername, destination);
+  } else if ((p.username != '') && (_hash(p.username) == p.password)) { // XXX
+    do_login('u', p.username, destination);
+  } else {
+    renderHtml("editor/login.ejs", { failure: "Login failed" });
+  }
   return true;
 }
 
@@ -66,4 +74,8 @@ function logout() {
   delete getSession().restricted;
   response.redirect('/');
   return true;
+}
+
+function _hash(username) {
+  return md5(username + '\n').substring(0, 4);
 }
