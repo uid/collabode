@@ -14,6 +14,13 @@ function getSession() {
   });
 }
 
+function renderError(code) {
+  response.reset();
+  response.setStatusCode(code);
+  renderHtml("error/" + code + ".ejs", { });
+  response.stop();
+}
+
 function renderFirstTemplateAsString(filenames, data) {
   var html = "";
   eachProperty(filenames, function(i, filename) {
