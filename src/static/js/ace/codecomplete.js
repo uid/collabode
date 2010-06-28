@@ -82,7 +82,7 @@ codecomplete.init = function($) {
     proposalDisplay = new Array();
     selectedIndex = 1;
     for (i in proposalSource) {
-      var matchString = proposalSource[i].replacement.match("^"+codecomplete.filterPrefix.toLowerCase(),"i");
+      var matchString = proposalSource[i].replacement.match(new RegExp('^'+codecomplete.filterPrefix.toLowerCase(),'i'));
       if (matchString != null) {
          proposalDisplay.push(proposalSource[i]);
       }
@@ -205,6 +205,11 @@ codecomplete.keyHandlerCC = function(keyCode, evt) {
 }
 
 codecomplete.handleClick = function(event) {
+  codecomplete.hideCC();
+  codecomplete.stopClick = false;
+}
+
+codecomplete.handleScroll = function(event) {
   codecomplete.hideCC();
   codecomplete.stopClick = false;
 }

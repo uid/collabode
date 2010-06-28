@@ -2884,6 +2884,16 @@ function OUTER(gscope) {
       }
     }
   }
+  
+  function handleScroll(evt) {
+    inCallStack("handleClick", function() {
+      idleWorkTimer.atMost(200);
+    });
+    
+    if (codecomplete.active) {
+      codecomplete.handleScroll(evt);
+    }
+  }
 
   function doReturnKey() {
     if (! (rep.selStart && rep.selEnd)) {
@@ -4141,6 +4151,7 @@ function OUTER(gscope) {
     bindEventHandler(document, "keypress", handleKeyEvent);
     bindEventHandler(document, "keyup", handleKeyEvent);
     bindEventHandler(document, "click", handleClick);
+    bindEventHandler(outerWin, "scroll", handleScroll);
     bindEventHandler(root, "blur", handleBlur);
     if (browser.msie) {
       bindEventHandler(document, "click", handleIEOuterClick);
