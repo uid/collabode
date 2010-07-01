@@ -892,6 +892,7 @@ function OUTER(gscope) {
     inCallStack("undoable", function() {
       fastIncorp(101);
       performDocumentApplyChangeset(cs, false);
+      window.focus();
     });
   };
   
