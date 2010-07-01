@@ -948,6 +948,9 @@ function OUTER(gscope) {
     var scrollX = outerWin.scrollX||outerWin.document.documentElement.scrollLeft; // fix to work in IE
     var top = rep.lines.atIndex(focusLine+1).lineNode.offsetTop + iframe.offsetTop - scrollY;
     var left = getSelectionPointX(getSelection().endPoint) + iframe.offsetLeft - scrollX;
+    if (($("#ac-widget").height() + top) > $("#editorcontainerbox").height()) {
+      top -= ($("#ac-widget").height() + 16); //XXX need to figure out how to get this value from t
+    }
     codecomplete.showCC(proposals, top, left, rep);
   };
 
