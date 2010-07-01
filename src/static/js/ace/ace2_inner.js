@@ -932,7 +932,8 @@ function OUTER(gscope) {
   
   editorInfo.ace_setRequestCodeCompletion = function($, handler) {
     setRequestCodeCompletion(handler);
-    codecomplete.init($);
+    codecomplete.init($, fastIncorp, performDocumentReplaceCharRange, 
+        lineAndColumnFromChar, performSelectionChange);
   };
   
   editorInfo.ace_showCodeCompletionProposals = function($, offset, proposals) {
@@ -2858,7 +2859,7 @@ function OUTER(gscope) {
     });
     
     // handler for codecompletion widget
-    if (evt.type == "click" && codecomplete.active) {
+    if (codecomplete.active) {
       codecomplete.handleClick(evt);
       if (codecomplete.stopClick) {
         evt.preventDefault();
@@ -3190,38 +3191,12 @@ function OUTER(gscope) {
     var isTypeForCmdKey = ((browser.msie || browser.safari) ? (type == "keydown") : (type == "keypress"));
 
     var stopped = false;
-    
-    // makes the code assist text replacement
-    function makeReplace() {
-      if (codecomplete.replace) {
-        fastIncorp(101);
-        performDocumentReplaceCharRange(codecomplete.start, codecomplete.end, codecomplete.replacementString);
-        var pos = lineAndColumnFromChar(codecomplete.start + codecomplete.replacementString.length);
-        performSelectionChange(pos, pos, false);
-      }
-    }
 
     inCallStack("handleKeyEvent", function() {
-    
-      // handler for codecompletion widget
-      if (codecomplete.active){
-        if (type == "keydown") {
-          codecomplete.keyHandlerCC(keyCode,evt);
-          makeReplace();
-        }
-      } 
-    
-      // decides whether to allow default key behavior
-      if (codecomplete.stopKey){
-        if (type == "keypress" || type == "keydown") {
-          evt.preventDefault();
-          return;
-        } else {
-          evt.preventDefault();
-          codecomplete.stopKey = false;
-          return;
-        }
-      }
+      
+      // handler for code completing
+      codecomplete.keyHandlerCC(evt);
+      if (codecomplete.stopHandler) { return; }
 
       if (type == "keypress" ||
 	  (isTypeForSpecialKey && keyCode == 13/*return*/)) {

@@ -2,6 +2,10 @@
 var selectedIndex = 1;
 var proposalSource;
 var proposalDisplay;
+var fastIncorp;
+var performDocumentReplaceCharRange;
+var lineAndColumnFromChar;
+var performSelectionChange;
 
 var codecomplete = {}
 codecomplete.active = false;        //indicates whether widget is open
@@ -14,9 +18,22 @@ codecomplete.start;                 //index of beginning character to codecomple
 codecomplete.end;                   //index of last character to codecomplete at
 codecomplete.cursorStart;           //cursor position where codecomplete was invoked
 codecomplete.filterPrefix;          //prefix to filter codecomplete list with
+codecomplete.stopHandler = false;
 
 // functions used by codecompletion widget
-codecomplete.init = function($) {
+codecomplete.init = function($, f1, f2, f3, f4) {
+  fastIncorp = f1;
+  performDocumentReplaceCharRange = f2;
+  lineAndColumnFromChar = f3;
+  performSelectionChange = f4
+
+  $(window).bind("keydown", function(event) {
+    if (codecomplete.active) {
+      event.preventDefault();
+      codecomplete.keyHandlerCC(event);
+    }
+  });
+  
   codecomplete.showCC = function(proposals,top,left,rep) {
     codecomplete.emptyCC();
     if (proposals.length > 0) {
@@ -56,7 +73,11 @@ codecomplete.init = function($) {
 
   codecomplete.populateCC = function(items) {
     forEach(items, function(p,i) {
-      $("#ac-widget-list").append($('<li class="ac-widget-item">').text(p.completion));
+      $("#ac-widget-list").append($('<li class="ac-widget-item" id=proposal'+i+'>').text(p.completion));
+      $("#proposal"+i).bind("click", function(event) {
+        selectedIndex = i+1;
+        codecomplete.setHighlight();
+      });
     });
   }
   
@@ -75,7 +96,6 @@ codecomplete.init = function($) {
     // the code complete was initially invoked
     if (codecomplete.end < codecomplete.cursorStart) {
       codecomplete.hideCC();
-      codecomplete.active = false;
     }
     
     // filter the displayed list based on the filterPrefix
@@ -95,7 +115,6 @@ codecomplete.init = function($) {
       codecomplete.setHighlight();
     } else {
       codecomplete.hideCC();
-      codecomplete.active = false;
     }
   }
   
@@ -166,47 +185,63 @@ codecomplete.init = function($) {
 }
 
 // key handler while code assist is active
-codecomplete.keyHandlerCC = function(keyCode, evt) {
-  codecomplete.replace = false;
-  codecomplete.stopKey = false;
-  if (keyCode >= 48 && keyCode <= 90 && keyCode != 59 && keyCode != 57) { // numbers and letters
-    codecomplete.incrementEnd = true;
-    codecomplete.filterCC(String.fromCharCode(keyCode));
-  } else if (keyCode == 27) { // escape key
-    codecomplete.hideCC();
-    codecomplete.stopKey = true;
-  } else if (keyCode == 40) { // down arrow
-    codecomplete.arrowDown();
-    codecomplete.stopKey = true;
-  } else if (keyCode == 38) { // up arrow
-    codecomplete.arrowUp();
-    codecomplete.stopKey = true;
-  } else if (keyCode == 8) { // backspace
-    codecomplete.incrementEnd = false;
-    codecomplete.filterCC();
-  } else if (keyCode == 13) { // enter
-    codecomplete.setReplacement();
-    codecomplete.hideCC();
-    codecomplete.replace = true;
-    codecomplete.stopKey = true;
-  } else if (keyCode == 59 || keyCode == 190 || (keyCode == 32 && !evt.ctrlKey)) { // semicolon, period, and space
-    codecomplete.setReplacement();
-    codecomplete.hideCC();
-    codecomplete.replace = true;
-  } else if (keyCode == 57 && evt.shiftKey) { // open paren
-    codecomplete.setReplacement();
-    codecomplete.hideCC();
-    codecomplete.replace = true;
-    codecomplete.stopKey = true;
-  } else {
-    codecomplete.incrementEnd = true;
-    codecomplete.filterCC(String.fromCharCode(keyCode));
+codecomplete.keyHandlerCC = function(evt) {
+  if (evt.type == "keydown" && codecomplete.active) {
+    var keyCode = evt.keyCode;
+    codecomplete.replace = false;
+    codecomplete.stopKey = false;
+    if (keyCode >= 48 && keyCode <= 90 && keyCode != 59 && keyCode != 57) { // numbers and letters
+      codecomplete.incrementEnd = true;
+      codecomplete.filterCC(String.fromCharCode(keyCode));
+    } else if (keyCode == 27) { // escape key
+      codecomplete.hideCC();
+      codecomplete.stopKey = true;
+    } else if (keyCode == 40) { // down arrow
+      codecomplete.arrowDown();
+      codecomplete.stopKey = true;
+    } else if (keyCode == 38) { // up arrow
+      codecomplete.arrowUp();
+      codecomplete.stopKey = true;
+    } else if (keyCode == 8) { // backspace
+      codecomplete.incrementEnd = false;
+      codecomplete.filterCC();
+    } else if (keyCode == 13) { // enter
+      codecomplete.setReplacement();
+      codecomplete.hideCC();
+      codecomplete.replace = true;
+      codecomplete.stopKey = true;
+    } else if (keyCode == 59 || keyCode == 190 || (keyCode == 32 && !evt.ctrlKey)) { // semicolon, period, and space
+      codecomplete.setReplacement();
+      codecomplete.hideCC();
+      codecomplete.replace = true;
+    } else if (keyCode == 57 && evt.shiftKey) { // open paren
+      codecomplete.setReplacement();
+      codecomplete.hideCC();
+      codecomplete.replace = true;
+      codecomplete.stopKey = true;
+    } else {
+      codecomplete.incrementEnd = true;
+      codecomplete.filterCC(String.fromCharCode(keyCode));
+    }
+    if (codecomplete.replace) {
+      fastIncorp(101);
+      performDocumentReplaceCharRange(codecomplete.start, codecomplete.end, codecomplete.replacementString);
+      var pos = lineAndColumnFromChar(codecomplete.start + codecomplete.replacementString.length);
+      performSelectionChange(pos, pos, false);
+    }
   }
-}
-
-codecomplete.handleClick = function(event) {
-  codecomplete.hideCC();
-  codecomplete.stopClick = false;
+  
+  if (codecomplete.stopKey) {
+    codecomplete.stopHandler = true;
+    if (evt.type == "keypress" || evt.type == "keydown") {
+      evt.preventDefault();
+    } else {
+      evt.preventDefault();
+      codecomplete.stopKey = false;
+    }
+  } else {
+    codecomplete.stopHandler = false;
+  }
 }
 
 codecomplete.handleScroll = function(event) {
@@ -214,8 +249,10 @@ codecomplete.handleScroll = function(event) {
   codecomplete.stopClick = false;
 }
 
-
-
+codecomplete.handleClick = function(event) {
+  codecomplete.hideCC();
+  codecomplete.stopClick = false;
+}
 
 
 
