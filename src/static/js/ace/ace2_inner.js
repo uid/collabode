@@ -934,7 +934,10 @@ function OUTER(gscope) {
   editorInfo.ace_setRequestCodeCompletion = function($, handler) {
     setRequestCodeCompletion(handler);
     codecomplete.init($, fastIncorp, performDocumentReplaceCharRange, 
-        lineAndColumnFromChar, performSelectionChange);
+        lineAndColumnFromChar, performSelectionChange, inCallStack);
+  };
+  editorInfo.ace_setRequestFormat = function(handler) {
+    setRequestFormat(handler);
   };
   
   editorInfo.ace_showCodeCompletionProposals = function($, offset, proposals) {
@@ -949,8 +952,9 @@ function OUTER(gscope) {
     var scrollX = outerWin.scrollX||outerWin.document.documentElement.scrollLeft; // fix to work in IE
     var top = rep.lines.atIndex(focusLine+1).lineNode.offsetTop + iframe.offsetTop - scrollY;
     var left = getSelectionPointX(getSelection().endPoint) + iframe.offsetLeft - scrollX;
+    var lineHeight = parseInt($("iframe").contents().find("iframe").contents().find("#innerdocbody").css("line-height").substring(0,2));
     if (($("#ac-widget").height() + top) > $("#editorcontainerbox").height()) {
-      top -= ($("#ac-widget").height() + 16); //XXX need to figure out how to get this value from t
+      top -= ($("#ac-widget").height() + lineHeight);
     }
     codecomplete.showCC(proposals, top, left, rep);
   };
@@ -2862,7 +2866,7 @@ function OUTER(gscope) {
       idleWorkTimer.atMost(200);
     });
     
-    // handler for codecompletion widget
+    // handler for hiding widget when clicking outside
     if (codecomplete.active) {
       codecomplete.handleClick(evt);
       if (codecomplete.stopClick) {
@@ -2891,10 +2895,6 @@ function OUTER(gscope) {
   }
   
   function handleScroll(evt) {
-    inCallStack("handleClick", function() {
-      idleWorkTimer.atMost(200);
-    });
-    
     if (codecomplete.active) {
       codecomplete.handleScroll(evt);
     }
@@ -3321,10 +3321,21 @@ function OUTER(gscope) {
 	  // cmd-Space (code completion)
 	  fastIncorp(100);
 	  evt.preventDefault();
-	  doRequestCodeCompletion();
+	  doRequestCodeCompletion(caretDocChar());
 	  specialHandled = true;
-	}
-
+	} 
+	
+	if ((!specialHandled) &&
+      ((browser.mozilla && ! browser.windows) ? (type == "keydown") : isTypeForCmdKey) &&
+      String.fromCharCode(which).toLowerCase() == "f" &&
+      (evt.metaKey || evt.ctrlKey) && evt.shiftKey) {
+    // shift-cmd-F (code formatting)
+    fastIncorp(100);
+    evt.preventDefault();
+    doRequestFormat();
+    specialHandled = true;
+  }
+	 
 	if (mozillaFakeArrows && mozillaFakeArrows.handleKeyEvent(evt)) {
 	  evt.preventDefault();
 	  specialHandled = true;
@@ -4893,15 +4904,25 @@ function OUTER(gscope) {
     requestCodeCompletionHandler = handler;
   }
   
-  function doRequestCodeCompletion() {
+  function doRequestCodeCompletion(offset) {
     if ( ! requestCodeCompletionHandler) {
       return; // XXX why would this happen?
     }
     if (isCaret()) {
-      requestCodeCompletionHandler(caretDocChar());
+      requestCodeCompletionHandler(offset);
     } else {
       // XXX maybe selection? not sure
     }
+  }
+  
+  var requestFormatHandler = false;
+  
+  function setRequestFormat(handler) {
+    requestFormatHandler = handler;
+  }
+  
+  function doRequestFormat() {
+    requestFormatHandler();
   }
 
 };

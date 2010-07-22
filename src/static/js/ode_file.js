@@ -53,6 +53,10 @@ $(document).ready(function() {
     collab.sendExtendedMessage({ type: "ORGIMPORTS_RESOLVED" }); // XXX
   });
   
+  ace.setRequestFormat(function() {
+    collab.sendExtendedMessage({ type: "FORMAT_REQUEST" });
+  });
+  
   $("#format").click(function() {
     collab.sendExtendedMessage({ type: "FORMAT_REQUEST" });
     return false;

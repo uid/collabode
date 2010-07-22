@@ -131,6 +131,9 @@ function Ace2Editor() {
   editor.setRequestCodeCompletion = pendingInit(function(handler) {
     info.ace_setRequestCodeCompletion($, handler);
   });
+  editor.setRequestFormat = pendingInit(function(handler) {
+    info.ace_setRequestFormat(handler);
+  });
   editor.showCodeCompletionProposals = pendingInit(function(offset, proposals) {
     info.ace_showCodeCompletionProposals($, offset, proposals);
   });
