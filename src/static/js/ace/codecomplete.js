@@ -2,10 +2,12 @@
 var selectedIndex = 1;
 var proposalSource;
 var proposalDisplay;
+var docLineHeight;
 var fastIncorp;
 var performDocumentReplaceCharRange;
 var lineAndColumnFromChar;
 var performSelectionChange;
+var inCallStack;
 
 var codecomplete = {}
 codecomplete.active = false;        //indicates whether widget is open
@@ -21,11 +23,13 @@ codecomplete.filterPrefix;          //prefix to filter codecomplete list with
 codecomplete.stopHandler = false;
 
 // functions used by codecompletion widget
-codecomplete.init = function($, f1, f2, f3, f4) {
+codecomplete.init = function($, f1, f2, f3, f4, f5) {
   fastIncorp = f1;
   performDocumentReplaceCharRange = f2;
   lineAndColumnFromChar = f3;
   performSelectionChange = f4
+  inCallStack = f5;
+  docLineHeight = parseInt($("iframe").contents().find("iframe").contents().find("#innerdocbody").css("line-height").substring(0,2));
 
   $(window).bind("keydown", function(event) {
     if (codecomplete.active) {
@@ -37,13 +41,13 @@ codecomplete.init = function($, f1, f2, f3, f4) {
   codecomplete.showCC = function(proposals,top,left,rep) {
     codecomplete.emptyCC();
     if (proposals.length > 0) {
+      codecomplete.active = true;
       proposalSource = proposals;
       proposalDisplay = proposalSource;
       codecomplete.populateCC(proposalDisplay);
       $("#ac-widget").css({"visibility":"visible","top":top+"px","left":left+"px"});
       $("#ac-widget").scrollTop(0);
       codecomplete.setHighlight();
-      codecomplete.active = true;
       codecomplete.ignoreSpace = false;
       
       // set the replacement start
@@ -77,6 +81,17 @@ codecomplete.init = function($, f1, f2, f3, f4) {
       $("#proposal"+i).bind("click", function(event) {
         selectedIndex = i+1;
         codecomplete.setHighlight();
+        window.focus();
+      });
+      $("#proposal"+i).bind("dblclick", function(event) {
+        window.focus();
+        selectedIndex = i+1;
+        codecomplete.setHighlight();
+        codecomplete.setReplacement();
+        codecomplete.hideCC();
+        inCallStack("dblclick", function() {
+          doReplace();
+        });
       });
     });
   }
@@ -144,8 +159,8 @@ codecomplete.init = function($, f1, f2, f3, f4) {
     var currTop = $("#ac-widget").scrollTop();
     if ($(".ac-widget-item:first").hasClass("ac-selected")) {
       $("#ac-widget").scrollTop(0);
-    } else if ($(".ac-selected").position().top > 128) {
-      $("#ac-widget").scrollTop(currTop+16);
+    } else if ($(".ac-selected").position().top > docLineHeight*9) {
+      $("#ac-widget").scrollTop(currTop+docLineHeight);
     }
   }
 
@@ -154,9 +169,9 @@ codecomplete.init = function($, f1, f2, f3, f4) {
     codecomplete.makeScrollVisible();
     var currTop = $("#ac-widget").scrollTop();
     if ($(".ac-widget-item:last").hasClass("ac-selected")) {
-      $("#ac-widget").scrollTop(16*$(".ac-widget-item").length);
+      $("#ac-widget").scrollTop(docLineHeight*$(".ac-widget-item").length);
     } else if ($(".ac-selected").position().top < 0) {
-      $("#ac-widget").scrollTop(currTop-16);
+      $("#ac-widget").scrollTop(currTop-docLineHeight);
     }
   }
   
@@ -167,8 +182,8 @@ codecomplete.init = function($, f1, f2, f3, f4) {
     if (selectedPosition < 0) {
       adjust = selectedPosition;
       $("#ac-widget").scrollTop(currTop+adjust);
-    } else if (selectedPosition > 128) {
-      adjust = selectedPosition-128;
+    } else if (selectedPosition > docLineHeight*8) {
+      adjust = selectedPosition-docLineHeight*8;
       $("#ac-widget").scrollTop(currTop+adjust);
     }
   }
@@ -224,10 +239,7 @@ codecomplete.keyHandlerCC = function(evt) {
       codecomplete.filterCC(String.fromCharCode(keyCode));
     }
     if (codecomplete.replace) {
-      fastIncorp(101);
-      performDocumentReplaceCharRange(codecomplete.start, codecomplete.end, codecomplete.replacementString);
-      var pos = lineAndColumnFromChar(codecomplete.start + codecomplete.replacementString.length);
-      performSelectionChange(pos, pos, false);
+      doReplace();
     }
   }
   
@@ -254,6 +266,12 @@ codecomplete.handleClick = function(event) {
   codecomplete.stopClick = false;
 }
 
+function doReplace() {
+  fastIncorp(101);
+  performDocumentReplaceCharRange(codecomplete.start, codecomplete.end, codecomplete.replacementString);
+  var pos = lineAndColumnFromChar(codecomplete.start + codecomplete.replacementString.length);
+  performSelectionChange(pos, pos, false);
+}
 
 
 
