@@ -77,7 +77,7 @@ codecomplete.init = function($, f1, f2, f3, f4, f5) {
 
   codecomplete.populateCC = function(items) {
     forEach(items, function(p,i) {
-      $("#ac-widget-list").append($('<li class="ac-widget-item" id=proposal'+i+'>').text(p.completion));
+      $("#ac-widget-list").append($('<li class="ac-widget-item" id=proposal'+i+'>').text(p.completion).prepend('<img src="/static/img/eclipse/jdt.ui.obj/'+p.image+'"/>'));
       $("#proposal"+i).bind("click", function(event) {
         selectedIndex = i+1;
         codecomplete.setHighlight();

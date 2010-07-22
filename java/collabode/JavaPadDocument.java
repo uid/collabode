@@ -19,7 +19,7 @@ import org.eclipse.ui.PlatformUI;
 
 import scala.Function1;
 import scala.Function2;
-import collabode.complete.JavaPadCompletionProposal;
+import collabode.complete.JavaPadCompletionProposalCollector;
 import collabode.orgimport.PadImportOrganizer;
 
 /**
@@ -307,7 +307,7 @@ public class JavaPadDocument extends PadDocument implements IBuffer {
         }
         
         public void run() {
-            CompletionProposalCollector collector = new CompletionProposalCollector(workingCopy);
+            JavaPadCompletionProposalCollector collector = new JavaPadCompletionProposalCollector(workingCopy);
             collector.setInvocationContext(new JavaContentAssistInvocationContext(workingCopy));
             try {
                 workingCopy.codeComplete(offset, collector);
@@ -316,27 +316,9 @@ public class JavaPadDocument extends PadDocument implements IBuffer {
                 return;
             }
             
-            IJavaCompletionProposal[] proposals = collector.getJavaCompletionProposals();
-            
-            SortedSet<IJavaCompletionProposal> sortedProposals = new TreeSet<IJavaCompletionProposal>(COMPARE);
-            for (IJavaCompletionProposal proposal : proposals){
-                sortedProposals.add(proposal);
-            }
-            List<JavaPadCompletionProposal> padProposals = new ArrayList<JavaPadCompletionProposal>(proposals.length);
-            for (IJavaCompletionProposal proposal : sortedProposals) {
-                padProposals.add(new JavaPadCompletionProposal(proposal));
-            }
-            
-            reporter.apply(padProposals.toArray());
+            reporter.apply(collector.getSortedJavaPadCompletionProposals());
         }
     }
-    
-    private static final Comparator<IJavaCompletionProposal> COMPARE = new Comparator<IJavaCompletionProposal>() {
-        private final CompletionProposalComparator compare = new CompletionProposalComparator();
-        public int compare(IJavaCompletionProposal p1, IJavaCompletionProposal p2) {
-            return compare.compare(p1, p2);
-        }
-    };
     
     /**
      * Formats the document's code.

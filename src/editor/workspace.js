@@ -247,7 +247,8 @@ function codeComplete(padId, offset, connectionId) {
         completion: "" + proposal.displayString,
         replacement: "" + proposal.replacementString,
         length: proposal.replacementLength,
-        offset: proposal.replacementOffset
+        offset: proposal.replacementOffset,
+        image: "" + proposal.imageName
       };
     }));
   }));
