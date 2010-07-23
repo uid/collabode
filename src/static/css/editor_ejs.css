@@ -194,10 +194,10 @@ body.nosidebar #padeditor { margin-left: 0; }
     -o-box-shadow: 5px 5px 5px #888; -icab-box-shadow: 5px 5px 5px #888; -khtml-box-shadow: 5px 5px 5px #888;
     -moz-box-shadow: 3px 3px 6px #888; -webkit-box-shadow: 5px 5px 5px #888;}
 #ac-widget-list {display:block; list-style-type:none; padding-left:0px; white-space:nowrap; margin-bottom:0px; }
-.ac-widget-item {height:8px; padding-left:2px; padding-top:2px; padding-bottom:6px; margin-bottom:0px;}
+.ac-widget-item {height:8px; padding-left:2px; padding-top:2px; padding-bottom:6px; margin-bottom:0px; padding-right:5px;}
 .ac-selected {background-color:#3875d7; color:#e8e8e8;}
 .ac-widget-item span {position:absolute;}
-.ac-widget-item img {margin-top:-3px;}
+.ac-widget-item img {margin-top:-1px;}
 
 #wizardcontainerbox {
 	border: 1px solid #c4c4c4;

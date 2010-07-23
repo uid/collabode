@@ -77,8 +77,10 @@ codecomplete.init = function($, f1, f2, f3, f4, f5) {
   }
 
   codecomplete.populateCC = function(items) {
+    var maxProposalWidth = 0;
     forEach(items, function(p,i) {
-      $("#ac-widget-list").append($('<li class="ac-widget-item" id=proposal'+i+'>').append('<span>'+p.completion+'</span>').prepend('<img src="/static/img/eclipse/jdt.ui.obj/'+p.image+'"/>'));
+      $("#ac-widget-list").append($('<li class="ac-widget-item" id=proposal'+i+'>').append('<span class="proposal-text">'+p.completion+'</span>').prepend('<img src="/static/img/eclipse/jdt.ui.obj/'+p.image+'"/>'));
+      maxProposalWidth = Math.max($("#proposal"+i).children(".proposal-text").width(), maxProposalWidth);
       $("#proposal"+i).bind("click", function(event) {
         selectedIndex = i+1;
         codecomplete.setHighlight();
@@ -95,6 +97,7 @@ codecomplete.init = function($, f1, f2, f3, f4, f5) {
         });
       });
     });
+    $(".ac-widget-item").css("width", maxProposalWidth+16);
   }
   
   codecomplete.filterCC = function(str) {
@@ -155,7 +158,6 @@ codecomplete.init = function($, f1, f2, f3, f4, f5) {
   }
   
   codecomplete.scrollDown = function() {
-    $("#ac-widget").scrollLeft(0);
     codecomplete.makeScrollVisible();
     var currTop = $("#ac-widget").scrollTop();
     if ($(".ac-widget-item:first").hasClass("ac-selected")) {
@@ -166,7 +168,6 @@ codecomplete.init = function($, f1, f2, f3, f4, f5) {
   }
 
   codecomplete.scrollUp = function() {
-    $("#ac-widget").scrollLeft(0);
     codecomplete.makeScrollVisible();
     var currTop = $("#ac-widget").scrollTop();
     if ($(".ac-widget-item:last").hasClass("ac-selected")) {
