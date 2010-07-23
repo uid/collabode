@@ -196,6 +196,8 @@ body.nosidebar #padeditor { margin-left: 0; }
 #ac-widget-list {display:block; list-style-type:none; padding-left:0px; white-space:nowrap; margin-bottom:0px; }
 .ac-widget-item {height:8px; padding-left:2px; padding-top:2px; padding-bottom:6px; margin-bottom:0px;}
 .ac-selected {background-color:#3875d7; color:#e8e8e8;}
+.ac-widget-item span {position:absolute;}
+.ac-widget-item img {margin-top:-3px;}
 
 #wizardcontainerbox {
 	border: 1px solid #c4c4c4;
