@@ -941,7 +941,7 @@ function OUTER(gscope) {
   };
   
   editorInfo.ace_showCodeCompletionProposals = function($, offset, proposals) {
-    if ( ! (isCaret() && (caretDocChar() == offset))) {
+    if ( ! (isCaret())) {
       alert("Unable to show completion proposals"); // XXX
       return;
     }
@@ -957,6 +957,15 @@ function OUTER(gscope) {
       top -= ($("#ac-widget").height() + lineHeight);
     }
     codecomplete.showCC(proposals, top, left, rep);
+    inCallStack("cursor check", function() {
+      fastIncorp(100);
+      if (codecomplete.cursorStart != caretDocChar()) {
+        console.log("cursor changed");
+        var filter = rep.alltext.substring(codecomplete.cursorStart, caretDocChar());
+        codecomplete.incrementEnd = true;
+        codecomplete.filterCC(filter); 
+      }
+    });
   };
 
   function now() { return (new Date()).getTime(); }
@@ -3319,11 +3328,20 @@ function OUTER(gscope) {
 	    String.fromCharCode(which) == " " &&
 	    (evt.metaKey || evt.ctrlKey)) {
 	  // cmd-Space (code completion)
-	  fastIncorp(100);
+	  codecomplete.cursorStart = caretDocChar();
 	  evt.preventDefault();
-	  doRequestCodeCompletion(caretDocChar());
+	  setTimeout(function() {doRequestCodeCompletion(caretDocChar());}, 0);
 	  specialHandled = true;
-	} 
+	} else if (String.fromCharCode(which) == ".") {
+    // auto-invoke on "." (code completion)
+    var requestOffset = caretDocChar()+1;
+    codecomplete.cursorStart = requestOffset;
+    setTimeout(function() {
+      if (codecomplete.cursorStart == caretDocChar()) {
+        doRequestCodeCompletion(requestOffset);
+      }
+    }, 600); // delay for doc to sync
+  }
 	
 	if ((!specialHandled) &&
       ((browser.mozilla && ! browser.windows) ? (type == "keydown") : isTypeForCmdKey) &&
@@ -4909,7 +4927,10 @@ function OUTER(gscope) {
       return; // XXX why would this happen?
     }
     if (isCaret()) {
-      requestCodeCompletionHandler(offset);
+      inCallStack("code complete", function() {
+        fastIncorp(100);
+        requestCodeCompletionHandler(offset);
+      });
     } else {
       // XXX maybe selection? not sure
     }
