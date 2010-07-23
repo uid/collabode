@@ -16,8 +16,7 @@ jimport("org.eclipse.text.edits.ReplaceEdit");
 jimport("java.lang.System");
 
 function onStartup() {
-  PadFunctions.bind(scalaFn(3, _pdsyncPadText),
-                    scalaFn(3, _reportPadProblems));
+  PadFunctions.bind(scalaFn(3, _pdsyncPadText));
   collab_server.setExtendedHandler("RUN_REQUEST", _onRunRequest);
   collab_server.setExtendedHandler("TESTS_REQUEST", _onTestsRequest);
   collab_server.setExtendedHandler("FORMAT_REQUEST", _onFormatRequest);
@@ -37,15 +36,19 @@ function _pdsyncPadText(username, file, txt) { // XXX should take revisions, not
   });
 }
 
-function _reportPadProblems(username, file, problems) {
+function taskReportProblems(username, file, problems) {
   model.accessPadGlobal(_padIdFor(username, file), function(pad) {
-    collab_server.updatePadClientsAnnotations(pad, "problem", problems.map(function(problem) {
-      return {
-        lineNumber: problem.getSourceLineNumber(),
-        severity: (problem.isError() ? "error" : "warning"),
-        message: problem.getMessage()
-      };
-    }));
+    collab_server.sendPadExtendedMessage(pad, {
+      type: "ANNOTATIONS",
+      annotationType: "problem",
+      annotations: problems.map(function(problem) {
+          return {
+            lineNumber: problem.getSourceLineNumber(),
+            severity: (problem.isError() ? "error" : "warning"),
+            message: problem.getMessage()
+          }
+        })
+    });
   });
 }
 

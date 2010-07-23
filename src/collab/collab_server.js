@@ -801,20 +801,6 @@ function sendPadExtendedMessage(pad, msg) {
   });
 }
 
-function updateClientAnnotations(connectionId, type, annotations) {
-  sendMessage(connectionId, {
-    type: "ANNOTATIONS",
-    annotationType: type,
-    annotations: annotations
-  });
-}
-
-function updatePadClientsAnnotations(pad, type, annotations) {
-  _getPadConnections(pad).forEach(function(connection) {
-    updateClientAnnotations(connection.connectionId, type, annotations);
-  });
-}
-
 function updateClientCodeCompletionProposals(connectionId, padId, offset, proposals) {
   sendMessage(connectionId, {
     type: "CODE_COMPLETION_PROPOSALS",

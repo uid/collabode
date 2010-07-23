@@ -46,13 +46,16 @@ $(document).ready(function() {
   collab.setOnExtendedMessage("APPLY_CHANGESET_AS_USER", function(msg) {
     ace.applyChangesetAsUser(msg.changeset);
   });
+  collab.setOnExtendedMessage("ANNOTATIONS", function(msg) {
+    ace.setAnnotations(msg.annotationType, msg.annotations);
+  });
+  collab.setOnExtendedMessage("TEST_RESULT", function(msg) {
+    testor.updateTest(msg.test, msg.result);
+  });
   collab.setOnExtendedMessage("ORGIMPORTS_PROMPT", function(msg) {
     // XXX present the UI, then eventually send the message with choices
     alert("ORGIMPORTS_PROMPT"); // XXX
     collab.sendExtendedMessage({ type: "ORGIMPORTS_RESOLVED" }); // XXX
-  });
-  collab.setOnExtendedMessage("TEST_RESULT", function(msg) {
-    testor.updateTest(msg.test, msg.result);
   });
   
   ace.setRequestFormat(function() {

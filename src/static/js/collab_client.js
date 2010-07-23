@@ -357,9 +357,6 @@ function getCollabClient(ace2editor, serverVars, initialUserInfo, options) {
         callbacks.onExtendedMessage[msg.payload.type](msg.payload);
       }
     }
-    else if (msg.type == "ANNOTATIONS") {
-      editor.setAnnotations(msg.annotationType, msg.annotations);
-    }
     else if (msg.type == "CODE_COMPLETION_PROPOSALS") {
       if (padId == msg.id) {
         editor.showCodeCompletionProposals(msg.offset, msg.proposals);

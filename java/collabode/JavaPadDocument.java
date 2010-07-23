@@ -51,7 +51,7 @@ public class JavaPadDocument extends PadDocument implements IBuffer {
 
         public void endReporting() {
             // XXX can we avoid reporting if the list is unchanged?
-            PadFunctions.reportProblems.apply(owner.username, file, problems.toArray());
+            Workspace.scheduleTask("reportProblems", owner.username, file, problems.toArray());
             for (IProblem problem : problems) {
                 if (problem.isError()) { return; }
             }
