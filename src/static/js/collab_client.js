@@ -21,7 +21,7 @@ $(window).bind("load", function() {
 /** Call this when the document is ready, and a new Ace2Editor() has been created and inited.
     ACE's ready callback does not need to have fired yet.
     "serverVars" are from calling doc.getCollabClientVars() on the server. */
-function getCollabClient(ace2editor, serverVars, initialUserInfo, options, testor) {
+function getCollabClient(ace2editor, serverVars, initialUserInfo, options) {
   var editor = ace2editor;
 
   var rev = serverVars.rev;
@@ -364,9 +364,6 @@ function getCollabClient(ace2editor, serverVars, initialUserInfo, options, testo
       if (padId == msg.id) {
         editor.showCodeCompletionProposals(msg.offset, msg.proposals);
       }
-    }
-    else if (msg.type == "TEST_RESULT") {
-      testor.updateTest(msg.test, msg.result);
     }
   }
   function updateUserInfo(userInfo) {

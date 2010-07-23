@@ -12,7 +12,7 @@ import org.eclipse.jdt.junit.model.ITestElement;
 import org.eclipse.jdt.junit.model.ITestElementContainer;
 
 import scala.Function2;
-import collabode.PadFunctions;
+import collabode.Workspace;
 
 /**
  * Keeps track of continuous test results for a project.
@@ -97,11 +97,11 @@ public class ProjectTestsOwner {
     }
     
     private void reportAdd(Test test, TestResult result) {
-        PadFunctions.reportTestResult.apply(project.getProject(), test, result);
+        Workspace.scheduleTask("testResult", project.getProject(), test, result);
     }
     
     private void reportRemove(Test test) {
-        PadFunctions.reportTestResult.apply(project.getProject(), test, null);
+        Workspace.scheduleTask("testResult", project.getProject(), test, null);
     }
     
     /**

@@ -49,6 +49,9 @@ serverhandlers.tasks.runningStateChange = function(username, file, state) {
 serverhandlers.tasks.runningOutput = function(username, file, text, attribs) {
     workspace.taskRunningOutput(username, file, text, attribs);
 };
+serverhandlers.tasks.testResult = function(project, test, result) {
+    workspace.taskTestResult(project, test, result);
+};
 
 serverhandlers.cometHandler = function(op, id, data) {
     if ( ! data) {

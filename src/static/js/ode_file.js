@@ -18,8 +18,7 @@ $(document).ready(function() {
   var collab = getCollabClient(ace,
                                clientVars.collab_client_vars,
                                user,
-                               { },
-                               testor);
+                               { });
   
   collab.setOnInternalAction(function(action) {
     if (action == "commitPerformed") {
@@ -51,6 +50,9 @@ $(document).ready(function() {
     // XXX present the UI, then eventually send the message with choices
     alert("ORGIMPORTS_PROMPT"); // XXX
     collab.sendExtendedMessage({ type: "ORGIMPORTS_RESOLVED" }); // XXX
+  });
+  collab.setOnExtendedMessage("TEST_RESULT", function(msg) {
+    testor.updateTest(msg.test, msg.result);
   });
   
   ace.setRequestFormat(function() {

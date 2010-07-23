@@ -17,8 +17,7 @@ jimport("java.lang.System");
 
 function onStartup() {
   PadFunctions.bind(scalaFn(3, _pdsyncPadText),
-                    scalaFn(3, _reportPadProblems),
-                    scalaFn(3, _reportTestResult));
+                    scalaFn(3, _reportPadProblems));
   collab_server.setExtendedHandler("RUN_REQUEST", _onRunRequest);
   collab_server.setExtendedHandler("TESTS_REQUEST", _onTestsRequest);
   collab_server.setExtendedHandler("FORMAT_REQUEST", _onFormatRequest);
@@ -234,7 +233,7 @@ function _onTestsRequest(padId, connectionId, msg) {
   case 'state':
     var doc = _getDocument(padId);
     ProjectTestsOwner.of(doc.getProject()).reportResults(scalaFn(2, function(test, result) {
-      collab_server.updateClientTestResult(connectionId, test, result); // XXX change to extended req
+      collab_server.sendConnectionExtendedMessage(connectionId, _testResultMessage(test, result));
     }));
     break;
   }
@@ -258,8 +257,46 @@ function getContentTypeName(padId) {
   return _getDocument(padId).getContentTypeName();
 }
 
-function _reportTestResult(project, test, result) {
-  collab_server.updateProjectClientsTestResult("" + project.getName(), test, result);
+function _testResultMessage(test, result) {
+  var msg = {
+      type: "TEST_RESULT",
+      test: {
+        name: "" + test.name,
+        className: "" + test.className,
+        methodName: "" + test.methodName
+      },
+      result: null
+    };
+    
+    if (result) {
+      msg.result = {
+        resultName: "" + result.resultName(),
+        status: "" + result.status
+      };
+      if (result.trace) {
+        msg.result.trace = { stackTrace: "" + result.trace.getTrace() };
+        // XXX always seems to be null, even in the TestResult c'tor
+        if (result.trace.getExpected()) {
+          msg.result.trace.expected = "" + result.trace.getExpected();
+          msg.result.trace.actual = "" + result.trace.getActual();
+        }
+      }
+    }
+    
+    return msg;
+}
+
+function taskTestResult(project, test, result) {
+  var projectName = "" + project.getName();
+  var padIds = collab_server.getAllPadsWithConnections().filter(function(padId) {
+    return projectName == _userFileFor(padId).filename.split("/", 3)[1];
+  });
+  var msg = _testResultMessage(test, result);
+  padIds.forEach(function(padId) {
+    model.accessPadGlobal(padId, function(pad) {
+      collab_server.sendPadExtendedMessage(pad, msg);
+    });
+  });
 }
 
 function _runningPadIdFor(username, file) {
