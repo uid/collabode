@@ -197,7 +197,7 @@ body.nosidebar #padeditor { margin-left: 0; }
 .ac-widget-item {height:8px; padding-left:2px; padding-top:2px; padding-bottom:6px; margin-bottom:0px; padding-right:5px;}
 .ac-selected {background-color:#3875d7; color:#e8e8e8;}
 .ac-widget-item span {position:absolute;}
-.ac-widget-item img {margin-top:-1px;}
+.ac-widget-item img {margin-top:-1px; height:16px; width:16px;}
 
 #wizardcontainerbox {
 	border: 1px solid #c4c4c4;
