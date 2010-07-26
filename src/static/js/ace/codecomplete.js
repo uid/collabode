@@ -18,7 +18,8 @@ codecomplete.incrementEnd = false;  //indicates whether to increment codecomplet
 codecomplete.replacementString = "";
 codecomplete.start;                 //index of beginning character to codecomplete at
 codecomplete.end;                   //index of last character to codecomplete at
-codecomplete.cursorStart;           //cursor position where codecomplete was invoked
+codecomplete.newCursorStart;           //cursor position where codecomplete was invoked
+codecomplete.cursorStart;
 codecomplete.filterPrefix;          //prefix to filter codecomplete list with
 codecomplete.stopHandler = false;
 
@@ -55,7 +56,7 @@ codecomplete.init = function($, f1, f2, f3, f4, f5) {
       
       // set the initial end of the replacement (will increment during filtering)
       codecomplete.end = codecomplete.start+proposals[0].length;
-      codecomplete.cursorStart = codecomplete.start+proposals[0].length;
+      codecomplete.newCursorStart = codecomplete.start+proposals[0].length;
       
       // set the initial filter prefix
       codecomplete.filterPrefix = rep.alltext.substring(codecomplete.start,codecomplete.end);
@@ -76,8 +77,10 @@ codecomplete.init = function($, f1, f2, f3, f4, f5) {
   }
 
   codecomplete.populateCC = function(items) {
+    var maxProposalWidth = 0;
     forEach(items, function(p,i) {
-      $("#ac-widget-list").append($('<li class="ac-widget-item" id=proposal'+i+'>').text(p.completion).prepend('<img src="/static/img/eclipse/jdt.ui.obj/'+p.image+'"/>'));
+      $("#ac-widget-list").append($('<li class="ac-widget-item" id=proposal'+i+'>').append('<span class="proposal-text">'+p.completion+'</span>').prepend('<img src="/static/img/eclipse/jdt.ui.obj/'+p.image+'"/>'));
+      maxProposalWidth = Math.max($("#proposal"+i).children(".proposal-text").width(), maxProposalWidth);
       $("#proposal"+i).bind("click", function(event) {
         selectedIndex = i+1;
         codecomplete.setHighlight();
@@ -94,22 +97,23 @@ codecomplete.init = function($, f1, f2, f3, f4, f5) {
         });
       });
     });
+    $(".ac-widget-item").css("width", maxProposalWidth+16);
   }
   
-  codecomplete.filterCC = function(newChar) {
+  codecomplete.filterCC = function(str) {
     // move end marker depending on whether it is a backspace or a new character;
     // filterPrefix changes accordingly
     if (codecomplete.incrementEnd) {
-      codecomplete.end++;
-      codecomplete.filterPrefix = ""+codecomplete.filterPrefix+newChar;
+      codecomplete.end += str.length;
+      codecomplete.filterPrefix = ""+codecomplete.filterPrefix+str;
     } else {
       codecomplete.end--;
       codecomplete.filterPrefix = codecomplete.filterPrefix.slice(0,-1);
     }
-    
+
     // do not filter if the cursor has moved further back than where
     // the code complete was initially invoked
-    if (codecomplete.end < codecomplete.cursorStart) {
+    if (codecomplete.end < codecomplete.newCursorStart) {
       codecomplete.hideCC();
     }
     
@@ -154,7 +158,6 @@ codecomplete.init = function($, f1, f2, f3, f4, f5) {
   }
   
   codecomplete.scrollDown = function() {
-    $("#ac-widget").scrollLeft(0);
     codecomplete.makeScrollVisible();
     var currTop = $("#ac-widget").scrollTop();
     if ($(".ac-widget-item:first").hasClass("ac-selected")) {
@@ -165,7 +168,6 @@ codecomplete.init = function($, f1, f2, f3, f4, f5) {
   }
 
   codecomplete.scrollUp = function() {
-    $("#ac-widget").scrollLeft(0);
     codecomplete.makeScrollVisible();
     var currTop = $("#ac-widget").scrollTop();
     if ($(".ac-widget-item:last").hasClass("ac-selected")) {
