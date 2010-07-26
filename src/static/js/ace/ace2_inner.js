@@ -960,7 +960,6 @@ function OUTER(gscope) {
     inCallStack("cursor check", function() {
       fastIncorp(100);
       if (codecomplete.cursorStart != caretDocChar()) {
-        console.log("cursor changed");
         var filter = rep.alltext.substring(codecomplete.cursorStart, caretDocChar());
         codecomplete.incrementEnd = true;
         codecomplete.filterCC(filter); 
