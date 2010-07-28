@@ -1,6 +1,10 @@
 appjetHome = ./data/appjet
-devMode = true
-listen = 9000
 logDir = ./data/logs
 transportPrefix = /comet
 transportUseWildcardSubdomains = false
+
+devMode = true
+listen = 9000
+
+dbDriver = org.hsqldb.jdbc.JDBCDriver
+dbURL = jdbc:hsqldb:mem:pads

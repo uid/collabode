@@ -19,8 +19,8 @@ import("editor.workspace");
 jimport("java.lang.System.out.println");
 
 serverhandlers.startupHandler = function() {
-    sqlcommon.init("org.hsqldb.jdbc.JDBCDriver",
-                   "jdbc:hsqldb:mem:pads", "u", "");
+    sqlcommon.init(appjet.config.dbDriver,
+                   appjet.config.dbURL, "u", "");
     
     model.onStartup();
     collab_server.onStartup();

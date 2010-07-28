@@ -1,8 +1,10 @@
 package collabode;
 
-import java.io.File;
-import java.io.IOException;
-import java.sql.*;
+import java.io.*;
+import java.net.URL;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.util.Properties;
 import java.util.Scanner;
 
 import org.eclipse.core.resources.*;
@@ -29,11 +31,21 @@ public class Application implements IApplication {
     public Object start(IApplicationContext context) throws Exception {
         BUNDLE = Platform.getBundle("collabode.etherpad");
         
-        setupDatabase();
+        String configFile;
+        try {
+            configFile = bundleResourcePath("config/collabode.properties");
+        } catch (FileNotFoundException fnfe) {
+            System.err.println("Missing config file: " + fnfe.getMessage());
+            throw fnfe;
+        }
+        Properties config = new Properties();
+        config.load(new FileInputStream(configFile));
+        
+        setupDatabase(config);
         net.appjet.oui.main.main(new String[] {
                 "--modulePath=" + bundleResourcePath("src"),
                 "--useVirtualFileRoot=" + bundleResourcePath("src"),
-                "--configFile=" + bundleResourcePath("config/collabode.properties") });
+                "--configFile=" + configFile });
         setupTesting();
         
         final Display display = PlatformUI.createDisplay();
@@ -57,12 +69,14 @@ public class Application implements IApplication {
     }
     
     public static String bundleResourcePath(String relativePath) throws IOException {
-        return FileLocator.toFileURL(BUNDLE.getResource(relativePath)).getPath();
+        URL url = BUNDLE.getResource(relativePath);
+        if (url == null) { throw new FileNotFoundException("bundle resource: " + relativePath); }
+        return FileLocator.toFileURL(url).getPath();
     }
     
-    private void setupDatabase() throws Exception {
-        Class.forName("org.hsqldb.jdbc.JDBCDriver");
-        Connection db = DriverManager.getConnection("jdbc:hsqldb:mem:pads", "u", "");
+    private void setupDatabase(Properties config) throws Exception {
+        Class.forName(config.getProperty("dbDriver"));
+        Connection db = DriverManager.getConnection(config.getProperty("dbURL"), "u", "");
         Scanner schema = new Scanner(new File(bundleResourcePath("config/schema.sql"))).useDelimiter(";");
         while (schema.hasNext()) {
             String stmt = schema.next().trim();

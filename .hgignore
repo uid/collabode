@@ -1,4 +1,5 @@
 bin
 inject-bin
+config/.*\.properties
 data
 workspace
