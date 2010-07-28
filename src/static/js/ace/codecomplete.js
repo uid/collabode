@@ -78,9 +78,9 @@ codecomplete.init = function($, f1, f2, f3, f4, f5) {
 
   codecomplete.populateCC = function(items) {
     var maxProposalWidth = 0;
+    var textLength = 0;
     forEach(items, function(p,i) {
-      $("#ac-widget-list").append($('<li class="ac-widget-item" id=proposal'+i+'>').append('<span class="proposal-text">'+p.completion+'</span>').prepend('<img src="/static/img/eclipse/jdt.ui.obj/'+p.image+'"/>'));
-      maxProposalWidth = Math.max($("#proposal"+i).children(".proposal-text").width(), maxProposalWidth);
+      $("#ac-widget-list").append($('<li class="ac-widget-item" id=proposal'+i+'>').append(p.completion).prepend('<img src="/static/img/eclipse/jdt.ui.obj/'+p.image+'"/>'));
       $("#proposal"+i).bind("click", function(event) {
         selectedIndex = i+1;
         codecomplete.setHighlight();
@@ -97,7 +97,6 @@ codecomplete.init = function($, f1, f2, f3, f4, f5) {
         });
       });
     });
-    $(".ac-widget-item").css("width", maxProposalWidth+16);
   }
   
   codecomplete.filterCC = function(str) {
@@ -159,34 +158,35 @@ codecomplete.init = function($, f1, f2, f3, f4, f5) {
   
   codecomplete.scrollDown = function() {
     codecomplete.makeScrollVisible();
-    var currTop = $("#ac-widget").scrollTop();
+    var currScroll = $("#ac-widget").scrollTop();
     if ($(".ac-widget-item:first").hasClass("ac-selected")) {
       $("#ac-widget").scrollTop(0);
-    } else if ($(".ac-selected").position().top > docLineHeight*9) {
-      $("#ac-widget").scrollTop(currTop+docLineHeight);
+    } else if (($(".ac-selected").position().top - currScroll) > docLineHeight*8) {
+      $("#ac-widget").scrollTop(currScroll+docLineHeight-(currScroll%docLineHeight));
     }
   }
 
   codecomplete.scrollUp = function() {
     codecomplete.makeScrollVisible();
-    var currTop = $("#ac-widget").scrollTop();
+    var currTop = $("#ac-widget-list").position().top;
+    var currScroll = $("#ac-widget").scrollTop();
+    var scrollInv = $("#ac-widget-list").height()-currScroll;
     if ($(".ac-widget-item:last").hasClass("ac-selected")) {
       $("#ac-widget").scrollTop(docLineHeight*$(".ac-widget-item").length);
-    } else if ($(".ac-selected").position().top < 0) {
-      $("#ac-widget").scrollTop(currTop-docLineHeight);
+    } else if (($(".ac-selected").position().top + currTop) < 0) {
+      $("#ac-widget").scrollTop(currScroll-docLineHeight+(scrollInv%docLineHeight));
     }
   }
   
   codecomplete.makeScrollVisible = function() {
-    var currTop = $("#ac-widget").scrollTop();
+    var currScroll = $("#ac-widget").scrollTop();
+    var currTop = $("#ac-widget-list").position().top;
     var selectedPosition = $(".ac-selected").position().top;
     var adjust;
-    if (selectedPosition < 0) {
-      adjust = selectedPosition;
-      $("#ac-widget").scrollTop(currTop+adjust);
-    } else if (selectedPosition > docLineHeight*8) {
-      adjust = selectedPosition-docLineHeight*8;
-      $("#ac-widget").scrollTop(currTop+adjust);
+    if ((selectedPosition + currTop) < 0) {
+      $("#ac-widget").scrollTop(selectedPosition);
+    } else if ((selectedPosition - currScroll) > docLineHeight*8) {
+      $("#ac-widget").scrollTop(selectedPosition-docLineHeight*8);
     }
   }
   
