@@ -13,7 +13,7 @@ jimport("collabode.Workspace");
 
 jimport("java.lang.System");
 
-const localhost = /^0:0:0:0:0:0:0:1(%0)?$/;
+const localhost = /((^0:0:0:0:0:0:0:1(%0)?)|(127.0.0.1))$/;
 
 function render_acl() {
   var padId = workspace.accessAclPad();
