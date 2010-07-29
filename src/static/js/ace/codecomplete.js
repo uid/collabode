@@ -77,16 +77,18 @@ codecomplete.init = function($, f1, f2, f3, f4, f5) {
   }
 
   codecomplete.populateCC = function(items) {
-    var maxProposalWidth = 0;
-    var textLength = 0;
     forEach(items, function(p,i) {
-      $("#ac-widget-list").append($('<li class="ac-widget-item" id=proposal'+i+'>').append(p.completion).prepend('<img src="/static/img/eclipse/jdt.ui.obj/'+p.image+'"/>'));
-      $("#proposal"+i).bind("click", function(event) {
+      var proposal = $('<li class="ac-widget-item" id=proposal'+i+'>').append(p.completion);
+      if (p.image) {
+        proposal.prepend('<img src="/static/img/eclipse/jdt.ui.obj/'+p.image+'"/>');
+      }
+      $("#ac-widget-list").append(proposal);
+      proposal.bind("click", function(event) {
         selectedIndex = i+1;
         codecomplete.setHighlight();
         window.focus();
       });
-      $("#proposal"+i).bind("dblclick", function(event) {
+      proposal.bind("dblclick", function(event) {
         window.focus();
         selectedIndex = i+1;
         codecomplete.setHighlight();

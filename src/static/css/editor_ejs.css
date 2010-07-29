@@ -192,11 +192,11 @@ body.nosidebar #padeditor { margin-left: 0; }
 #ac-widget {position:absolute; width:240px; height:159px; overflow-y:auto; overflow-x:scroll; background-color:white;
     visibility:hidden; border-style:solid; border-color:gray; border-width:1px;  box-shadow: 5px 5px 5px #888;
     -o-box-shadow: 5px 5px 5px #888; -icab-box-shadow: 5px 5px 5px #888; -khtml-box-shadow: 5px 5px 5px #888;
-    -moz-box-shadow: 3px 3px 6px #888; -webkit-box-shadow: 5px 5px 5px #888;}
+    -moz-box-shadow: 3px 3px 6px #888; -webkit-box-shadow: 5px 5px 5px #888; }
 #ac-widget-list {position:absolute; min-width:100%; display:block; list-style-type:none; padding-left:0px; white-space:nowrap; margin-bottom:0px; }
-.ac-widget-item {height:8px; padding-left:20px; padding-top:2px; padding-bottom:6px; margin-bottom:0px; padding-right:5px;}
-.ac-selected {background-color:#3875d7; color:#e8e8e8;}
-.ac-widget-item img {margin-top:-1px; margin-left:-18px; position:absolute; height:16px; width:16px;}
+.ac-widget-item {height:8px; padding-left:20px; padding-top:2px; padding-bottom:6px; margin-bottom:0px; padding-right:5px; }
+.ac-selected {background-color:#3875d7; color:#e8e8e8; }
+.ac-widget-item img {margin-top:-1px; margin-left:-18px; position:absolute; height:16px; width:16px; }
 
 #wizardcontainerbox {
 	border: 1px solid #c4c4c4;

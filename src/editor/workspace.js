@@ -250,7 +250,7 @@ function codeComplete(padId, offset, connectionId) {
         replacement: "" + proposal.replacementString,
         length: proposal.replacementLength,
         offset: proposal.replacementOffset,
-        image: "" + proposal.imageName
+        image: (proposal.imageName ? "" + proposal.imageName : null)
       };
     }));
   }));
