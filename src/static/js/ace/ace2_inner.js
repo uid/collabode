@@ -3329,17 +3329,15 @@ function OUTER(gscope) {
 	  // cmd-Space (code completion)
 	  codecomplete.cursorStart = caretDocChar();
 	  evt.preventDefault();
-	  setTimeout(function() {doRequestCodeCompletion(caretDocChar());}, 0);
+	  scheduler.setTimeout(function() {doRequestCodeCompletion();}, 0);
 	  specialHandled = true;
 	} else if (String.fromCharCode(which) == ".") {
     // auto-invoke on "." (code completion)
-    var requestOffset = caretDocChar()+1;
-    codecomplete.cursorStart = requestOffset;
-    setTimeout(function() {
-      if (codecomplete.cursorStart == caretDocChar()) {
-        doRequestCodeCompletion(requestOffset);
-      }
-    }, 600); // delay for doc to sync
+	  fastIncorp(100);
+    codecomplete.cursorStart = caretDocChar()+1;
+    scheduler.setTimeout(function() {
+        doRequestCodeCompletion();
+      }, 500);
   }
 	
 	if ((!specialHandled) &&
@@ -4921,15 +4919,17 @@ function OUTER(gscope) {
     requestCodeCompletionHandler = handler;
   }
   
-  function doRequestCodeCompletion(offset) {
+  function doRequestCodeCompletion() {
     if ( ! requestCodeCompletionHandler) {
       return; // XXX why would this happen?
     }
     if (isCaret()) {
-      inCallStack("code complete", function() {
-        fastIncorp(100);
-        requestCodeCompletionHandler(offset);
-      });
+        inCallStack("code completion", function() {
+          fastIncorp(100);
+          if (caretDocChar() == codecomplete.cursorStart) {
+            requestCodeCompletionHandler(caretDocChar());
+          }
+        });
     } else {
       // XXX maybe selection? not sure
     }

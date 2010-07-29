@@ -97,7 +97,7 @@ function getCollabClient(ace2editor, serverVars, initialUserInfo, options) {
     debugMessages.push(str);
   }
 
-  function handleUserChanges() {
+  function handleUserChanges(noRateLimit) {
     if ((! socket) || channelState == "CONNECTING") {
       if (channelState == "CONNECTING" && (((+new Date()) - initialStartConnectTime) > 20000)) {
         abandonConnection("initsocketfail"); // give up
@@ -107,7 +107,7 @@ function getCollabClient(ace2editor, serverVars, initialUserInfo, options) {
         setTimeout(wrapRecordingErrors("setTimeout(handleUserChanges)", handleUserChanges),
                    1000);
       }
-      return;
+      return false;
     }
 
     var t = (+new Date());
@@ -126,14 +126,14 @@ function getCollabClient(ace2editor, serverVars, initialUserInfo, options) {
         setTimeout(wrapRecordingErrors("setTimeout(handleUserChanges)", handleUserChanges),
                    3000);
       }
-      return;
+      return false;
     }
 
     var earliestCommit = lastCommitTime + 500;
-    if (t < earliestCommit) {
+    if ((t < earliestCommit) && ! noRateLimit) {
       setTimeout(wrapRecordingErrors("setTimeout(handleUserChanges)", handleUserChanges),
                  earliestCommit - t);
-      return;
+      return false;
     }
 
     var sentMessage = false;
@@ -155,10 +155,16 @@ function getCollabClient(ace2editor, serverVars, initialUserInfo, options) {
       setTimeout(wrapRecordingErrors("setTimeout(handleUserChanges)", handleUserChanges),
                  3000);
     }
+    
+    return true;
   }
   
   function handleRequestCodeCompletion(offset) {
-    sendMessage({ type: "REQUEST_CODE_COMPLETION", offset: offset });
+    if (handleUserChanges(true)) {
+      sendMessage({ type: "REQUEST_CODE_COMPLETION", offset: offset });
+    } else {
+      setTimeout(function() {handleRequestCodeCompletion(offset);}, 250);
+    }
   }
 
   function getStats() {
