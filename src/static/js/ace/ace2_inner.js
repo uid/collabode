@@ -3333,11 +3333,9 @@ function OUTER(gscope) {
 	  specialHandled = true;
 	} else if (String.fromCharCode(which) == ".") {
     // auto-invoke on "." (code completion)
-	  fastIncorp(100);
+    fastIncorp(100);
     codecomplete.cursorStart = caretDocChar()+1;
-    scheduler.setTimeout(function() {
-        doRequestCodeCompletion();
-      }, 500);
+    scheduler.setTimeout(function() { doRequestCodeCompletion(); }, 500);
   }
 	
 	if ((!specialHandled) &&
@@ -4924,12 +4922,12 @@ function OUTER(gscope) {
       return; // XXX why would this happen?
     }
     if (isCaret()) {
-        inCallStack("code completion", function() {
-          fastIncorp(100);
-          if (caretDocChar() == codecomplete.cursorStart) {
-            requestCodeCompletionHandler(caretDocChar());
-          }
-        });
+      inCallStack("code completion", function() {
+        fastIncorp(100);
+        if (caretDocChar() == codecomplete.cursorStart) {
+          requestCodeCompletionHandler(caretDocChar());
+        }
+      });
     } else {
       // XXX maybe selection? not sure
     }
