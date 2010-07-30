@@ -90,7 +90,7 @@ public class ContinuousTesting implements Runnable {
     
     private ILaunch launch(IJavaProject project) throws CoreException, IOException, InterruptedException {
         ILaunchManager mgr = DebugPlugin.getDefault().getLaunchManager();
-        ILaunchConfigurationType type = mgr.getLaunchConfigurationType("org.eclipse.jdt.junit.launchconfig");
+        ILaunchConfigurationType type = mgr.getLaunchConfigurationType("collabode.testing.launchconfig");
         ILaunchConfigurationWorkingCopy config = type.newInstance(null, "Continuous Test " + project.getElementName());
         config.setAttribute(IJavaLaunchConfigurationConstants.ATTR_PROJECT_NAME, project.getElementName());
         config.setAttribute(IJavaLaunchConfigurationConstants.ATTR_MAIN_TYPE_NAME, "");
@@ -98,10 +98,10 @@ public class ContinuousTesting implements Runnable {
         config.setAttribute("org.eclipse.jdt.junit.CONTAINER", project.getHandleIdentifier());
         config.setAttribute("org.eclipse.jdt.junit.TEST_KIND", "org.eclipse.jdt.junit.loader.junit4");
         
-        // XXX this doesn't work for tests
-        String policy = "'" + Application.bundleResourcePath("config/security.policy") + "'";
+        String policy = "'" + Application.bundleResourcePath("config/security.test.policy") + "'";
         config.setAttribute(IJavaLaunchConfigurationConstants.ATTR_VM_ARGUMENTS,
-                "-Dorg.eclipse.osgi.framework.internal.core.FrameworkSecurityManager -Djava.security.policy=" + policy + " -ea");
+                "-Dorg.eclipse.osgi.framework.internal.core.FrameworkSecurityManager " + // XXX does nothing?
+                "-Djava.security.manager -Djava.security.policy==" + policy + " -ea");
         
         return config.launch(ILaunchManager.RUN_MODE, null);
     }

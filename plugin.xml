@@ -20,5 +20,19 @@
             id="collabode.ANNOTATIONS_CONTAINER">
       </classpathContainerInitializer>
    </extension>
+   <extension
+         point="org.eclipse.debug.core.launchConfigurationTypes">
+      <launchConfigurationType
+            name="JUnit Restricted"
+            delegateDescription="The Eclipse JUnit Launcher with security restriction"
+            delegateName="Eclipse JUnit Launcher Restricted"
+            delegate="collabode.testing.JUnitRestrictedLaunchConfigurationDelegate"
+            modes="run, debug"
+            id="collabode.testing.launchconfig"
+            sourceLocatorId="org.eclipse.jdt.launching.sourceLocator.JavaSourceLookupDirector"
+            sourcePathComputerId="org.eclipse.jdt.launching.sourceLookup.javaSourcePathComputer"
+            migrationDelegate="collabode.testing.JUnitRestrictedMigrationDelegate">
+      </launchConfigurationType>
+   </extension>
 
 </plugin>
