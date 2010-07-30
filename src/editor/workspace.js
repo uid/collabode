@@ -357,26 +357,27 @@ function _onFormatRequest(padId, connectionId, msg) {
 
 function _onOrganizeImportsRequest(padId, connectionId, msg) {
   System.out.println("_onOrganizeImportsRequest"); // XXX
-  _getDocument(padId).organizeImports(connectionId,
-    scalaFn(2, function(openChoices, ranges) {
-      System.out.println("_onOrganizeImportsRequest prompter"); // XXX
-      collab_server.sendConnectionExtendedMessage(connectionId, {
-        type: "ORGIMPORTS_PROMPT",
-        // XXX openChoices and ranges encoded into the msg
-      });
-    }),
-    scalaFn(1, function(iterator) {
-      System.out.println("_onOrganizeImportsRequest reporter"); // XXX
-      model.accessPadGlobal(padId, function(pad) {
-        var cs = _makeChangeSetStr(pad, iterator);
-        collab_server.sendConnectionExtendedMessage(connectionId, {
-          type: "APPLY_CHANGESET_AS_USER",
-          changeset: cs,
-          apool: pad.pool()
-        });
-      });
-    })
-  );
+  _getDocument(padId).organizeImports(connectionId);
+}
+
+function taskOrgImportsPrompt(connectionId, openChoices, ranges) {
+  System.out.println("_onOrganizeImportsRequest prompter"); // XXX
+  collab_server.sendConnectionExtendedMessage(connectionId, {
+    type: "ORGIMPORTS_PROMPT",
+    // XXX openChoices and ranges encoded into the msg
+  });
+}
+
+function taskOrgImportsApply(username, file, connectionId, iterator) {
+  System.out.println("_onOrganizeImportsRequest reporter"); // XXX
+  model.accessPadGlobal(_padIdFor(username, file), function(pad) {
+    var cs = _makeChangeSetStr(pad, iterator);
+    collab_server.sendConnectionExtendedMessage(connectionId, {
+      type: "APPLY_CHANGESET_AS_USER",
+      changeset: cs,
+      apool: pad.pool()
+    });
+  });
 }
 
 function _onOrganizeImportsResolved(padId, connectionId, msg) {

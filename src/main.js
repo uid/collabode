@@ -55,6 +55,12 @@ serverhandlers.tasks.runningOutput = function(username, file, text, attribs) {
 serverhandlers.tasks.testResult = function(project, test, result) {
     workspace.taskTestResult(project, test, result);
 };
+serverhandlers.tasks.orgImportsPrompt = function(connectionId, openChoices, ranges) {
+    workspace.taskOrgImportsPrompt(connectionId, openChoices, ranges);
+};
+serverhandlers.tasks.orgImportsApply = function(username, file, connectionId, iterator) {
+    workspace.taskOrgImportsApply(username, file, connectionId, iterator);
+};
 
 serverhandlers.cometHandler = function(op, id, data) {
     if ( ! data) {

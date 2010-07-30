@@ -12,13 +12,12 @@ import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.formatter.CodeFormatter;
 import org.eclipse.jdt.core.search.TypeNameMatch;
-import org.eclipse.jdt.ui.text.java.*;
+import org.eclipse.jdt.ui.text.java.JavaContentAssistInvocationContext;
 import org.eclipse.jface.text.*;
 import org.eclipse.text.edits.*;
 import org.eclipse.ui.PlatformUI;
 
 import scala.Function1;
-import scala.Function2;
 import collabode.complete.JavaPadCompletionProposalCollector;
 import collabode.orgimport.PadImportOrganizer;
 
@@ -332,16 +331,14 @@ public class JavaPadDocument extends PadDocument implements IBuffer {
     /**
      * Performs organize imports.
      */
-    public void organizeImports(final String connectionId,
-                                final Function2<TypeNameMatch[][],ISourceRange[],Boolean> prompter,
-                                final Function1<ChangeSetOpIterator,Boolean> reporter) {
+    public void organizeImports(final String connectionId) {
         Debug.here(); // XXX
         new Thread(new Runnable() {
             public void run() {
                 try {
-                    TextEdit edit = PadImportOrganizer.of(connectionId).createTextEdit(workingCopy, prompter);
+                    TextEdit edit = PadImportOrganizer.of(connectionId).createTextEdit(workingCopy);
                     System.out.println("Organize imports success: " + edit);
-                    reporter.apply(new ChangeSetOpIterator(JavaPadDocument.this, edit));
+                    Workspace.scheduleTask("orgImportsApply", owner.username, file, connectionId, new ChangeSetOpIterator(JavaPadDocument.this, edit));
                 } catch (OperationCanceledException oce) {
                     System.err.println("Organize imports canceled"); // XXX
                     // XXX nothing to do
