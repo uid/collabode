@@ -2,7 +2,6 @@ package collabode.orgimport;
 
 import java.util.concurrent.*;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.jdt.core.ICompilationUnit;
