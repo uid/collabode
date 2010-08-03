@@ -38,7 +38,7 @@ function render_acl() {
 }
 
 function do_login(clazz, username, destination) {
-  username = username.replace(/\s+/g, '').toLowerCase();
+  username = username.replace(/\W+/g, '').toLowerCase();
   getSession().userId = clazz + '.' + username;
   getSession().userName = username;
   getSession().restricted = workspace.restricted(getSession().userId);

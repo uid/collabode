@@ -64,6 +64,19 @@ public class Workspace {
         return project;
     }
     
+    public static IProject cloneProject(String projectname, String destinationname) throws CoreException {
+        IProject dest = getWorkspace().getRoot().getProject(destinationname);
+        if (dest.exists()) { return dest; }
+        
+        IProject project = getWorkspace().getRoot().getProject(projectname);
+        project.open(null);
+        IProjectDescription desc = project.getDescription();
+        desc.setLocation(null);
+        desc.setName(destinationname);
+        project.copy(desc, false, null);
+        return dest;
+    }
+    
     public static void createDocument(String username, IFile file) throws IOException, JavaModelException {
         PadDocumentOwner.of(username).create(file);
     }

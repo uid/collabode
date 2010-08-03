@@ -257,3 +257,14 @@ function delete_path(projectname, filename) {
   response.redirect(parentpath);
   return true;
 }
+
+function clone_path(projectname, filename) {
+  var destination = projectname+"-"+getSession().userName;
+  var project = Workspace.cloneProject(projectname, destination);
+  var resource = project.findMember(filename);
+  
+  workspace.cloneAcl(getSession().userId, projectname, destination);
+  
+  response.redirect(''+resource.getFullPath());
+  return true;
+}

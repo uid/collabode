@@ -150,6 +150,7 @@ function handlePath() {
     [_file('console'), r(console_control.render_console)],
     [_proj('delete'), u(editor_control.render_confirm_delete)],
     [_file('delete'), u(editor_control.render_confirm_delete)],
+    [_file('clone'), r(editor_control.clone_path)],
     [_proj(), r(editor_control.render_project)],
     [_file(), r(editor_control.render_path)]
   ]);

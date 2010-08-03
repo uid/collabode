@@ -94,8 +94,7 @@ function accessAclPad() {
   return padId;
 }
 
-function _isAllowedBySomeAcl(userId, allowed) {
-  var ret = false;
+function _findAcl(userId, f) {
   model.accessPadGlobal(accessAclPad(), function(pad) {
     var lines = pad.text().split('\n');
     for (idx in lines) {
@@ -104,12 +103,34 @@ function _isAllowedBySomeAcl(userId, allowed) {
       if (line == '') { continue; }
       var acl = line.split(/\s+/);
       if (acl.length < 2) { continue; }
-      if (acl[0] != userId) { continue; }
+      if ((acl[0] != 'anyone') && (acl[0] != userId)) { continue; }
       
-      ret = ret || allowed(acl);
-      
-      if (ret) { break; }
+      if (f(acl)) { break; }
     }
+  });
+}
+
+function cloneAcl(userId, project, destination) {
+  var additions = [];
+  _findAcl('clones', function(acl) {
+    var match = acl[1].match('^/'+project+'(/.*)');
+    if (match) {
+      acl[0] = userId;
+      acl[1] = '/'+destination+match[1];
+      additions.push(acl.join(' '));
+    }
+    return false;
+  });
+  model.accessPadGlobal(accessAclPad(), function(pad) {
+    collab_server.setPadText(pad, pad.text() + additions.join('\n') + '\n');
+  });
+}
+
+function _isAllowedBySomeAcl(userId, allowed) {
+  var ret = false;
+  _findAcl(userId, function(acl) {
+    ret = ret || allowed(acl);
+    return ret;
   });
   return ret;
 }
