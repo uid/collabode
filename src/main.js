@@ -97,7 +97,10 @@ function handlePath() {
     GET: new Dispatcher(),
     POST: new Dispatcher()
   };
+  noauth.HEAD = noauth.GET;
   noauth.GET.addLocations([
+    ['/favicon.ico', forward(static_control)],
+    ['/robots.txt', forward(static_control)],
     [PrefixMatcher('/static/'), forward(static_control)],
     ['/', editor_control.render_root],
     [/^\/login:([\w]+)(\/.*)$/, auth_control.render_login],
@@ -140,7 +143,8 @@ function handlePath() {
   var authed = {
     GET: new Dispatcher(),
     POST: new Dispatcher()
-  }
+  };
+  authed.HEAD = authed.GET;
   authed.GET.addLocations([
     ['/acl', u(auth_control.render_acl)],
     [_file('console'), r(console_control.render_console)],
