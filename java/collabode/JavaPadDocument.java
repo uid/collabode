@@ -11,7 +11,6 @@ import org.eclipse.jdt.core.compiler.IProblem;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.formatter.CodeFormatter;
-import org.eclipse.jdt.core.search.TypeNameMatch;
 import org.eclipse.jdt.ui.text.java.JavaContentAssistInvocationContext;
 import org.eclipse.jface.text.*;
 import org.eclipse.text.edits.*;
@@ -353,8 +352,7 @@ public class JavaPadDocument extends PadDocument implements IBuffer {
      * Provide resolution of ambiguous names.
      * Should only be called during {@link #organizeImports}.
      */
-    public void organizeImportsResolved(String connectionId, TypeNameMatch[] userChoices) {
-        Debug.here(); // XXX
+    public void organizeImportsResolved(String connectionId, int[] userChoices) {
         PadImportOrganizer.of(connectionId).chose(userChoices);
     }
 }

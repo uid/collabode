@@ -28,12 +28,24 @@ public class ChangeSetOpIterator implements Iterator<ChangeSetOp> {
             int last = 0;
             
             @Override public boolean visit(ReplaceEdit edit) {
-                queue(doc, edit, last);
+                queue(doc, last, edit, edit.getText());
                 last = edit.getOffset() + edit.getLength();
                 return true;
             }
             
             @Override public boolean visit(MultiTextEdit edit) {
+                return true;
+            }
+            
+            @Override public boolean visit(InsertEdit edit) {
+                queue(doc, last, edit, edit.getText());
+                last = edit.getOffset() + edit.getLength();
+                return true;
+            }
+            
+            @Override public boolean visit(DeleteEdit edit) {
+                queue(doc, last, edit, "");
+                last = edit.getOffset();
                 return true;
             }
         
@@ -77,7 +89,7 @@ public class ChangeSetOpIterator implements Iterator<ChangeSetOp> {
         }
     }
     
-    private void queue(IDocument doc, ReplaceEdit edit, int last) {
+    private void queue(IDocument doc, int last, TextEdit edit, String editText) {
         try {
             rest.add(new ChangeSetOp("=", doc.get(last, edit.getOffset()-last)));
             
@@ -85,8 +97,8 @@ public class ChangeSetOpIterator implements Iterator<ChangeSetOp> {
                 rest.add(new ChangeSetOp("-", doc.get(edit.getOffset(), edit.getLength())));
             }
             
-            if ( ! edit.getText().isEmpty()) {
-                rest.add(new ChangeSetOp("+", edit.getText()));
+            if ( ! editText.isEmpty()) {
+                rest.add(new ChangeSetOp("+", editText));
             }
         } catch (BadLocationException ble) {
             throw new NoSuchElementException(ble.getMessage()); // XXX

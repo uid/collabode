@@ -377,20 +377,26 @@ function _onFormatRequest(padId, connectionId, msg) {
 }
 
 function _onOrganizeImportsRequest(padId, connectionId, msg) {
-  System.out.println("_onOrganizeImportsRequest"); // XXX
   _getDocument(padId).organizeImports(connectionId);
 }
 
 function taskOrgImportsPrompt(connectionId, openChoices, ranges) {
-  System.out.println("_onOrganizeImportsRequest prompter"); // XXX
+  var openChoicesArr = openChoices.map(function (options) {
+    return options.map(function (option) { return option.getFullyQualifiedName(); });
+  });
+  
+  var offsets = ranges.map(function (range) { return range.getOffset(); });
+  var lengths = ranges.map(function (range) { return range.getLength(); });
+
   collab_server.sendConnectionExtendedMessage(connectionId, {
     type: "ORGIMPORTS_PROMPT",
-    // XXX openChoices and ranges encoded into the msg
+    suggestion: openChoicesArr,
+    length: lengths,
+    offset: offsets
   });
 }
 
 function taskOrgImportsApply(username, file, connectionId, iterator) {
-  System.out.println("_onOrganizeImportsRequest reporter"); // XXX
   model.accessPadGlobal(_padIdFor(username, file), function(pad) {
     var cs = _makeChangeSetStr(pad, iterator);
     collab_server.sendConnectionExtendedMessage(connectionId, {
@@ -402,8 +408,7 @@ function taskOrgImportsApply(username, file, connectionId, iterator) {
 }
 
 function _onOrganizeImportsResolved(padId, connectionId, msg) {
-  System.out.println("_onOrganizeImportsResolved"); // XXX
-  _getDocument(padId).organizeImportsResolved(connectionId, null); // XXX msg.whatever
+  _getDocument(padId).organizeImportsResolved(connectionId, msg.choices);
 }
 
 function taskRunningStateChange(username, file, state) {

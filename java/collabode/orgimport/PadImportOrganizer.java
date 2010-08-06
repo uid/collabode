@@ -19,10 +19,9 @@ public class PadImportOrganizer {
     
     private static final ConcurrentMap<String, PadImportOrganizer> ORGANIZERS = new ConcurrentHashMap<String, PadImportOrganizer>();
     
-    private static final TypeNameMatch[] CANCEL = new TypeNameMatch[0];
+    private static final int[] CANCEL = new int[0];
     
     public static PadImportOrganizer of(String connectionId) {
-        Debug.here(); // XXX
         if ( ! ORGANIZERS.containsKey(connectionId)) {
             ORGANIZERS.put(connectionId, new PadImportOrganizer(connectionId));
         }
@@ -30,7 +29,7 @@ public class PadImportOrganizer {
     }
     
     private final String connectionId;
-    private final BlockingQueue<TypeNameMatch[]> choices = new ArrayBlockingQueue<TypeNameMatch[]>(1);
+    private final BlockingQueue<int[]> choices = new ArrayBlockingQueue<int[]>(1);
     
     private PadImportOrganizer(String connectionId) {
         this.connectionId = connectionId;
@@ -43,16 +42,17 @@ public class PadImportOrganizer {
      * XXX change prompter signature if TypeNameMatch or ISourceRange not appropriate to pass around
      */
     public TextEdit createTextEdit(ICompilationUnit cu) throws CoreException, OperationCanceledException {
-        Debug.here(); // XXX
         IChooseImportQuery query = new IChooseImportQuery() {
             public TypeNameMatch[] chooseImports(TypeNameMatch[][] openChoices, ISourceRange[] ranges) {
-                Debug.here(); // XXX
                 choices.clear();
-                // XXX maybe munge openChoices or ranges first, etc.
                 Workspace.scheduleTask("orgImportsPrompt", connectionId, openChoices, ranges);
                 try {
-                    TypeNameMatch[] userChoices = choices.poll(1, TimeUnit.MINUTES);
-                    return userChoices == CANCEL ? null : userChoices;
+                    int[] userChoicesIdx = choices.poll(1, TimeUnit.MINUTES);
+                    TypeNameMatch[]  userChoices = new TypeNameMatch[userChoicesIdx.length];
+                    for (int i=0; i<userChoicesIdx.length; i++) {
+                        userChoices[i] = openChoices[i][userChoicesIdx[i]];
+                    }
+                    return userChoicesIdx == CANCEL ? null : userChoices;
                 } catch (InterruptedException ie) {
                     return null;
                 }
@@ -66,8 +66,7 @@ public class PadImportOrganizer {
      * Report user resolutions of ambiguous class names.
      * XXX change signature if TypeNameMatch not appropriate to pass in
      */
-    public void chose(TypeNameMatch[] userChoices) {
-        Debug.here(); // XXX
+    public void chose(int[] userChoices) {
         if (userChoices == null) {
             userChoices = CANCEL;
         }
