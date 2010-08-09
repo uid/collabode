@@ -29,4 +29,5 @@ Require-Bundle: org.eclipse.equinox.app,
  org.eclipse.ui.editors;bundle-version="3.5.0"
 Bundle-ClassPath: lib/appjet-eth-dev.jar,
  lib/hsqldb.jar,
+ lib/turkit.jar,
  .

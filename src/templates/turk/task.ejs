@@ -1,0 +1,30 @@
+<% helpers.setHtmlTitle([ projectname, filename ]) %>
+<% helpers.includeCss("turk_ejs.css") %>
+<% helpers.addBodyClass(assigned ? 'assignment' : 'preview') %>
+
+<table cellpadding="0" cellspacing="0" border="0">
+<tr><td height="1%">
+<div id="task">
+<%= toHTML(description) %>
+<% if (assigned) { %>
+  <form action="<%= submitTo %>/mturk/externalSubmit" method="POST">
+  <input type="hidden" name="assignmentId" value="<%= assignmentId %>"/>
+  <input type="image" src="<%= submitTo %>/images/submit_hit.gif" border="0"/>
+  (Use the editor below to complete the HIT)
+  </form>
+<% } else { %>
+  <p>Click &quot;Accept HIT&quot; to begin! You will not be able to edit code until you accept.</p>
+<% } %>
+</div>
+
+</td></tr>
+<tr><td height="99%">
+
+<% if (assigned) { %>
+  <iframe src="/login:<%= workerId %>/clone/<%= projectname %>/<%= filename %>"/>
+<% } else { %>
+  <iframe src="/login:preview/<%= projectname %>/<%= filename %>"/>
+<% } %>
+
+</td></tr>
+</table>

@@ -13,6 +13,9 @@ jimport("collabode.testing.ProjectTestsOwner");
 
 jimport("org.eclipse.text.edits.ReplaceEdit");
 
+jimport("java.io.StringReader");
+jimport("java.util.Properties");
+
 jimport("java.lang.System");
 
 function onStartup() {
@@ -121,8 +124,14 @@ function cloneAcl(userId, project, destination) {
     }
     return false;
   });
+  _findAcl(userId, function(acl) {
+    additions = additions.filter(function(line) {
+      return line != acl.join(' ');
+    });
+  });
+  additions = additions.map(function(line) { return line+'\n'; });
   model.accessPadGlobal(accessAclPad(), function(pad) {
-    collab_server.setPadText(pad, pad.text() + additions.join('\n') + '\n');
+    collab_server.setPadText(pad, pad.text() + additions.join(''));
   });
 }
 
@@ -157,6 +166,26 @@ function isChangesetAllowed(padId, changeset, author) {
     var doc = _getDocument(padId);
     return doc.isAllowed(_makeReplaceEdits(doc, changeset), acl.slice(2));
   });
+}
+
+function accessSettingsPad(userId) {
+  var padId = userId + "*settings*";
+  
+  model.accessPadGlobal(padId, function(pad) {
+    if ( ! pad.exists()) {
+      pad.create(false);
+    }
+  });
+  
+  return padId;
+}
+
+function getSettings(userId, key) {
+  var props = new Properties();
+  model.accessPadGlobal(accessSettingsPad(userId), function(pad) {
+    props.load(new StringReader(pad.text()));
+  });
+  return props;
 }
 
 function taskPdsyncDocumentText(padId, cs) {
