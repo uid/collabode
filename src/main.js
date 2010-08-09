@@ -8,6 +8,7 @@ import("control.static_control");
 import("control.auth_control");
 import("control.console_control");
 import("control.editor_control");
+import("control.turk_control");
 
 import("collab.collabroom_server");
 import("collab.collab_server");
@@ -105,7 +106,8 @@ function handlePath() {
     ['/', editor_control.render_root],
     [/^\/login:([\w]+)(\/.*)$/, auth_control.render_login],
     [/^\/login()(\/.*)$/, auth_control.render_login],
-    ['/logout', auth_control.logout]
+    ['/logout', auth_control.logout],
+    [_file('turk:([\\w]+)'), turk_control.render_task]
   ]);
   noauth.POST.addLocations([
     [/^\/login(\/.*)$/, auth_control.login]
@@ -147,6 +149,7 @@ function handlePath() {
   authed.HEAD = authed.GET;
   authed.GET.addLocations([
     ['/acl', u(auth_control.render_acl)],
+    ['/settings', u(auth_control.render_settings)],
     [_file('console'), r(console_control.render_console)],
     [_proj('delete'), u(editor_control.render_confirm_delete)],
     [_file('delete'), u(editor_control.render_confirm_delete)],

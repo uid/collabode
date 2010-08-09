@@ -37,6 +37,28 @@ function render_acl() {
   return true;
 }
 
+function render_settings() {
+  var padId = workspace.accessSettingsPad(getSession().userId);
+  
+  model.accessPadGlobal(padId, function(pad) {
+    helpers.addClientVars({
+      padId: padId,
+      collab_client_vars: collab_server.getCollabClientVars(pad),
+      initialRevisionList: revisions.getRevisionList(pad),
+      serverTimestamp: +(new Date),
+      initialOptions: pad.getPadOptionsObj(),
+      userId: getSession().userId,
+      userName: getSession().userName,
+      opts: {}
+    });
+  });
+  
+  renderHtml("editor/settings.ejs", {
+    projects: Workspace.listProjects()
+  });
+  return true;
+}
+
 function do_login(clazz, username, destination) {
   username = username.replace(/\W+/g, '').toLowerCase();
   getSession().userId = clazz + '.' + username;

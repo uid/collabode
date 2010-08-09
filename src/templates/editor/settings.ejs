@@ -1,4 +1,4 @@
-<% helpers.setHtmlTitle("Access Control") %>
+<% helpers.setHtmlTitle("Settings") %>
 <% helpers.includeCss("editor_ejs.css") %>
 <% helpers.includeCometJs() %>
 <% helpers.includeJQuery() %>
@@ -11,13 +11,13 @@
 
 <div id="editorpage">
 
-<%= helpers.renderPartial("docbar", { project: "Collabode", file: "Access Control" }) %>
+<%= helpers.renderPartial("docbar", { project: "Collabode", file: "Settings" }) %>
 
 <div id="docbaroverlay">
   <div id="docbartools">
     <div id="connstatusconnecting" title="Connecting"><!-- --></div>
     <div id="connstatusdisconnected" title="Disconnected">
-      <p>Disconnected from the server<br/>ACL will not be updated</p>
+      <p>Disconnected from the server<br/>Settings will not be updated</p>
     </div>
     <div id="syncstatusdone" title="Updated"><!-- --></div>
   </div>
@@ -28,19 +28,11 @@
     <%= helpers.renderList("explorer", projects) %>
   </div>
   <div class="sidebarsection">
-    <p>ACL lines of the form:<br/>
-    <i>user path [permissions]</i></p>
-    <br/>
-    <p>Read granted on parents and children of named paths</p>
-    <br/>
-    <p>Edit granted only on named files; permissions may restrict</p>
-    <br/>
-    <p>E.g.:</p>
+    <p>Settings:</p>
     <div style="font-size:small">
-    anyone /myproj/src<br/>
-    clones /myproj/src/Hello.java<br/>
-    r.maxg /my... type:Hello<br/>
-    r.maxg /my... type:Hello method:foo<br/>
+    turkID = ABC123...<br/>
+    turkSecret = def456...<br/>
+    turkSandbox = true
     </div>
   </div>
 </div>

@@ -15,7 +15,14 @@
   <div id="padeditor">
     <div id="wizardcontainerbox">
       <h1>Collabode + Eclipse</h1>
-      <p><a href="/acl">Edit access control</a></p>
+      <% if (session.userId) { %>
+        <% if ( ! session.restricted) { %>
+          <p><a href="/acl">Edit access control</a></p>
+          <p><a href="/settings">Edit settings</a></p>
+        <% } %>
+      <% } else { %>
+        <p><a href="/login/">Log in</a></p>
+      <% } %>
       <div><%= helpers.renderPartial("filegrid", { members: projects }) %></div>
     </div>
   </div>

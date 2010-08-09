@@ -1,10 +1,15 @@
 <div id="editortop">
   <div id="docbar">
-    <div id="docbarproject"><span><%= project %></span></div>
+    <div id="docbarproject">
+      <a href="/" id="home" title="Home"></a>
+      <span><%= project %></span>
+    </div>
     <div id="docbarfile"><span><%= typeof file == "undefined" ? "" : file %></span></div>
 <% if (session.userId) { %>
-    <div id="docbaruser"><a href="/logout" id="logout" title="Log out"></a>
-    <%= session.restricted ? '<s>'+session.userName+'</s>' : session.userName %></div>
+    <div id="docbaruser">
+      <a href="/logout" id="logout" title="Log out"></a>
+      <span><%= session.restricted ? '<s>'+session.userName+'</s>' : session.userName %></span>
+    </div>
 <% } %>
   </div>
 </div>

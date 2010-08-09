@@ -42,10 +42,16 @@ body.fullwidth #editorpage { width: auto; margin-left: 6px; margin-right: 6px; }
 	white-space:nowrap;
 }
 
+#docbarproject a {
+	float:left; height:22px; width:22px; margin-right:4px;
+}
 #docbaruser a {
-	float:right; height:22px; width:22px; margin:0 4px;
+	float:right; height:22px; width:22px; margin-left:4px;
 }
 
+#home {
+	background: url(/favicon.ico) no-repeat center center;
+}
 #logout {
 	background: url(/static/img/eclipse/jst.ws.consum.login.gif) no-repeat center center;
 }
