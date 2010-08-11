@@ -11,7 +11,6 @@ import org.eclipse.jdt.internal.corext.codemanipulation.OrganizeImportsOperation
 import org.eclipse.jdt.internal.corext.codemanipulation.OrganizeImportsOperation.IChooseImportQuery;
 import org.eclipse.text.edits.TextEdit;
 
-import collabode.Debug;
 import collabode.Workspace;
 
 @SuppressWarnings("restriction")
@@ -47,12 +46,15 @@ public class PadImportOrganizer {
                 choices.clear();
                 Workspace.scheduleTask("orgImportsPrompt", connectionId, openChoices, ranges);
                 try {
-                    int[] userChoicesIdx = choices.poll(1, TimeUnit.MINUTES);
+                    int[] userChoicesIdx = choices.poll(5, TimeUnit.MINUTES);
+                    if (userChoicesIdx == null || userChoicesIdx == CANCEL) {
+                        return null;
+                    }
                     TypeNameMatch[]  userChoices = new TypeNameMatch[userChoicesIdx.length];
                     for (int i=0; i<userChoicesIdx.length; i++) {
                         userChoices[i] = openChoices[i][userChoicesIdx[i]];
                     }
-                    return userChoicesIdx == CANCEL ? null : userChoices;
+                    return userChoices;
                 } catch (InterruptedException ie) {
                     return null;
                 }
