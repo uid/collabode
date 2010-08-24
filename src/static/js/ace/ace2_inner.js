@@ -931,11 +931,13 @@ function OUTER(gscope) {
     });
   };
   
+  var codeCompleteWidget;
+  var widgetInvokeOffset;
   editorInfo.ace_setRequestCodeCompletion = function($, handler) {
     setRequestCodeCompletion(handler);
-    codecomplete.init($, fastIncorp, performDocumentReplaceCharRange, 
-        lineAndColumnFromChar, performSelectionChange, inCallStack);
+    codeCompleteWidget = makeCodeCompleteWidget($, editorInfo.ace_replaceBeforeCursor);
   };
+  
   editorInfo.ace_setRequestFormat = function(handler) {
     setRequestFormat(handler);
   };
@@ -952,20 +954,31 @@ function OUTER(gscope) {
     var scrollX = outerWin.scrollX||outerWin.document.documentElement.scrollLeft; // fix to work in IE
     var top = rep.lines.atIndex(focusLine+1).lineNode.offsetTop + iframe.offsetTop - scrollY;
     var left = getSelectionPointX(getSelection().endPoint) + iframe.offsetLeft - scrollX;
-    var lineHeight = parseInt($("iframe").contents().find("iframe").contents().find("#innerdocbody").css("line-height").substring(0,2));
-    if (($("#ac-widget").height() + top) > $("#editorcontainerbox").height()) {
-      top -= ($("#ac-widget").height() + lineHeight);
-    }
-    codecomplete.showCC(proposals, top, left, rep);
+    codeCompleteWidget.show(proposals, top, left, rep);
     inCallStack("cursor check", function() {
       fastIncorp(100);
-      if (codecomplete.cursorStart != caretDocChar()) {
-        var filter = rep.alltext.substring(codecomplete.cursorStart, caretDocChar());
-        codecomplete.incrementEnd = true;
-        codecomplete.filterCC(filter); 
+      if (widgetInvokeOffset != caretDocChar()) {
+        var filterText = rep.alltext.substring(widgetInvokeOffset, caretDocChar());
+        codeCompleteWidget.filter(filterText); 
       }
     });
   };
+  
+  var orgImportsWidget;
+  editorInfo.ace_showImportProposals = function($, proposals, sendSelection) {
+    orgImportsWidget = makeOrgImportsWidget($, sendSelection);
+    orgImportsWidget.handleImportResolve(proposals);
+  }
+  
+  editorInfo.ace_replaceBeforeCursor = function(length, replacement) {
+    inCallStackIfNecessary("replace", function() {
+      fastIncorp(101);
+      var start = (caretDocChar() != 0) ? (caretDocChar()-length) : codeCompleteWidget.replacementStartOffset; // XXX work-around for IE placing cursor back at 0
+      performDocumentReplaceCharRange(start, start+length, replacement);
+      var pos = lineAndColumnFromChar(start+replacement.length);
+      performSelectionChange(pos, pos, false);
+    });
+  }
 
   function now() { return (new Date()).getTime(); }
 
@@ -2875,12 +2888,10 @@ function OUTER(gscope) {
     });
     
     // handler for hiding widget when clicking outside
-    if (codecomplete.active) {
-      codecomplete.handleClick(evt);
-      if (codecomplete.stopClick) {
-        evt.preventDefault();
-        return;
-      }
+    if (codeCompleteWidget && codeCompleteWidget.active()) {
+      codeCompleteWidget.handleClick(evt);
+    } else if (orgImportsWidget && orgImportsWidget.active()) {
+      orgImportsWidget.handleClick(evt); 
     }
 
     // only want to catch left-click
@@ -2903,8 +2914,8 @@ function OUTER(gscope) {
   }
   
   function handleScroll(evt) {
-    if (codecomplete.active) {
-      codecomplete.handleScroll(evt);
+    if (codeCompleteWidget.active()) {
+      codeCompleteWidget.handleScroll(evt);
     }
   }
 
@@ -3206,9 +3217,7 @@ function OUTER(gscope) {
 
     inCallStack("handleKeyEvent", function() {
       
-      // handler for code completing
-      codecomplete.keyHandlerCC(evt);
-      if (codecomplete.stopHandler) { return; }
+      if (codeCompleteWidget.handleKeys(evt)) { return; }
 
       if (type == "keypress" ||
 	  (isTypeForSpecialKey && keyCode == 13/*return*/)) {
@@ -3327,14 +3336,14 @@ function OUTER(gscope) {
 	    String.fromCharCode(which) == " " &&
 	    (evt.metaKey || evt.ctrlKey)) {
 	  // cmd-Space (code completion)
-	  codecomplete.cursorStart = caretDocChar();
+	  widgetInvokeOffset = caretDocChar();
 	  evt.preventDefault();
 	  scheduler.setTimeout(function() {doRequestCodeCompletion();}, 0);
 	  specialHandled = true;
 	} else if (String.fromCharCode(which) == ".") {
     // auto-invoke on "." (code completion)
     fastIncorp(100);
-    codecomplete.cursorStart = caretDocChar()+1;
+    widgetInvokeOffset = caretDocChar()+1;
     scheduler.setTimeout(function() { doRequestCodeCompletion(); }, 500);
   }
 	
@@ -4924,7 +4933,7 @@ function OUTER(gscope) {
     if (isCaret()) {
       inCallStack("code completion", function() {
         fastIncorp(100);
-        if (caretDocChar() == codecomplete.cursorStart) {
+        if (caretDocChar() == widgetInvokeOffset) {
           requestCodeCompletionHandler(caretDocChar());
         }
       });

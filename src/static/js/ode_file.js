@@ -53,9 +53,9 @@ $(document).ready(function() {
     testor.updateTest(msg.test, msg.result);
   });
   collab.setOnExtendedMessage("ORGIMPORTS_PROMPT", function(msg) {
-    // XXX present the UI, then eventually send the message with choices
-    alert("ORGIMPORTS_PROMPT"); // XXX
-    collab.sendExtendedMessage({ type: "ORGIMPORTS_RESOLVED" }); // XXX
+    ace.showImportProposals(msg.suggestion, function(selection) {
+      collab.sendExtendedMessage({ type: "ORGIMPORTS_RESOLVED" , choices: selection});
+    });
   });
   
   ace.setRequestFormat(function() {

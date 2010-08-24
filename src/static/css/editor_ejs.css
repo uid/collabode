@@ -195,14 +195,20 @@ body.nosidebar #padeditor { margin-left: 0; }
 }
 #codecompletion option { }
 
-#ac-widget {position:absolute; width:240px; height:159px; overflow-y:auto; overflow-x:scroll; background-color:white;
-    visibility:hidden; border-style:solid; border-color:gray; border-width:1px;  box-shadow: 5px 5px 5px #888;
-    -o-box-shadow: 5px 5px 5px #888; -icab-box-shadow: 5px 5px 5px #888; -khtml-box-shadow: 5px 5px 5px #888;
-    -moz-box-shadow: 3px 3px 6px #888; -webkit-box-shadow: 5px 5px 5px #888; }
-#ac-widget-list {position:absolute; min-width:100%; display:block; list-style-type:none; padding-left:0px; white-space:nowrap; margin-bottom:0px; }
-.ac-widget-item {height:8px; padding-left:20px; padding-top:2px; padding-bottom:6px; margin-bottom:0px; padding-right:5px; }
-.ac-selected {background-color:#3875d7; color:#e8e8e8; }
-.ac-widget-item img {margin-top:-1px; margin-left:-18px; position:absolute; height:16px; width:16px; }
+#orgimports-container { position:absolute; width:346px; height:232px; top:11px; left:368px; background-color:#dedede; box-shadow:5px 5px 5px #888; -o-box-shadow:5px 5px 5px #888; 
+      -icab-box-shadow:5px 5px 5px #888; -khtml-box-shadow:5px 5px 5px #888; -moz-box-shadow:3px 3px 6px #888; -webkit-box-shadow:5px 5px 5px #888; border:1px; }
+#listwidget-list {position:absolute; min-width:100%; display:block; list-style-type:none; padding-left:0px; white-space:nowrap; margin-bottom:0px; cursor:default; }
+.listwidget-listitem { height:8px; padding-left:20px; padding-top:2px; padding-bottom:6px; margin-bottom:0px; padding-right:5px; }
+.listwidget-selected { background-color:#3875d7; color:white; }
+.listwidget-listitem img { margin-top:-1px; margin-left:-18px; position:absolute; height:16px; width:16px; }
+.codecomplete { visibility:hidden; position:absolute; width:240px; height:159px; overflow-y:auto; overflow-x:scroll; background-color:white;
+    border-style:solid; border-color:gray; border-width:1px; box-shadow:5px 5px 5px #888; -o-box-shadow:5px 5px 5px #888; 
+    -icab-box-shadow:5px 5px 5px #888; -khtml-box-shadow:5px 5px 5px #888; -moz-box-shadow:3px 3px 6px #888; -webkit-box-shadow:5px 5px 5px #888; }
+.orgimports { position:absolute; width:325px; height:159px; overflow-y:auto; background-color:white;
+      border-style:solid; border-color:gray; border-width:1px; left:9px; top:36px; }
+#orgimports-input { position:absolute; top:8px; left:9px; width:325px; height:17px; }
+#orgimports-cancel { position:absolute; top:198px; height:25px; width:65px; left:77px; }
+#orgimports-next { position:absolute; top:198px; height:25px; width:65px; left:9px; }
 
 #wizardcontainerbox {
 	border: 1px solid #c4c4c4;

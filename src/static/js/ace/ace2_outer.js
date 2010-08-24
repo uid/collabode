@@ -137,6 +137,12 @@ function Ace2Editor() {
   editor.showCodeCompletionProposals = pendingInit(function(offset, proposals) {
     info.ace_showCodeCompletionProposals($, offset, proposals);
   });
+  editor.showImportProposals = pendingInit(function(proposals, sendSelection) {
+    info.ace_showImportProposals($, proposals, sendSelection);
+  });
+  editor.replaceBeforeCursor = pendingInit(function(length, replacement) {
+    info.ace_replaceBeforeCursor(length, replacement);
+  });
 
   // calls to these functions ($$INCLUDE_...)  are replaced when this file is processed
   // and compressed, putting the compressed code from the named file directly into the
@@ -194,7 +200,7 @@ function Ace2Editor() {
       iframeHTML.push($$INCLUDE_CSS_Q("editor.css syntax.css inner.css"));
       //iframeHTML.push(INCLUDE_JS_Q_DEV("ace2_common_dev.js"));
       //iframeHTML.push(INCLUDE_JS_Q_DEV("profiler.js"));
-      iframeHTML.push($$INCLUDE_JS_Q("ace2_common.js skiplist.js virtual_lines.js easysync2.js cssmanager.js colorutils.js undomodule.js contentcollector.js changesettracker.js linestylefilter.js domline.js codecomplete.js"));
+      iframeHTML.push($$INCLUDE_JS_Q("ace2_common.js skiplist.js virtual_lines.js easysync2.js cssmanager.js colorutils.js undomodule.js contentcollector.js changesettracker.js linestylefilter.js domline.js widget_codecomplete.js widget_orgimports.js widget_list.js"));
       iframeHTML.push($$INCLUDE_JS_Q("ace2_inner.js"));
       iframeHTML.push('\'\\n<style type="text/css" title="dynamicsyntax"></style>\\n\'');
       iframeHTML.push('\'</head><body id="innerdocbody" class="syntax" spellcheck="false">&nbsp;</body></html>\'');
