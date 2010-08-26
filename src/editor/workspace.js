@@ -298,7 +298,6 @@ function codeComplete(padId, offset, connectionId) {
       return {
         completion: "" + proposal.displayString,
         replacement: "" + proposal.replacementString,
-        length: proposal.replacementLength,
         offset: proposal.replacementOffset,
         image: (proposal.imageName ? "" + proposal.imageName : null)
       };
