@@ -331,15 +331,12 @@ public class JavaPadDocument extends PadDocument implements IBuffer {
      * Performs organize imports.
      */
     public void organizeImports(final String connectionId) {
-        Debug.here(); // XXX
         new Thread(new Runnable() {
             public void run() {
                 try {
                     TextEdit edit = PadImportOrganizer.of(connectionId).createTextEdit(workingCopy);
-                    System.out.println("Organize imports success: " + edit);
                     Workspace.scheduleTask("orgImportsApply", owner.username, file, connectionId, new ChangeSetOpIterator(JavaPadDocument.this, edit));
                 } catch (OperationCanceledException oce) {
-                    System.err.println("Organize imports canceled"); // XXX
                     // XXX nothing to do
                 } catch (CoreException ce) {
                     ce.printStackTrace(); // XXX
