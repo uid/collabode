@@ -14,7 +14,7 @@ function makeCodeCompleteWidget($, doReplace) {
   var preventKeyPressOrUp = false;
   var keypressRepeats = 0;
 
-  codeCompleteWidget.show = function(items, top, left, rep) {
+  codeCompleteWidget.show = function(items, top, left, rep, caretPosition) {
     proposalObjects = items;
     var proposals = _listWidgetItems(items);
     distFromInvoke = 0;
@@ -29,10 +29,11 @@ function makeCodeCompleteWidget($, doReplace) {
     $(".codecomplete").css("visibility", "visible");
     
     if (listWidget.active) {
-      filterPrefix = rep.alltext.substring(codeCompleteWidget.replacementStartOffset, codeCompleteWidget.replacementStartOffset+items[0].length);
+      filterPrefix = rep.alltext.substring(codeCompleteWidget.replacementStartOffset, caretPosition);
     }
   }
   
+  // used in ace2_inner
   codeCompleteWidget.active = function() {
     return listWidget.active;
   }
@@ -52,22 +53,11 @@ function makeCodeCompleteWidget($, doReplace) {
       return false;
     }
     
-    if (listWidget.filter(filterPrefix+str)) {
+    if (listWidget.filter(filterPrefix+str) > 0) {
       filterPrefix = ""+filterPrefix+str;
-      _resetList();
-      _populate();
-      _setHighlight();
       return true;
     }
     return false;
-  }
-  
-  function _populate() {
-    listWidget.populate();
-  }
-  
-  function _resetList() {
-    listWidget.reset();
   }
   
   function _listWidgetItems(items) {
@@ -82,7 +72,7 @@ function makeCodeCompleteWidget($, doReplace) {
   /*
    * Return true if ace editor should stop key handling
    */
-  codeCompleteWidget.handleKeys = function(evt) {
+  codeCompleteWidget.handleKeys = function(evt, isTypeForSpecialKey) {    
     var keyCode = evt.keyCode;
     if (preventKeyPressOrUp) {
       evt.preventDefault();
@@ -90,7 +80,11 @@ function makeCodeCompleteWidget($, doReplace) {
       return true;
     }
     
+    isTypeForSpecialKey = ($.browser.mozilla) ? (evt.type == "keydown") : (evt.type == "keypress");
     if ( ! listWidget.active) {
+      return false;
+    } else if ((evt.metaKey || evt.ctrlKey || evt.altKey) && isTypeForSpecialKey) {
+      _close();
       return false;
     }
     
@@ -101,15 +95,15 @@ function makeCodeCompleteWidget($, doReplace) {
       if ( ! listWidget.handleKeys(evt)) {
         return false;
       }
-      
+
       if (keyCode == 27) { // escape key
         evt.preventDefault();
         _close();
       } else if (keyCode == 8) { // backspace
-        if (!codeCompleteWidget.filter("", true)) {
+        if ( ! codeCompleteWidget.filter("", true)) {
           _close();
         }
-      } else if ((keyCode == 59 || keyCode == 186) || (keyCode == 32 && !evt.ctrlKey)) { // semicolon and space
+      } else if ((keyCode == 59 || keyCode == 186) || (keyCode == 32 && ! evt.ctrlKey)) { // semicolon and space
         _setReplacementObject();
         _close();
         doReplace(filterPrefix.length, replacementObject.replacement);
@@ -117,7 +111,7 @@ function makeCodeCompleteWidget($, doReplace) {
         _close();
       } else if (keyCode == 190) { // period
         _setReplacementObject();
-        if (!codeCompleteWidget.filter(String.fromCharCode(46))) {
+        if ( ! codeCompleteWidget.filter(String.fromCharCode(46))) {
           _close();
           doReplace(filterPrefix.length, replacementObject.replacement);
         }
@@ -129,7 +123,7 @@ function makeCodeCompleteWidget($, doReplace) {
         doReplace(filterPrefix.length, replacementObject.replacement);
         return true;
       } else {
-        if (!codeCompleteWidget.filter(String.fromCharCode(keyCode))) {
+        if ( ! codeCompleteWidget.filter(String.fromCharCode(keyCode))) {
           _close();
         }
       }
@@ -139,21 +133,6 @@ function makeCodeCompleteWidget($, doReplace) {
   
   function _close() {
     listWidget.close();
-  }
-  
-  function _setHighlight() {
-    listWidget.setHighlight();
-  }
-  
-  mouseHandler.handleClick = function() {
-    window.focus();
-  }
-  
-  mouseHandler.handleDblClick = function() {
-    window.focus();
-    _setReplacementObject();
-    _close();
-    doReplace(filterPrefix.length, replacementObject.replacement);
   }
   
   function _setReplacementObject() {
@@ -166,6 +145,17 @@ function makeCodeCompleteWidget($, doReplace) {
   
   codeCompleteWidget.handleClick = function(event) {
     _close();
+  }
+  
+  mouseHandler.handleClick = function() {
+    window.focus();
+  }
+
+  mouseHandler.handleDblClick = function() {
+    window.focus();
+    _setReplacementObject();
+    _close();
+    doReplace(filterPrefix.length, replacementObject.replacement);
   }
   
   return codeCompleteWidget;

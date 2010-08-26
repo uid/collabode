@@ -46,21 +46,11 @@ function makeOrgImportsWidget($, sendSelection) {
   
   orgImportsWidget.filter = function() {
     listWidget.filter($("#orgimports-input").val());
-    _resetList();
-    _populate();
-    _setHighlight();
   }
   
+  // used in ace2_inner
   orgImportsWidget.active = function() {
     return listWidget.active;
-  }
-  
-  function _populate() {
-    listWidget.populate();
-  }
-  
-  function _resetList() {
-    listWidget.reset();
   }
   
   function _listWidgetItems(items) {
@@ -96,10 +86,6 @@ function makeOrgImportsWidget($, sendSelection) {
   function _close() {
     $("#orgimports-container").remove();
     listWidget.close();
-  }
-  
-  function _setHighlight() {
-    listWidget.setHighlight();
   }
   
   function _cancel() {

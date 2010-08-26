@@ -18,29 +18,15 @@ function makeListWidget($, mouseHandler) {
       listWidget.active = true;
       currentItems = items;
       currentDisplayedItems = currentItems;
-      listWidget.populate();
+      _populate();
       $("#editorcontainerbox").append(listWidgetContainer);
       listWidgetContainer.css({"top":top+"px","left":left+"px"});
       listWidgetItemList.appendTo(listWidgetContainer);
-      listWidget.setHighlight();
+      _setHighlight();
       _attachClickHandlers();
     } else {
       listWidget.active = false;
     }
-  }
-  
-  listWidget.populate = function() {
-    forEach(currentDisplayedItems, function(p,i) {
-      var item = $('<li class="listwidget-listitem" id=listitem'+i+'>').append(p[0]);
-      if (p[1]) {
-        item.prepend('<img src="/static/img/eclipse/jdt.ui.obj/'+p[1]+'"/>');
-      }
-      listWidgetItemList.append(item);
-    });
-  }
-  
-  listWidget.reset = function() {
-    $("#listwidget-list").empty();
   }
   
   /*
@@ -55,10 +41,14 @@ function makeListWidget($, mouseHandler) {
         currentDisplayedItems.push(currentItems[i]);
       }
     }
-    if (currentDisplayedItems.length == 0) {
-      return false;
+    
+    $("#listwidget-list").empty();
+    if (currentDisplayedItems.length > 0) {
+      _populate();
+      _setHighlight();
+      _scrollToSelection(true);
     }
-    return true;
+    return currentDisplayedItems.length;
   }
   
   listWidget.close = function() {
@@ -70,15 +60,21 @@ function makeListWidget($, mouseHandler) {
     listWidgetItemList = $("<div id='listwidget-list' />");
   }
   
-  listWidget.getDisplayedItems = function() {
-    return currentDisplayedItems;
-  }
-  
   listWidget.getSelectedItem = function() {
     return currentDisplayedItems[selectedIndex-1];
   }
   
-  listWidget.setHighlight = function() {
+  function _populate() {
+    forEach(currentDisplayedItems, function(p,i) {
+      var item = $('<li class="listwidget-listitem" id=listitem'+i+'>').append(p[0]);
+      if (p[1]) {
+        item.prepend('<img src="/static/img/eclipse/jdt.ui.obj/'+p[1]+'"/>');
+      }
+      listWidgetItemList.append(item);
+    });
+  }
+  
+  function _setHighlight() {
     $(".listwidget-listitem").removeClass("listwidget-selected");
     $(".listwidget-listitem:nth-child("+selectedIndex+")").addClass("listwidget-selected");
   }
@@ -92,14 +88,14 @@ function makeListWidget($, mouseHandler) {
   function _handleClick(event) {
     var item = event.target.id;
     selectedIndex = parseFloat(item.substr(8)) + 1;
-    listWidget.setHighlight();
+    _setHighlight();
     mouseHandler.handleClick();
   }
   
   function _handleDblClick(event) {
     var item = event.target.id;
     selectedIndex = parseFloat(item.substr(8)) + 1;
-    listWidget.setHighlight();
+    _setHighlight();
     mouseHandler.handleDblClick();
     event.preventDefault();
   }
@@ -110,8 +106,8 @@ function makeListWidget($, mouseHandler) {
     } else {
       selectedIndex += 1;
     }
-    listWidget.setHighlight();
-    _scrollDown();
+    _setHighlight();
+    _scrollToSelection();
   }
   
   function _arrowUp() {
@@ -120,33 +116,11 @@ function makeListWidget($, mouseHandler) {
     } else {
       selectedIndex -= 1;
     }
-    listWidget.setHighlight();
-    _scrollUp();
-  }
-  
-  function _scrollDown() {
+    _setHighlight();
     _scrollToSelection();
-    var currScroll = $("#listwidget").scrollTop();
-    if ($(".listwidget-listitem:first").hasClass("listwidget-selected")) {
-      $("#listwidget").scrollTop(0);
-    } else if (($(".listwidget-selected").position().top - currScroll) > listWidget.docLineHeight*8) {
-      $("#listwidget").scrollTop(currScroll+listWidget.docLineHeight-(currScroll%listWidget.docLineHeight));
-    }
   }
   
-  function _scrollUp() {
-    _scrollToSelection();
-    var currTop = $("#listwidget-list").position().top;
-    var currScroll = $("#listwidget").scrollTop();
-    var scrollInv = $("#listwidget-list").height()-currScroll;
-    if ($(".listwidget-listitem:last").hasClass("listwidget-selected")) {
-      $("#listwidget").scrollTop(listWidget.docLineHeight*$(".listwidget-listitem").length);
-    } else if (($(".listwidget-selected").position().top + currTop) < 0) {
-      $("#listwidget").scrollTop(currScroll-listWidget.docLineHeight+(scrollInv%listWidget.docLineHeight));
-    }
-  }
-  
-  function _scrollToSelection() {
+  function _scrollToSelection(resetLeft) {
     var currScroll = $("#listwidget").scrollTop();
     var currTop = $("#listwidget-list").position().top;
     var selectedPosition = $(".listwidget-selected").position().top;
@@ -155,6 +129,9 @@ function makeListWidget($, mouseHandler) {
       $("#listwidget").scrollTop(selectedPosition);
     } else if ((selectedPosition - currScroll) > listWidget.docLineHeight*8) {
       $("#listwidget").scrollTop(selectedPosition-listWidget.docLineHeight*8);
+    }
+    if (resetLeft) {
+      $("#listwidget").scrollLeft(0);
     }
   }
   

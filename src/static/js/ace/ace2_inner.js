@@ -954,7 +954,7 @@ function OUTER(gscope) {
     var scrollX = outerWin.scrollX||outerWin.document.documentElement.scrollLeft; // fix to work in IE
     var top = rep.lines.atIndex(focusLine+1).lineNode.offsetTop + iframe.offsetTop - scrollY;
     var left = getSelectionPointX(getSelection().endPoint) + iframe.offsetLeft - scrollX;
-    codeCompleteWidget.show(proposals, top, left, rep);
+    codeCompleteWidget.show(proposals, top, left, rep, caretDocChar());
     inCallStack("cursor check", function() {
       fastIncorp(100);
       if (widgetInvokeOffset != caretDocChar()) {
@@ -3217,7 +3217,7 @@ function OUTER(gscope) {
 
     inCallStack("handleKeyEvent", function() {
       
-      if (codeCompleteWidget.handleKeys(evt)) { return; }
+      if (codeCompleteWidget.handleKeys(evt, isTypeForSpecialKey)) { return; }
 
       if (type == "keypress" ||
 	  (isTypeForSpecialKey && keyCode == 13/*return*/)) {
