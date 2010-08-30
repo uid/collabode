@@ -970,12 +970,12 @@ function OUTER(gscope) {
     orgImportsWidget.handleImportResolve(proposals);
   }
   
-  editorInfo.ace_replaceBeforeCursor = function(length, replacement) {
+  editorInfo.ace_replaceBeforeCursor = function(length, replacement, kind) {
     inCallStackIfNecessary("replace", function() {
       fastIncorp(101);
       var start = (caretDocChar() != 0) ? (caretDocChar()-length) : codeCompleteWidget.replacementStartOffset; // XXX work-around for IE placing cursor back at 0
       performDocumentReplaceCharRange(start, start+length, replacement);
-      var pos = lineAndColumnFromChar(start+replacement.length);
+      var pos = (kind == "METHOD_REF_ARGS") ? lineAndColumnFromChar(start+replacement.length-1) : lineAndColumnFromChar(start+replacement.length);
       performSelectionChange(pos, pos, false);
     });
   }

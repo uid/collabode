@@ -30,6 +30,9 @@ public class JavaPadCompletionProposalCollector extends CompletionProposalCollec
     
     private static final Pattern IMGPATTERN = Pattern.compile("URLImageDescriptor\\(.*/(.*)\\)");
     
+    public static final String METHOD_REF_NO_ARGS = "METHOD_REF_NO_ARGS";
+    public static final String METHOD_REF_ARGS = "METHOD_REF_ARGS";
+    public static final String OTHER = "OTHER";
     
     /**
      * Creates a new instance ready to collect proposals.
@@ -47,12 +50,14 @@ public class JavaPadCompletionProposalCollector extends CompletionProposalCollec
     @Override protected IJavaCompletionProposal createJavaCompletionProposal(CompletionProposal proposal) {
         AbstractJavaCompletionProposal aProposal = (AbstractJavaCompletionProposal)super.createJavaCompletionProposal(proposal);
         
+        String kind = OTHER;
         final int flags = proposal.getFlags();
         ImageDescriptor descriptor = null;
         switch (proposal.getKind()) {
             case CompletionProposal.METHOD_DECLARATION:
             case CompletionProposal.METHOD_NAME_REFERENCE:
             case CompletionProposal.METHOD_REF:
+                kind =  (proposal.getSignature()[1] == ')') ? METHOD_REF_NO_ARGS : METHOD_REF_ARGS;
             case CompletionProposal.CONSTRUCTOR_INVOCATION:
             case CompletionProposal.METHOD_REF_WITH_CASTED_RECEIVER:
             case CompletionProposal.ANNOTATION_ATTRIBUTE_REF:
@@ -98,11 +103,11 @@ public class JavaPadCompletionProposalCollector extends CompletionProposalCollec
         if (descriptor != null) {
             Matcher m = IMGPATTERN.matcher(descriptor.toString());
             if (m.matches()) {
-                return new ProposalHolder(aProposal, m.group(1));
+                return new ProposalHolder(aProposal, m.group(1), kind);
             }
         }
         
-        return new ProposalHolder(aProposal, null);
+        return new ProposalHolder(aProposal, null, kind);
     }
     
     /**
@@ -134,10 +139,12 @@ class ProposalHolder implements IJavaCompletionProposal {
     
     public final AbstractJavaCompletionProposal proposal;
     public final String image;
+    public final String kind;
     
-    ProposalHolder(AbstractJavaCompletionProposal proposal, String image) {
+    ProposalHolder(AbstractJavaCompletionProposal proposal, String image, String kind) {
         this.proposal = proposal;
         this.image = image;
+        this.kind = kind;
     }
 
     public void apply(IDocument document) { }

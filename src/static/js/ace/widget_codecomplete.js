@@ -106,21 +106,21 @@ function makeCodeCompleteWidget($, doReplace) {
       } else if ((keyCode == 59 || keyCode == 186) || (keyCode == 32 && ! evt.ctrlKey)) { // semicolon and space
         _setReplacementObject();
         _close();
-        doReplace(filterPrefix.length, replacementObject.replacement);
+        doReplace(filterPrefix.length, replacementObject.replacement, replacementObject.kind);
       } else if (keyCode == 32 && evt.ctrlKey) { // code completion invoke
         _close();
       } else if (keyCode == 190) { // period
         _setReplacementObject();
         if ( ! codeCompleteWidget.filter(String.fromCharCode(46))) {
           _close();
-          doReplace(filterPrefix.length, replacementObject.replacement);
+          doReplace(filterPrefix.length, replacementObject.replacement, replacementObject.kind);
         }
       } else if ((keyCode == 57 && evt.shiftKey) || keyCode == 13) { // open paren, enter
         evt.preventDefault();
         preventKeyPressOrUp = true;
         _setReplacementObject();
         _close();
-        doReplace(filterPrefix.length, replacementObject.replacement);
+        doReplace(filterPrefix.length, replacementObject.replacement, replacementObject.kind);
         return true;
       } else {
         if ( ! codeCompleteWidget.filter(String.fromCharCode(keyCode))) {
@@ -155,7 +155,7 @@ function makeCodeCompleteWidget($, doReplace) {
     window.focus();
     _setReplacementObject();
     _close();
-    doReplace(filterPrefix.length, replacementObject.replacement);
+    doReplace(filterPrefix.length, replacementObject.replacement, replacementObject.kind);
   }
   
   return codeCompleteWidget;

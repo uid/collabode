@@ -299,7 +299,8 @@ function codeComplete(padId, offset, connectionId) {
         completion: "" + proposal.displayString,
         replacement: "" + proposal.replacementString,
         offset: proposal.replacementOffset,
-        image: (proposal.imageName ? "" + proposal.imageName : null)
+        image: (proposal.imageName ? "" + proposal.imageName : null),
+        kind: "" + proposal.kind
       };
     }));
   }));
