@@ -1,5 +1,5 @@
 
-function makeListWidget($, mouseHandler) {
+function makeListWidget($, widgetClickHandler) {
   
   var listWidget = {};
   listWidget.active = false;
@@ -89,14 +89,14 @@ function makeListWidget($, mouseHandler) {
     var item = event.target.id;
     selectedIndex = parseFloat(item.substr(8)) + 1;
     _setHighlight();
-    mouseHandler.handleClick();
+    widgetClickHandler(event);
   }
   
   function _handleDblClick(event) {
     var item = event.target.id;
     selectedIndex = parseFloat(item.substr(8)) + 1;
     _setHighlight();
-    mouseHandler.handleDblClick();
+    widgetClickHandler(event);
     event.preventDefault();
   }
   

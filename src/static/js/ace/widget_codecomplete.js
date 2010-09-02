@@ -2,19 +2,18 @@
 function makeCodeCompleteWidget($, doReplace) {
   
   var codeCompleteWidget = {};
-  var mouseHandler = {};
-  var listWidget = makeListWidget($, mouseHandler);
+  var listWidget = makeListWidget($, _handleListClick);
   
   codeCompleteWidget.replacementStartOffset;
 
   var proposalObjects;
   var filterPrefix;
   var replacementObject;
+  var cursorAdjust;
   var distFromInvoke = 0;
   var preventKeyPressOrUp = false;
-  var keypressRepeats = 0;
 
-  codeCompleteWidget.show = function(items, top, left, rep, caretPosition) {
+  codeCompleteWidget.show = function(items, top, left, prefix) {
     proposalObjects = items;
     var proposals = _listWidgetItems(items);
     distFromInvoke = 0;
@@ -29,7 +28,7 @@ function makeCodeCompleteWidget($, doReplace) {
     $(".codecomplete").css("visibility", "visible");
     
     if (listWidget.active) {
-      filterPrefix = rep.alltext.substring(codeCompleteWidget.replacementStartOffset, caretPosition);
+      filterPrefix = prefix;
     }
   }
   
@@ -68,11 +67,11 @@ function makeCodeCompleteWidget($, doReplace) {
     }
     return proposals;
   }
-  
+
   /*
    * Return true if ace editor should stop key handling
    */
-  codeCompleteWidget.handleKeys = function(evt, isTypeForSpecialKey) {    
+  codeCompleteWidget.handleKeys = function(evt, isTypeForCmdKey) {    
     var keyCode = evt.keyCode;
     if (preventKeyPressOrUp) {
       evt.preventDefault();
@@ -80,19 +79,17 @@ function makeCodeCompleteWidget($, doReplace) {
       return true;
     }
     
-    isTypeForSpecialKey = ($.browser.mozilla) ? (evt.type == "keydown") : (evt.type == "keypress");
     if ( ! listWidget.active) {
       return false;
-    } else if ((evt.metaKey || evt.ctrlKey || evt.altKey) && isTypeForSpecialKey) {
-      _close();
-      return false;
-    }
+    } 
     
     if (evt.type == "keyup" || evt.type == "keypress") {
-      keypressRepeats = 0;
       return true;
     } else {
       if ( ! listWidget.handleKeys(evt)) {
+        return false;
+      } else if ((evt.metaKey || evt.ctrlKey || evt.altKey) && isTypeForCmdKey) {
+        _close();
         return false;
       }
 
@@ -106,21 +103,21 @@ function makeCodeCompleteWidget($, doReplace) {
       } else if ((keyCode == 59 || keyCode == 186) || (keyCode == 32 && ! evt.ctrlKey)) { // semicolon and space
         _setReplacementObject();
         _close();
-        doReplace(filterPrefix.length, replacementObject.replacement, replacementObject.kind);
+        doReplace(filterPrefix.length, replacementObject.replacement, cursorAdjust);
       } else if (keyCode == 32 && evt.ctrlKey) { // code completion invoke
         _close();
       } else if (keyCode == 190) { // period
         _setReplacementObject();
         if ( ! codeCompleteWidget.filter(String.fromCharCode(46))) {
           _close();
-          doReplace(filterPrefix.length, replacementObject.replacement, replacementObject.kind);
+          doReplace(filterPrefix.length, replacementObject.replacement, cursorAdjust);
         }
       } else if ((keyCode == 57 && evt.shiftKey) || keyCode == 13) { // open paren, enter
         evt.preventDefault();
         preventKeyPressOrUp = true;
         _setReplacementObject();
         _close();
-        doReplace(filterPrefix.length, replacementObject.replacement, replacementObject.kind);
+        doReplace(filterPrefix.length, replacementObject.replacement, cursorAdjust);
         return true;
       } else {
         if ( ! codeCompleteWidget.filter(String.fromCharCode(keyCode))) {
@@ -137,25 +134,26 @@ function makeCodeCompleteWidget($, doReplace) {
   
   function _setReplacementObject() {
     replacementObject = proposalObjects[listWidget.getSelectedItem()[2]];
+    cursorAdjust = (replacementObject.kind == "METHOD_REF_ARGS") ? -1 : 0;
   }
   
-  codeCompleteWidget.handleScroll = function(event) {
+  codeCompleteWidget.handleEditorScroll = function(event) {
     _close();
   }
   
-  codeCompleteWidget.handleClick = function(event) {
+  codeCompleteWidget.handleEditorClick = function(event) {
     _close();
   }
   
-  mouseHandler.handleClick = function() {
-    window.focus();
-  }
-
-  mouseHandler.handleDblClick = function() {
-    window.focus();
-    _setReplacementObject();
-    _close();
-    doReplace(filterPrefix.length, replacementObject.replacement, replacementObject.kind);
+  function _handleListClick(evt) {
+    if (evt.type == "click") {
+      window.focus();
+    } else {
+      window.focus();
+      _setReplacementObject();
+      _close();
+      doReplace(filterPrefix.length, replacementObject.replacement, cursorAdjust);
+    }
   }
   
   return codeCompleteWidget;

@@ -938,23 +938,20 @@ function OUTER(gscope) {
     codeCompleteWidget = makeCodeCompleteWidget($, editorInfo.ace_replaceBeforeCursor);
   };
   
-  editorInfo.ace_setRequestFormat = function(handler) {
-    setRequestFormat(handler);
-  };
-  
   editorInfo.ace_showCodeCompletionProposals = function($, offset, proposals) {
     if ( ! (isCaret())) {
       alert("Unable to show completion proposals"); // XXX
       return;
     }
     var focusLine = (rep.selFocusAtStart ? rep.selStart[0] : rep.selEnd[0]);
+    var filterPrefix = rep.alltext.substring(proposals[0].offset, caretDocChar());
     
     // show codecompletion widget
     var scrollY = outerWin.scrollY||outerWin.document.documentElement.scrollTop; // fix to work in IE
     var scrollX = outerWin.scrollX||outerWin.document.documentElement.scrollLeft; // fix to work in IE
     var top = rep.lines.atIndex(focusLine+1).lineNode.offsetTop + iframe.offsetTop - scrollY;
     var left = getSelectionPointX(getSelection().endPoint) + iframe.offsetLeft - scrollX;
-    codeCompleteWidget.show(proposals, top, left, rep, caretDocChar());
+    codeCompleteWidget.show(proposals, top, left, filterPrefix);
     inCallStack("cursor check", function() {
       fastIncorp(100);
       if (widgetInvokeOffset != caretDocChar()) {
@@ -964,21 +961,33 @@ function OUTER(gscope) {
     });
   };
   
-  var orgImportsWidget;
-  editorInfo.ace_showImportProposals = function($, proposals, sendSelection) {
-    orgImportsWidget = makeOrgImportsWidget($, sendSelection);
-    orgImportsWidget.handleImportResolve(proposals);
-  }
-  
-  editorInfo.ace_replaceBeforeCursor = function(length, replacement, kind) {
+  editorInfo.ace_replaceBeforeCursor = function(length, replacement, cursorAdjust) {
     inCallStackIfNecessary("replace", function() {
       fastIncorp(101);
       var start = (caretDocChar() != 0) ? (caretDocChar()-length) : codeCompleteWidget.replacementStartOffset; // XXX work-around for IE placing cursor back at 0
       performDocumentReplaceCharRange(start, start+length, replacement);
-      var pos = (kind == "METHOD_REF_ARGS") ? lineAndColumnFromChar(start+replacement.length-1) : lineAndColumnFromChar(start+replacement.length);
+      var pos = lineAndColumnFromChar(start+replacement.length+cursorAdjust);
       performSelectionChange(pos, pos, false);
     });
   }
+  
+  var externalKeyHandlers = [];
+  var externalClickHandlers = [];
+  editorInfo.ace_addKeyHandler = function(handler) {
+    externalKeyHandlers.push(handler);
+  }
+  editorInfo.ace_addClickHandler = function(handler) {
+    externalClickHandlers.push(handler);
+  }
+  editorInfo.ace_removeKeyHandler = function(handler) {
+    var index = externalKeyHandlers.indexOf(handler);
+    externalKeyHandlers.splice(index, 1);
+  }
+  editorInfo.ace_removeClickHandler = function(handler) {
+    var index = externalClickHandlers.indexOf(handler);
+    externalClickHandlers.splice(index, 1);
+  }
+  
 
   function now() { return (new Date()).getTime(); }
 
@@ -2886,14 +2895,16 @@ function OUTER(gscope) {
     inCallStack("handleClick", function() {
       idleWorkTimer.atMost(200);
     });
+
+    externalClickHandlers.forEach(function(handler) {
+      handler(evt);
+    });
     
     // handler for hiding widget when clicking outside
     if (codeCompleteWidget && codeCompleteWidget.active()) {
-      codeCompleteWidget.handleClick(evt);
-    } else if (orgImportsWidget && orgImportsWidget.active()) {
-      orgImportsWidget.handleClick(evt); 
+      codeCompleteWidget.handleEditorClick(evt);
     }
-
+    
     // only want to catch left-click
     if ((! evt.ctrlKey) && (evt.button != 2) && (evt.button != 3)) {
       // find A tag with HREF
@@ -2915,7 +2926,7 @@ function OUTER(gscope) {
   
   function handleScroll(evt) {
     if (codeCompleteWidget.active()) {
-      codeCompleteWidget.handleScroll(evt);
+      codeCompleteWidget.handleEditorScroll(evt);
     }
   }
 
@@ -3208,7 +3219,9 @@ function OUTER(gscope) {
 		     || keyCode == 91));
     if (isModKey) return;
 
-    var specialHandled = false;
+    var callbacks = {
+      specialHandled: false
+    };
     var isTypeForSpecialKey = ((browser.msie || browser.safari) ?
 			       (type == "keydown") : (type == "keypress"));
     var isTypeForCmdKey = ((browser.msie || browser.safari) ? (type == "keydown") : (type == "keypress"));
@@ -3217,7 +3230,13 @@ function OUTER(gscope) {
 
     inCallStack("handleKeyEvent", function() {
       
-      if (codeCompleteWidget.handleKeys(evt, isTypeForSpecialKey)) { return; }
+      if (codeCompleteWidget.handleKeys(evt, callbacks, isTypeForCmdKey)) { return; } // XXX
+      
+      var char = String.fromCharCode(evt.which).toLowerCase();
+      externalKeyHandlers.forEach(function(handler) {
+        handler(evt, char, callbacks, isTypeForCmdKey);
+      });
+      var specialHandled = callbacks.specialHandled;
 
       if (type == "keypress" ||
 	  (isTypeForSpecialKey && keyCode == 13/*return*/)) {
@@ -3345,17 +3364,6 @@ function OUTER(gscope) {
     fastIncorp(100);
     widgetInvokeOffset = caretDocChar()+1;
     scheduler.setTimeout(function() { doRequestCodeCompletion(); }, 500);
-  }
-	
-	if ((!specialHandled) &&
-      ((browser.mozilla && ! browser.windows) ? (type == "keydown") : isTypeForCmdKey) &&
-      String.fromCharCode(which).toLowerCase() == "f" &&
-      (evt.metaKey || evt.ctrlKey) && evt.shiftKey) {
-    // shift-cmd-F (code formatting)
-    fastIncorp(100);
-    evt.preventDefault();
-    doRequestFormat();
-    specialHandled = true;
   }
 	 
 	if (mozillaFakeArrows && mozillaFakeArrows.handleKeyEvent(evt)) {
@@ -4940,16 +4948,6 @@ function OUTER(gscope) {
     } else {
       // XXX maybe selection? not sure
     }
-  }
-  
-  var requestFormatHandler = false;
-  
-  function setRequestFormat(handler) {
-    requestFormatHandler = handler;
-  }
-  
-  function doRequestFormat() {
-    requestFormatHandler();
   }
 
 };

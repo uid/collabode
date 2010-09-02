@@ -20,6 +20,10 @@ $(document).ready(function() {
                                user,
                                { });
   
+  var orgImportsWidget = makeOrgImportsWidget($, ace, function(selection) {
+    collab.sendExtendedMessage({ type: "ORGIMPORTS_RESOLVED" , choices: selection});
+  });
+  
   collab.setOnInternalAction(function(action) {
     if (action == "commitPerformed") {
       $("#syncstatussyncing").css('display', 'block');
@@ -53,15 +57,29 @@ $(document).ready(function() {
     testor.updateTest(msg.test, msg.result);
   });
   collab.setOnExtendedMessage("ORGIMPORTS_PROMPT", function(msg) {
-    ace.showImportProposals(msg.suggestion, function(selection) {
-      collab.sendExtendedMessage({ type: "ORGIMPORTS_RESOLVED" , choices: selection});
-    });
+    orgImportsWidget.handleOrgImportsResolve(msg.suggestion);
   });
   
-  ace.setRequestFormat(function() {
-    collab.sendExtendedMessage({ type: "FORMAT_REQUEST" });
+  ace.addKeyHandler(function(event, char, cb, cmdKey) {
+    if (( ! cb.specialHandled) && cmdKey && char == "f" &&
+        (event.metaKey || event.ctrlKey) && event.shiftKey) {
+      // shift-cmd-F (code formatting)
+      event.preventDefault();
+      collab.sendExtendedMessage({ type: "FORMAT_REQUEST" });
+      cb.specialHandled = true;
+    }
   });
   
+  ace.addKeyHandler(function(event, char, cb, cmdKey) {
+    if (( ! cb.specialHandled) && cmdKey && char == "o" &&
+        (event.metaKey || event.ctrlKey) && event.shiftKey) {
+      // shift-cmd-o (code formatting)
+      event.preventDefault();
+      collab.sendExtendedMessage({ type: "ORGIMPORTS_REQUEST" });
+      cb.specialHandled = true;
+    }
+  });
+
   $("#format").click(function() {
     collab.sendExtendedMessage({ type: "FORMAT_REQUEST" });
     return false;

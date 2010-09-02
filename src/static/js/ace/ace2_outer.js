@@ -131,17 +131,23 @@ function Ace2Editor() {
   editor.setRequestCodeCompletion = pendingInit(function(handler) {
     info.ace_setRequestCodeCompletion($, handler);
   });
-  editor.setRequestFormat = pendingInit(function(handler) {
-    info.ace_setRequestFormat(handler);
-  });
   editor.showCodeCompletionProposals = pendingInit(function(offset, proposals) {
     info.ace_showCodeCompletionProposals($, offset, proposals);
   });
-  editor.showImportProposals = pendingInit(function(proposals, sendSelection) {
-    info.ace_showImportProposals($, proposals, sendSelection);
-  });
   editor.replaceBeforeCursor = pendingInit(function(length, replacement) {
     info.ace_replaceBeforeCursor(length, replacement);
+  });
+  editor.addKeyHandler = pendingInit(function(handler) {
+    info.ace_addKeyHandler(handler);
+  });
+  editor.addClickHandler = pendingInit(function(handler) {
+    info.ace_addClickHandler(handler);
+  });
+  editor.removeKeyHandler = pendingInit(function(handler) {
+    info.ace_removeKeyHandler(handler);
+  });
+  editor.removeClickHandler = pendingInit(function(handler) {
+    info.ace_removeClickHandler(handler);
   });
 
   // calls to these functions ($$INCLUDE_...)  are replaced when this file is processed
@@ -200,7 +206,7 @@ function Ace2Editor() {
       iframeHTML.push($$INCLUDE_CSS_Q("editor.css syntax.css inner.css"));
       //iframeHTML.push(INCLUDE_JS_Q_DEV("ace2_common_dev.js"));
       //iframeHTML.push(INCLUDE_JS_Q_DEV("profiler.js"));
-      iframeHTML.push($$INCLUDE_JS_Q("ace2_common.js skiplist.js virtual_lines.js easysync2.js cssmanager.js colorutils.js undomodule.js contentcollector.js changesettracker.js linestylefilter.js domline.js widget_codecomplete.js widget_orgimports.js widget_list.js"));
+      iframeHTML.push($$INCLUDE_JS_Q("ace2_common.js skiplist.js virtual_lines.js easysync2.js cssmanager.js colorutils.js undomodule.js contentcollector.js changesettracker.js linestylefilter.js domline.js widget_codecomplete.js widget_list.js"));
       iframeHTML.push($$INCLUDE_JS_Q("ace2_inner.js"));
       iframeHTML.push('\'\\n<style type="text/css" title="dynamicsyntax"></style>\\n\'');
       iframeHTML.push('\'</head><body id="innerdocbody" class="syntax" spellcheck="false">&nbsp;</body></html>\'');
