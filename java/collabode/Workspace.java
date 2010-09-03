@@ -25,6 +25,7 @@ public class Workspace {
         if (WORKSPACE == null) {
             new InstanceScope().getNode(ResourcesPlugin.PI_RESOURCES).putBoolean(ResourcesPlugin.PREF_AUTO_REFRESH, true);
             Hashtable<String,String> options = getJavaCoreOptions();
+            options.put(JavaCore.CODEASSIST_VISIBILITY_CHECK, "enabled");
             options.put(JavaCore.CODEASSIST_FORBIDDEN_REFERENCE_CHECK, "enabled");
             options.put(DefaultCodeFormatterConstants.FORMATTER_TAB_CHAR, "space");
             JavaCore.setOptions(options);
