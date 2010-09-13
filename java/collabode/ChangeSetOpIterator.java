@@ -10,9 +10,13 @@ import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.text.edits.*;
 
 public class ChangeSetOpIterator implements Iterator<ChangeSetOp> {
+    public final int length;
+    
     private Queue<ChangeSetOp> rest = new LinkedList<ChangeSetOp>();
     
     ChangeSetOpIterator(IDocument doc, TextPresentation presentation) {
+        length = doc.getLength();
+        
         StyleRange first = presentation.getFirstStyleRange();
         if (first != null) {
             // initial keep, neither adds nor removes attributes
@@ -24,6 +28,8 @@ public class ChangeSetOpIterator implements Iterator<ChangeSetOp> {
     }
     
     ChangeSetOpIterator(final IDocument doc, TextEdit edit) {
+        length = doc.getLength();
+        
         edit.accept(new TextEditVisitor() {
             int last = 0;
             

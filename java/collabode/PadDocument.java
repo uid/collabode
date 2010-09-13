@@ -19,6 +19,8 @@ public class PadDocument extends Document {
     final PadDocumentOwner owner;
     final IFile file;
     
+    int revision;
+    
     /**
      * Are we currently revising this document to match its EtherPad pad?
      */
@@ -46,7 +48,7 @@ public class PadDocument extends Document {
             }
         });
         
-        PadFunctions.syncText.apply(owner.username, file, get());
+        revision = PadFunctions.syncText.apply(owner.username, file, get()).intValue();
     }
     
     public IProject getProject() {
@@ -116,9 +118,13 @@ public class PadDocument extends Document {
      * Updates the content of the document, because the pad content changed.
      * XXX change to a TextEdit and use apply()?
      */
-    public synchronized void pdsyncApply(ReplaceEdit[] edits) {
+    public synchronized void pdsyncApply(int newRev, ReplaceEdit[] edits) {
         try {
             revising.set(true);
+            revision = newRev;
+            if (edits.length > 1) { // XXX revision is a lie until all edits have been applied
+                System.err.println("Incorrect doc rev " + newRev + " for " + (edits.length-1) + " intermediate");
+            }
             for (ReplaceEdit edit : edits) {
                 replace(edit.getOffset(), edit.getLength(), edit.getText());
             }

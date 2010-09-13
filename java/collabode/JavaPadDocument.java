@@ -104,7 +104,7 @@ public class JavaPadDocument extends PadDocument implements IBuffer {
      * Update syntax highlighting.
      */
     public void changeTextPresentation(TextPresentation presentation) {
-        Workspace.scheduleTask("pdsyncPadStyle", owner.username, file, new ChangeSetOpIterator(this, presentation));
+        Workspace.scheduleTask("pdsyncPadStyle", owner.username, file, revision, new ChangeSetOpIterator(this, presentation));
     }
     
     /*

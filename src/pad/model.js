@@ -131,7 +131,7 @@ function accessPadGlobal(padId, padFunc, rwMode) {
         updateCoarseChangesets(true);
         
         if (meta.pdlinked && ( ! pad.pdsyncing()) && textChanged) { // XXX avoids infinite loop
-          execution.scheduleTask("dbwriter_infreq", "pdsyncDocumentText", 0, [ padId, theChangeset ]);
+          execution.scheduleTask("dbwriter_infreq", "pdsyncDocumentText", 0, [ padId, newRev, theChangeset ]);
         }
       }
       function getNumForAuthor(author, dontAddIfAbsent) {
@@ -327,9 +327,12 @@ function accessPadGlobal(padId, padFunc, rwMode) {
       return new Date(revmeta.getJSONEntry(r).t);
     },
     pdsync: function(padSyncFunc) {
-      pdsyncing = true;
-      padSyncFunc();
-      pdsyncing = false;
+      try {
+        pdsyncing = true;
+        padSyncFunc();
+      } finally {
+        pdsyncing = false;
+      }
     },
     pdsyncing: function() { return pdsyncing; },
     // note: calls like appendRevision will NOT notify clients of the change!

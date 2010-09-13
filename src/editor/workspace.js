@@ -32,11 +32,14 @@ function _padIdFor(username, file) {
 }
 
 function _pdsyncPadText(username, file, txt) { // XXX should take revisions, not full text
+  var rev;
   model.accessPadGlobal(_padIdFor(username, file), function(pad) {
     pad.pdsync(function() {
       collab_server.setPadText(pad, txt);
     });
+    rev = pad.getHeadRevisionNumber();
   });
+  return rev;
 }
 
 function taskReportProblems(username, file, problems) {
@@ -164,7 +167,7 @@ function isChangesetAllowed(padId, changeset, author) {
   return _isAllowedBySomeAcl(author, function(acl) {
     if (acl[1] != uf.filename) { return false; }
     var doc = _getDocument(padId);
-    return doc.isAllowed(_makeReplaceEdits(doc, changeset), acl.slice(2));
+    return doc.isAllowed(_makeReplaceEdits(changeset), acl.slice(2));
   });
 }
 
@@ -188,21 +191,25 @@ function getSettings(userId, key) {
   return props;
 }
 
-function taskPdsyncDocumentText(padId, cs) {
+function taskPdsyncDocumentText(padId, newRev, cs) {
   var doc = _getDocument(padId);
-  doc.pdsyncApply(_makeReplaceEdits(doc, cs));
+  doc.pdsyncApply(newRev, _makeReplaceEdits(cs));
 }
 
-function taskPdsyncPadStyle(username, file, iterator) {
+function taskPdsyncPadStyle(username, file, baseRev, iterator) {
   model.accessPadGlobal(_padIdFor(username, file), function(pad) {
     var changeset = _makeChangeSetStr(pad, iterator);
+    while (baseRev != pad.getHeadRevisionNumber()) {
+      baseRev++;
+      changeset = Changeset.follow(pad.getRevisionChangeset(baseRev), changeset, false, pad.pool());
+    }
     pad.pdsync(function () {
       collab_server.applyChangesetToPad(pad, changeset, "#syntaxcolor");
     });
   });
 }
 
-function _makeReplaceEdits(doc, changeset) {
+function _makeReplaceEdits(changeset) {
   var edits = [];
   var unpacked = Changeset.unpack(changeset);
   var csIter = Changeset.opIterator(unpacked.ops);
@@ -253,7 +260,7 @@ function _makeReplaceEdits(doc, changeset) {
 
 function _makeChangeSetStr(pad, iterator) {
   var apool = pad.pool();
-  var builder = Changeset.builder(pad.text().length); // XXX ignoring len
+  var builder = Changeset.builder(iterator.length + 1); // XXX final newline
   while (iterator.hasNext()) {
     var op = iterator.next();
     switch (op.opcode) {
