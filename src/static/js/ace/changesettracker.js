@@ -104,7 +104,11 @@ function makeChangesetTracker(scheduler, apool, aceCallbacksProvider) {
 
         var preferInsertingAfterUserChanges = true;
         var oldUserChangeset = userChangeset;
-        userChangeset = Changeset.follow(c2, oldUserChangeset, preferInsertingAfterUserChanges, apool);
+        if (Changeset.isIdentity(oldUserChangeset)) {
+          userChangeset = Changeset.identity(Changeset.newLen(c2));
+        } else {
+          userChangeset = Changeset.follow(c2, oldUserChangeset, preferInsertingAfterUserChanges, apool);
+        }
         var postChange =
           Changeset.follow(oldUserChangeset, c2, ! preferInsertingAfterUserChanges, apool);
 
