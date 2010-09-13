@@ -63,8 +63,8 @@ public class ContinuousTesting implements Runnable {
     }
     
     public void run() {
-        try {
-            while (true) {
+        while (true) {
+            try {
                 IProject project = toRun.take();
                 
                 Job.getJobManager().join(ResourcesPlugin.FAMILY_AUTO_BUILD, null);
@@ -82,9 +82,9 @@ public class ContinuousTesting implements Runnable {
                 } catch (CoreException ce) {
                     ce.printStackTrace(); // XXX
                 }
+            } catch (Exception e) {
+                e.printStackTrace(); // XXX ... and madly soldier on
             }
-        } catch (Exception e) {
-            e.printStackTrace(); // XXX
         }
     }
     
