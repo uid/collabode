@@ -29,7 +29,7 @@ public class PadDocument extends Document {
     PadDocument(PadDocumentOwner owner, IFile file) throws IOException {
         super();
         try {
-            super.set(IO.toString(file.getContents()));
+            super.set(IO.toString(file.getContents()).replaceAll("\t", "    ")); // XXX clobbers tabs
         } catch (CoreException ce) {
             throw new IOException(ce);
         }
