@@ -2,8 +2,7 @@ package collabode;
 
 import java.io.*;
 import java.net.URL;
-import java.sql.Connection;
-import java.sql.DriverManager;
+import java.sql.*;
 import java.util.Properties;
 import java.util.Scanner;
 
@@ -78,10 +77,19 @@ public class Application implements IApplication {
         Class.forName(config.getProperty("dbDriver"));
         Connection db = DriverManager.getConnection(config.getProperty("dbURL"), "u", "");
         Scanner schema = new Scanner(new File(bundleResourcePath("config/schema.sql"))).useDelimiter(";");
+        String alreadyExists = config.getProperty("dbAlreadyExists");
         while (schema.hasNext()) {
             String stmt = schema.next().trim();
             if (stmt.isEmpty()) { continue; }
-            db.createStatement().execute(stmt);
+            try {
+                db.createStatement().execute(stmt);
+            } catch (SQLException sqle) {
+                if ( ! sqle.getSQLState().equals(alreadyExists)) {
+                    System.err.println(stmt);
+                    System.err.println(sqle.getSQLState());
+                    throw sqle;
+                }
+            }
         }
         db.close();
     }

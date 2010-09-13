@@ -8,3 +8,4 @@ listen = 9000
 
 dbDriver = org.hsqldb.jdbc.JDBCDriver
 dbURL = jdbc:hsqldb:mem:pads
+dbAlreadyExists = 42504
