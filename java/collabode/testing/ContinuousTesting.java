@@ -69,6 +69,8 @@ public class ContinuousTesting implements Runnable {
                 
                 Job.getJobManager().join(ResourcesPlugin.FAMILY_AUTO_BUILD, null);
                 IJavaProject javaProject = JavaCore.create(project);
+                if ( ! javaProject.exists()) { continue; }
+                
                 if (JUnitCore.findTestTypes(javaProject, null).length == 0) {
                     ProjectTestsOwner.of(javaProject).empty();
                     continue;
