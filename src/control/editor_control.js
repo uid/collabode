@@ -52,7 +52,7 @@ function create_project() {
   return true;
 }
 
-function render_path(projectname, filename) {
+function render_path(projectname, filename, lineno) {
   var project = Workspace.accessProject(projectname);
   var resource = project.findMember(filename);
   
@@ -82,7 +82,7 @@ function render_path(projectname, filename) {
   switch(resource.getType()) {
   
   case IResource.FILE:
-    return _render_file(project, resource, tree(resource.getParent()));
+    return _render_file(project, resource, lineno, tree(resource.getParent()));
   
   case IResource.FOLDER:    
     renderHtml("editor/folder.ejs", {
@@ -163,7 +163,7 @@ var _renderers = {
   }
 };
 
-function _render_file(project, file, projectfiles) {
+function _render_file(project, file, lineno, projectfiles) {
   var extension = null;
   var lastdot = file.getName().lastIndexOf('.');
   if (lastdot > 0) {
@@ -188,6 +188,7 @@ function _render_file(project, file, projectfiles) {
   }
   
   data.__proto__ = _renderers._file(project, file);
+  if (lineno) { helpers.addClientVars({ scrollToLineNo: lineno }); }
   renderHtml("editor/file.ejs", data);
   return true;
 }

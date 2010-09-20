@@ -1,0 +1,17 @@
+<% helpers.setHtmlTitle(toHTML(description)) %>
+<% helpers.includeCss("turk_ejs.css") %>
+<% helpers.addBodyClass(assigned ? 'assignment' : 'preview') %>
+
+<table cellpadding="0" cellspacing="0" border="0">
+<tr><td height="1%">
+<div id="task">
+<%= toHTML(description) %>
+</div>
+
+</td></tr>
+<tr><td height="99%">
+
+<iframe src="<%= frameURL %>"></iframe>
+
+</td></tr>
+</table>

@@ -971,6 +971,12 @@ function OUTER(gscope) {
     });
   }
   
+  editorInfo.ace_scrollToLineNo = function(lineno) {
+    inCallStackIfNecessary("scroll", function() {
+      scrollNodeVerticallyIntoView(rep.lines.atIndex(lineno).lineNode);
+    });
+  };
+  
   var externalKeyHandlers = [];
   var externalClickHandlers = [];
   editorInfo.ace_addKeyHandler = function(handler) {

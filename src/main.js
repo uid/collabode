@@ -107,7 +107,8 @@ function handlePath() {
     [/^\/login:([\w]+)(\/.*)$/, auth_control.render_login],
     [/^\/login()(\/.*)$/, auth_control.render_login],
     ['/logout', auth_control.logout],
-    [_file('turk:([\\w]+)'), turk_control.render_task]
+    [_file('turk:([\\w]+)'), turk_control.render_task],
+    [/^\/frame%22([\s\S]*?)%22(\/.*)$/, turk_control.render_framed] // XXX anyone can frame us?
   ]);
   noauth.POST.addLocations([
     [/^\/login(\/.*)$/, auth_control.login]
@@ -129,9 +130,10 @@ function handlePath() {
   function deny(handler) {
     return function() { utils.renderError(403); return true; };
   }
-  function check(handler) {
-    return function(projectname, filename) {
-      if (workspace.isRenderAllowed(projectname, filename, userId)) {
+  function check(handler, shift, fakeId) {
+    shift = shift || 0;
+    return function() {
+      if (workspace.isRenderAllowed(arguments[0+shift], arguments[1+shift], fakeId || userId)) {
         return handler.apply(this, arguments);
       } else {
         return deny()(); // what is this, Perl?
@@ -154,12 +156,14 @@ function handlePath() {
     [_proj('delete'), u(editor_control.render_confirm_delete)],
     [_file('delete'), u(editor_control.render_confirm_delete)],
     [_file('clone'), r(editor_control.clone_path)],
+    [_file('knockout:([\\w,.\\[;]+)"([\\s\\S]*)"'), r(turk_control.render_knockout, 2, 'clones')],
     [_proj(), r(editor_control.render_project)],
     [_file(), r(editor_control.render_path)]
   ]);
   authed.POST.addLocations([
     [_proj('delete'), u(editor_control.delete_path)],
     [_file('delete'), u(editor_control.delete_path)],
+    [_file('knockout:([\\w,.\\[;]+)"([\\s\\S]*)"'), r(turk_control.create_knockout, 2, 'clones')],
     ['/', u(editor_control.create_project)],
     [_proj(), u(editor_control.create_path)],
     [_file(), u(editor_control.create_path)]
@@ -177,5 +181,8 @@ function _proj(verb) {
 }
 
 function _file(verb) {
-  return new RegExp("^" + (verb ? "/" + verb : "") + "/([\\w-\\.]+)/(.+)$")
+  var regex = new RegExp("^" + (verb ? "/" + verb : "") + "/([\\w-\\.]+)/(.+?)(?::(\\d+))?$");
+  return {
+    exec: function(path) { return regex.exec(decodeURIComponent(path)); }
+  };
 }

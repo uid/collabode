@@ -1,0 +1,26 @@
+<% helpers.setHtmlTitle([ project.getName()+'...', file.getProjectRelativePath() ]) %>
+<% helpers.includeCss("editor_ejs.css") %>
+
+<div id="editorpage">
+
+<%= helpers.renderPartial("docbar", { project: project.getName()+'...', file: file.getName() }) %>
+
+<div id="sidebarbox">
+  <div class="sidebarsection">
+  </div>
+</div>
+
+<div id="padmain">
+  <div id="padeditor">
+    <form id="wizardcontainerbox" method="post">
+      <h1>Implement a method</h1>
+      <p>Please implement the method <tt><%= toHTML(method) %></tt> in <tt><%= file.getName() %></tt></p>
+      
+      <div id="wizardbottom">
+        <button type="submit">Get started</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+</div>

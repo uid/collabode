@@ -3,6 +3,10 @@ $(document).ready(function() {
   ace.init("editorcontainer", "", function() {
     $("#editorloadingbox").hide();
     ace.focus();
+    
+    if (clientVars.scrollToLineNo) {
+      ace.scrollToLineNo(clientVars.scrollToLineNo);
+    }
   });
   
   Layout.onResize = ace.adjustSize;

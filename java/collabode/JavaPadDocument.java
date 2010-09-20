@@ -352,4 +352,13 @@ public class JavaPadDocument extends PadDocument implements IBuffer {
     public void organizeImportsResolved(String connectionId, int[] userChoices) {
         PadImportOrganizer.of(connectionId).chose(userChoices);
     }
+    
+    public ChangeSetOpIterator knockout(String methodName, String[] paramSigs, String replacement) throws JavaModelException {
+        IMethod method = workingCopy.findPrimaryType().getMethod(methodName, paramSigs);
+        ISourceRange range = method.getSourceRange();
+        String source = method.getSource();
+        int start = range.getOffset() + source.indexOf('\n', source.indexOf('{')) + 1;
+        int end = range.getOffset() + source.lastIndexOf('\n', source.lastIndexOf('}'));
+        return new ChangeSetOpIterator(this, new ReplaceEdit(start, end - start, replacement));
+    }
 }

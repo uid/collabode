@@ -317,6 +317,16 @@ function getContentTypeName(padId) {
   return _getDocument(padId).getContentTypeName();
 }
 
+function knockout(padId, method, params, replacement) {
+  var changeset;
+  model.accessPadGlobal(padId, function(pad) {
+    var iterator = _getDocument(padId).knockout(method, params, replacement);
+    changeset = _makeChangeSetStr(pad, iterator);
+    collab_server.applyChangesetToPad(pad, changeset, "#knockout");
+  });
+  return Changeset.opIterator(Changeset.unpack(changeset).ops).next().lines;
+}
+
 function _testResultMessage(test, result) {
   var msg = {
       type: "TEST_RESULT",

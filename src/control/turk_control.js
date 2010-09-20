@@ -2,6 +2,9 @@ import("helpers");
 import("utils.*");
 
 import("editor.turk");
+import("editor.workspace");
+
+jimport("collabode.Workspace");
 
 jimport("java.lang.System");
 
@@ -23,5 +26,49 @@ function render_task(requester, projectname, filename) {
     projectname: projectname,
     filename: filename
   });
+  return true;
+}
+
+function render_framed(description, destination) {
+  renderHtml("turk/framed.ejs", {
+    description: decodeURIComponent(description),
+    assigned: true,
+    frameURL: destination
+  });
+  return true;
+}
+
+function render_knockout(methodAndParams, replacement, projectname, filename) {
+  var method = methodAndParams.split(',')[0];
+  var params = methodAndParams.split(',').slice(1);
+  replacement = decodeURIComponent(replacement);
+  
+  var project = Workspace.accessProject(projectname);
+  var file = project.findMember(filename);
+  
+  renderHtml("turk/knockout.ejs", {
+    project: project,
+    file: file,
+    method: method
+  });
+  return true;
+}
+
+function create_knockout(methodAndParams, replacement, projectname, filename) {
+  var method = methodAndParams.split(',')[0];
+  var params = methodAndParams.split(',').slice(1);
+  replacement = decodeURIComponent(replacement);
+  
+  var destination = projectname+"-"+method+params.length+"-"+getSession().userName; // XXX uniqueness
+  var project = Workspace.cloneProject(projectname, destination);
+  var file = project.findMember(filename);
+  
+  workspace.cloneAcl(getSession().userId, projectname, destination);
+  
+  var padId = workspace.accessDocumentPad(workspace.everyone, file);
+  var lineno = workspace.knockout(padId, method, params, replacement);
+  
+  var description = "Implement the method '"+method+"' in "+file.getName()+", line "+lineno+".";
+  response.redirect('/frame"'+description+'"'+file.getFullPath()+':'+lineno);
   return true;
 }
