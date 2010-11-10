@@ -120,7 +120,7 @@ public class FileRunOwner {
         config.setAttribute(IJavaLaunchConfigurationConstants.ATTR_PROJECT_NAME, file.getProject().getName());
         config.setAttribute(IJavaLaunchConfigurationConstants.ATTR_MAIN_TYPE_NAME, main.getFullyQualifiedName());
         
-        String policy = "'" + Application.bundleResourcePath("config/security.run.policy") + "'";
+        String policy = '"' + Application.bundleResourcePath("config/security.run.policy") + '"';
         config.setAttribute(IJavaLaunchConfigurationConstants.ATTR_VM_ARGUMENTS,
                 "-Dorg.eclipse.osgi.framework.internal.core.FrameworkSecurityManager " + // XXX does nothing?
                 "-Djava.security.manager -Djava.security.policy==" + policy + " -ea");
