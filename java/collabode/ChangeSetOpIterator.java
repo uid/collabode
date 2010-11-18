@@ -14,6 +14,9 @@ public class ChangeSetOpIterator implements Iterator<ChangeSetOp> {
     
     private Queue<ChangeSetOp> rest = new LinkedList<ChangeSetOp>();
     
+    /**
+     * Create a changeset for presentation changes.
+     */
     ChangeSetOpIterator(IDocument doc, TextPresentation presentation) {
         length = doc.getLength();
         
@@ -27,6 +30,10 @@ public class ChangeSetOpIterator implements Iterator<ChangeSetOp> {
         }
     }
     
+    /**
+     * Create a changeset for text edits.
+     * <code>doc</code> must <b>not</b> yet have <code>edit</code> applied.
+     */
     ChangeSetOpIterator(final IDocument doc, TextEdit edit) {
         length = doc.getLength();
         
@@ -51,7 +58,7 @@ public class ChangeSetOpIterator implements Iterator<ChangeSetOp> {
             
             @Override public boolean visit(DeleteEdit edit) {
                 queue(doc, last, edit, "");
-                last = edit.getOffset();
+                last = edit.getOffset() + edit.getLength();
                 return true;
             }
         
