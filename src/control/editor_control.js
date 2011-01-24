@@ -32,7 +32,7 @@ function render_project(projectname) {
       projects: Workspace.listProjects()
     });
     return true;
-  }    
+  }
   
   var projectfiles = Workspace.listProjects().slice();
   projectfiles.splice(projectfiles.indexOf(project)+1, 0, project.members());
@@ -84,7 +84,7 @@ function render_path(projectname, filename, lineno) {
   case IResource.FILE:
     return _render_file(project, resource, lineno, tree(resource.getParent()));
   
-  case IResource.FOLDER:    
+  case IResource.FOLDER:
     renderHtml("editor/folder.ejs", {
       project: project,
       folder: resource,
@@ -253,7 +253,7 @@ function delete_path(projectname, filename) {
   var resource = project.findMember(filename);
   var parentpath = ''+resource.getParent().getFullPath();
   
-  resource['delete'](false, null); // workaround because `delete` is a JS keyword
+  resource['delete'](IResource.ALWAYS_DELETE_PROJECT_CONTENT, null); // workaround because `delete` is a JS keyword
   
   response.redirect(parentpath);
   return true;
