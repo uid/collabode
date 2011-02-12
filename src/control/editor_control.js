@@ -23,7 +23,7 @@ function render_root() {
   return true;
 }
 
-function render_project(projectname) {
+function render_new_project(projectname) {
   var project = Workspace.accessProject(projectname);
   
   if ( ! project.exists()) {
@@ -45,9 +45,38 @@ function render_project(projectname) {
   return true;
 }
 
+function render_project(projectname) {
+  var project = Workspace.accessProject(projectname);
+  
+  if ( ! project.exists()) {
+    renderHtml("editor/none.ejs", {
+      project: project,
+      filename: "",
+      projectfiles: Workspace.listProjects()
+    });
+    return true;
+  }
+  
+  var projectfiles = Workspace.listProjects().slice();
+  projectfiles.splice(projectfiles.indexOf(project)+1, 0, project.members());
+  
+  renderHtml("editor/project.ejs", {
+    project: project,
+    projectfiles: projectfiles,
+    markers: _find_markers(project)
+  });
+  return true;
+}
+
 function create_project() {
   var projectname = request.params["projectname"];
-  var project = Workspace.createProject(projectname);
+  var projecttype = request.params["projecttype"];
+  var project = null;
+  if (projecttype == "webappproject") {
+    project = Workspace.createWebAppProject(projectname);
+  } else {
+    project = Workspace.createJavaProject(projectname);
+  }
   response.redirect(''+project.getFullPath());
   return true;
 }

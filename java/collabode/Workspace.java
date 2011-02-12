@@ -62,6 +62,25 @@ public class Workspace {
         return project;
     }
     
+    public static IProject createJavaProject(String projectname) throws CoreException {
+        final IProject project = getWorkspace().getRoot().getProject(projectname);
+        if ( ! project.exists()) {
+            getWorkspace().run(new IWorkspaceRunnable() {
+                public void run(IProgressMonitor monitor) throws CoreException {
+                    project.create(null);
+                    project.open(null);
+                    addJavaNature(project);
+                    setupJavaClasspath(project);
+                }
+            }, null);
+        }
+        return project;
+    }
+    
+    public static IProject createWebAppProject(String projectname) throws CoreException {
+        return createJavaProject(projectname + "-webapp");
+    }
+    
     public static IProject cloneProject(String projectname, String destinationname) throws CoreException {
         IProject dest = getWorkspace().getRoot().getProject(destinationname);
         if (dest.exists()) { return dest; }

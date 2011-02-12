@@ -235,6 +235,10 @@ body.nosidebar #padeditor { margin-left: 0; }
 	padding:0; margin:0;
 }
 
+#wizardcontainerbox .wideselect {
+	width: 300px;
+}
+
 #filegrid tr ~ tr td { padding-top:1em; }
 #filegrid td ~ td { padding-left:2em; }
 #filegrid a {

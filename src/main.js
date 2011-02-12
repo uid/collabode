@@ -152,6 +152,7 @@ function handlePath() {
   authed.GET.addLocations([
     ['/acl', u(auth_control.render_acl)],
     ['/settings', u(auth_control.render_settings)],
+    ['/new', u(editor_control.render_new_project)],
     [_file('console'), r(console_control.render_console)],
     [_proj('delete'), u(editor_control.render_confirm_delete)],
     [_file('delete'), u(editor_control.render_confirm_delete)],

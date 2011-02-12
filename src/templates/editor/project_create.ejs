@@ -1,9 +1,9 @@
-<% helpers.setHtmlTitle(project.getName()) %>
+<% helpers.setHtmlTitle("Create a new project") %>
 <% helpers.includeCss("editor_ejs.css") %>
 
 <div id="editorpage">
 
-<%= helpers.renderPartial("docbar", { project: project.getName() }) %>
+<%= helpers.renderPartial("docbar", { project: "Create a new project" }) %>
 
 <div id="sidebarbox">
   <div class="sidebarsection">
@@ -14,9 +14,13 @@
 <div id="padmain">
   <div id="padeditor">
     <form id="wizardcontainerbox" method="post" action="/">
-      <h1>Create a Java project</h1>
-      <p>Project name: <%= project.getName() %></p>
-      <input type="hidden" name="projectname" value="<%= project.getName() %>"/>
+      <h1>Create a new project</h1>
+      <p>Project name: <input type="text" name="projectname" value=""/></p>
+      <p>Project type:</p>
+      <select class="wideselect" name="projecttype" size="3">
+      	<option value="javaproject">Java project</option>
+      	<option value="webappproject">Web application project</option>
+      </select>
       
       <div id="wizardbottom">
         <button type="submit">Create project</button>
