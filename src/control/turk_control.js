@@ -60,7 +60,7 @@ function create_knockout(methodAndParams, replacement, projectname, filename) {
   replacement = decodeURIComponent(replacement);
   
   var destination = projectname+"-"+method+params.length+"-"+getSession().userName; // XXX uniqueness
-  var project = Workspace.cloneProject(projectname, destination);
+  var project = Workspace.cloneProject(workspace.everyone, projectname, destination);
   var file = project.findMember(filename);
   
   workspace.cloneAcl(getSession().userId, projectname, destination);
