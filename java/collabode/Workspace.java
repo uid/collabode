@@ -1,5 +1,6 @@
 package collabode;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Hashtable;
 
@@ -62,7 +63,11 @@ public class Workspace {
         return project;
     }
     
-    public static IProject cloneProject(String projectname, String destinationname) throws CoreException {
+    /**
+     * Clone a project using on-disk files and in-memory {@link PadDocument}s
+     * belonging to <code>username</code>.
+     */
+    public static IProject cloneProject(String username, String projectname, String destinationname) throws CoreException {
         IProject dest = getWorkspace().getRoot().getProject(destinationname);
         if (dest.exists()) { return dest; }
         
@@ -72,6 +77,15 @@ public class Workspace {
         desc.setLocation(null);
         desc.setName(destinationname);
         project.copy(desc, false, null);
+        
+        for (PadDocument doc : PadDocumentOwner.of(username).documents()) {
+            if (doc.file.getProject().equals(project)) {
+                IFile file = (IFile)dest.findMember(doc.file.getProjectRelativePath());
+                // XXX duplicated from PadDocument.commit
+                file.setContents(new ByteArrayInputStream(doc.get().getBytes()), false, true, null);
+            }
+        }
+        
         return dest;
     }
     
