@@ -846,7 +846,11 @@ function OUTER(gscope) {
     changesetTracker.setBaseAttributedText(atxt, apoolJsonObj);
   };
   editorInfo.ace_applyChangesToBase = function(c, optAuthor, apoolJsonObj) {
+    var needsScrolling = determineEditorNeedsScroll();
     changesetTracker.applyChangesToBase(c, optAuthor, apoolJsonObj);
+    if (needsScrolling || determineEditorNeedsScroll()) {
+      doScrollToBottom();
+    }
   };
   editorInfo.ace_prepareUserChangeset = function() {
     return changesetTracker.prepareUserChangeset();
@@ -4063,6 +4067,22 @@ function OUTER(gscope) {
     addClass(sideDiv, 'sidedivdelayed');
   }
 
+  function determineEditorNeedsScroll() {
+    var odoc = outerWin.document;
+    var doce1 = odoc.documentElement;
+    var clientHeight = doce1.clientHeight;
+    var scrollHeight = odoc.body.scrollHeight;
+    var scrollY = getScrollY();
+    if (scrollHeight - scrollY <= clientHeight + 100) { // XXX why 100px?
+      return true;
+    }
+    return false;
+  }
+  
+  function doScrollToBottom() {
+    outerWin.scrollBy(0,1000000000);
+  }
+  
   function getScrollXY() {
     var win = outerWin;
     var odoc = outerWin.document;
