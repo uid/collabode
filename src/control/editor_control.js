@@ -290,7 +290,7 @@ function delete_path(projectname, filename) {
 
 function clone_path(projectname, filename) {
   var destination = projectname+"-"+getSession().userName;
-  var project = Workspace.cloneProject(projectname, destination);
+  var project = Workspace.cloneProject(workspace.everyone, projectname, destination);
   var resource = project.findMember(filename);
   
   workspace.cloneAcl(getSession().userId, projectname, destination);

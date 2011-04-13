@@ -90,4 +90,11 @@ public class PadDocumentOwner extends WorkingCopyOwner {
     public <T extends PadDocument> T get(String path, Class<T> clazz) {
         return (T)documents.get(path);
     }
+    
+    /**
+     * Obtain all the documents owned by this owner.
+     */
+    public PadDocument[] documents() {
+        return documents.values().toArray(new PadDocument[0]);
+    }
 }
