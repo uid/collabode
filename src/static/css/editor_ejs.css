@@ -81,6 +81,12 @@ body.fullwidth #editorpage { width: auto; margin-left: 6px; margin-right: 6px; }
 	margin-top: 22px;
 }
 
+#docbartools p.errortip {
+    font-size: 14px; line-height: 18px;
+    background:#fdd;
+    padding: 4px 4px;
+}
+
 #sidebarbox {
 	position: absolute;
 	margin-top: 6px;
@@ -146,6 +152,10 @@ body.nosidebar #padeditor { margin-left: 0; }
 }
 #syncstatusdone {
 	float:left; height: 22px; width: 22px;
+}
+#syncstatuswarning {
+    display: none;
+    z-index: 50 !important;
 }
 
 #savenow {
