@@ -641,6 +641,7 @@ function getCollabClient(ace2editor, serverVars, initialUserInfo, options) {
     getCurrentRevisionNumber: getCurrentRevisionNumber,
     getDiagnosticInfo: getDiagnosticInfo,
     getMissedChanges: getMissedChanges,
+    getChannelState: function() { return channelState; },
     callWhenNotCommitting: callWhenNotCommitting,
     addHistoricalAuthors: tellAceAboutHistoricalAuthors
   });

@@ -65,6 +65,19 @@ $(document).ready(function() {
   });
   
   ace.addKeyHandler(function(event, char, cb, cmdKey) {
+    if (( ! cb.specialHandled) && cmdKey && char == "s" &&
+        (event.metaKey || event.ctrlKey)) {
+      // cmd-S ("sync")
+      event.preventDefault();
+      if (collab.getChannelState() != "CONNECTED") {
+        $("#syncstatuswarning").css('display', 'block');
+        $("#syncstatuswarning").delay(2000).fadeOut(1000);
+      }
+      cb.specialHandled = true; 
+    }
+  });
+  
+  ace.addKeyHandler(function(event, char, cb, cmdKey) {
     if (( ! cb.specialHandled) && cmdKey && char == "f" &&
         (event.metaKey || event.ctrlKey) && event.shiftKey) {
       // shift-cmd-F (code formatting)
