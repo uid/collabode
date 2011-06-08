@@ -17,22 +17,19 @@ import collabode.JavaPadDocument;
 public class PadSemanticHighlighter {
     static final JavaColorManager COLORS = new JavaColorManager(false);
     
-    private final PadCompilationUnitEditor editor;
-    private final PadJavaSourceViewer viewer;
-    
     public PadSemanticHighlighter(final JavaPadDocument doc) {
-        editor = new PadCompilationUnitEditor();
-        viewer = new PadJavaSourceViewer(doc);
-        
-        JavaPlugin.getDefault().getJavaTextTools().setupJavaDocumentPartitioner(doc, IJavaPartitions.JAVA_PARTITIONING);
-        
         PlatformUI.getWorkbench().getDisplay().syncExec(new Runnable() {
             public void run() {
+                PadCompilationUnitEditor editor = new PadCompilationUnitEditor();
+                PadJavaSourceViewer viewer = new PadJavaSourceViewer(doc);
+                
+                JavaPlugin.getDefault().getJavaTextTools().setupJavaDocumentPartitioner(doc, IJavaPartitions.JAVA_PARTITIONING);
+                
                 editor.config.getPresentationReconciler(viewer).install(viewer); // standard highlighting
                 new SemanticHighlightingManager().install(editor, viewer, COLORS, PreferenceConstants.getPreferenceStore());
+                
+                doc.addReconcileListener(editor);
             }
         });
-        
-        doc.addReconcileListener(editor);
     }
 }
