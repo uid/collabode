@@ -48,21 +48,6 @@ public class Workspace {
         return getWorkspace().getRoot().getProject(projectname);
     }
     
-    public static IProject createProject(String projectname) throws CoreException {
-        final IProject project = getWorkspace().getRoot().getProject(projectname);
-        if ( ! project.exists()) {
-            getWorkspace().run(new IWorkspaceRunnable() {
-                public void run(IProgressMonitor monitor) throws CoreException {
-                    project.create(null);
-                    project.open(null);
-                    addJavaNature(project);
-                    setupJavaClasspath(project);
-                }
-            }, null);
-        }
-        return project;
-    }
-    
     public static IProject createJavaProject(String projectname) throws CoreException {
         final IProject project = getWorkspace().getRoot().getProject(projectname);
         if ( ! project.exists()) {
