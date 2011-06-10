@@ -117,4 +117,8 @@ public class ChangeSetOpIterator implements Iterator<ChangeSetOp> {
             throw new NoSuchElementException(ble.getMessage()); // XXX
         }
     }
+    
+    @Override public String toString() {
+        return getClass().getSimpleName() + rest;
+    }
 }
