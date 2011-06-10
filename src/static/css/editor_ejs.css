@@ -244,6 +244,9 @@ body.nosidebar #padeditor { margin-left: 0; }
 	border-collapse:collapse;
 	padding:0; margin:0;
 }
+#wizardcontainerbox a {
+    text-decoration: none;
+}
 
 #wizardcontainerbox .wideselect {
 	width: 300px;
