@@ -25,6 +25,14 @@ function onStartup() {
   appjet.cache[EXTENDED] = {};
 }
 
+function willShutdown() {
+  getAllRoomsOfType(PADPAGE_ROOMTYPE).forEach(function(roomName) {
+    getRoomConnections(roomName).forEach(function(connection) {
+      bootConnection(connection.connectionId, "shutdown");
+    });
+  });
+}
+
 function _padIdToRoom(padId) {
   return "padpage/"+padId;
 }

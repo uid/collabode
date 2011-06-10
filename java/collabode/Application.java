@@ -46,6 +46,7 @@ public class Application implements IApplication {
                 "--useVirtualFileRoot=" + bundleResourcePath("src"),
                 "--configFile=" + configFile });
         setupTesting();
+        setupShutdown();
         
         final Display display = PlatformUI.createDisplay();
         PlatformUI.createAndRunWorkbench(display, new WorkbenchAdvisor() {
@@ -115,5 +116,26 @@ public class Application implements IApplication {
                 }
             }
         }, IResourceChangeEvent.POST_CHANGE);
+    }
+    
+    private void setupShutdown() {
+        new Thread(new Runnable() {
+            public void run() {
+                BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+                String line;
+                try {
+                    while ((line = br.readLine()) != null) {
+                        if (line.equals("quit")) {
+                            Workspace.scheduleTask("willShutdown");
+                            PlatformUI.getWorkbench().getDisplay().syncExec(new Runnable() {
+                                public void run() { PlatformUI.getWorkbench().close(); }
+                            });
+                        }
+                    }
+                } catch (IOException ioe) {
+                    ioe.printStackTrace(); // XXX
+                }
+            }
+        }, "console input").start();
     }
 }

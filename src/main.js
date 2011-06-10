@@ -35,6 +35,9 @@ serverhandlers.requestHandler = function() {
     handlePath();
 };
 
+serverhandlers.tasks.willShutdown = function() {
+    collab_server.willShutdown();
+};
 serverhandlers.tasks.writePad = function(padId) {
     dbwriter.taskWritePad(padId);
 };
