@@ -68,7 +68,7 @@ function includeJs(relpath) {
 }
 
 function includeJQuery() {
-    includeJs("jquery-1.3.2.js");
+    includeJs("jquery-1.6.1.min.js");
 }
 
 function includeCss(relpath) {
