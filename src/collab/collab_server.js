@@ -748,6 +748,7 @@ function _handleCometMessage(connection, msg) {
   }
   else if (msg.type == "EXTENDED_MESSAGE") {
     appjet.cache[EXTENDED][msg.payload.type](_roomToPadId(connection.roomName),
+                                             connection.data.userInfo.userId,
                                              connection.connectionId,
                                              msg.payload);
   }

@@ -41,8 +41,8 @@ serverhandlers.tasks.willShutdown = function() {
 serverhandlers.tasks.writePad = function(padId) {
     dbwriter.taskWritePad(padId);
 };
-serverhandlers.tasks.pdsyncDocumentText = function(padId, newRev, cs) {
-    workspace.taskPdsyncDocumentText(padId, newRev, cs);
+serverhandlers.tasks.pdsyncDocumentText = function(padId, newRev, cs, author) {
+    workspace.taskPdsyncDocumentText(padId, newRev, cs, author);
 };
 serverhandlers.tasks.pdsyncPadStyle = function(username, file, baseRev, iterator) {
     workspace.taskPdsyncPadStyle(username, file, baseRev, iterator);

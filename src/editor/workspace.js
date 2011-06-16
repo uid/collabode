@@ -192,7 +192,7 @@ function getSettings(userId, key) {
   return props;
 }
 
-function taskPdsyncDocumentText(padId, newRev, cs) {
+function taskPdsyncDocumentText(padId, newRev, cs, author) {
   var doc = _getDocument(padId);
   doc.pdsyncApply(newRev, _makeReplaceEdits(cs));
 }
@@ -289,7 +289,7 @@ function _makeChangeSetStr(pad, iterator) {
 function onNewEditor(padId, connectionId) {
 }
 
-function _onTestsRequest(padId, connectionId, msg) {
+function _onTestsRequest(padId, userId, connectionId, msg) {
   switch (msg.action) {
   case 'state':
     var doc = _getDocument(padId);
@@ -300,7 +300,7 @@ function _onTestsRequest(padId, connectionId, msg) {
   }
 }
 
-function _onCodeCompleteRequest(padId, connectionId, msg) {
+function _onCodeCompleteRequest(padId, userId, connectionId, msg) {
   _getDocument(padId).codeComplete(msg.offset, scalaFn(1, function(proposals) {
     collab_server.sendConnectionExtendedMessage(connectionId, {
       type: "CODECOMPLETE_PROPOSALS",
@@ -395,7 +395,7 @@ function accessRunFilePad(username, file) {
   return padId;
 }
 
-function _onRunRequest(padId, connectionId, msg) {
+function _onRunRequest(padId, userId, connectionId, msg) {
   var uf = _runningUserFileFor(padId);
   var owner = FileRunOwner.of(uf.username);
   
@@ -415,7 +415,7 @@ function _onRunRequest(padId, connectionId, msg) {
   }
 }
 
-function _onFormatRequest(padId, connectionId, msg) {
+function _onFormatRequest(padId, userId, connectionId, msg) {
   var iterator = _getDocument(padId).formatDocument();
   model.accessPadGlobal(padId, function(pad) {
     var cs = _makeChangeSetStr(pad, iterator);
@@ -427,7 +427,7 @@ function _onFormatRequest(padId, connectionId, msg) {
   });
 }
 
-function _onOrganizeImportsRequest(padId, connectionId, msg) {
+function _onOrganizeImportsRequest(padId, userId, connectionId, msg) {
   _getDocument(padId).organizeImports(connectionId);
 }
 
@@ -458,7 +458,7 @@ function taskOrgImportsApply(username, file, connectionId, iterator) {
   });
 }
 
-function _onOrganizeImportsResolved(padId, connectionId, msg) {
+function _onOrganizeImportsResolved(padId, userId, connectionId, msg) {
   _getDocument(padId).organizeImportsResolved(connectionId, msg.choices);
 }
 

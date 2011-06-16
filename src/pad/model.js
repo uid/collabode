@@ -131,7 +131,7 @@ function accessPadGlobal(padId, padFunc, rwMode) {
         updateCoarseChangesets(true);
         
         if (meta.pdlinked && ( ! pad.pdsyncing()) && textChanged) { // XXX avoids infinite loop
-          execution.scheduleTask("dbwriter_infreq", "pdsyncDocumentText", 0, [ padId, newRev, theChangeset ]);
+          execution.scheduleTask("dbwriter_infreq", "pdsyncDocumentText", 0, [ padId, newRev, theChangeset, author ]);
         }
       }
       function getNumForAuthor(author, dontAddIfAbsent) {
