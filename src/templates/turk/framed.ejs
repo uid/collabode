@@ -4,9 +4,11 @@
 
 <table cellpadding="0" cellspacing="0" border="0">
 <tr><td height="1%">
+<% if (description != '') { %>
 <div id="task">
 <%= toHTML(description) %>
 </div>
+<% } %>
 
 </td></tr>
 <tr><td height="99%">
