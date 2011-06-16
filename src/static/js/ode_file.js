@@ -54,6 +54,9 @@ $(document).ready(function() {
   collab.setOnExtendedMessage("APPLY_CHANGESET_AS_USER", function(msg) {
     ace.applyChangesetAsUser(msg.changeset);
   });
+  collab.setOnExtendedMessage("CODECOMPLETE_PROPOSALS", function(msg) {
+    ace.showCodeCompletionProposals(msg.offset, msg.proposals);
+  });
   collab.setOnExtendedMessage("ANNOTATIONS", function(msg) {
     ace.setAnnotations(msg.annotationType, msg.annotations);
   });

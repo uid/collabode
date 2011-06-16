@@ -2906,7 +2906,7 @@ function OUTER(gscope) {
       idleWorkTimer.atMost(200);
     });
 
-    externalClickHandlers.forEach(function(handler) {
+    forEach(externalClickHandlers, function(handler) {
       handler(evt);
     });
     
@@ -3243,7 +3243,7 @@ function OUTER(gscope) {
       if (codeCompleteWidget.handleKeys(evt, callbacks, isTypeForCmdKey)) { return; } // XXX
       
       var char = String.fromCharCode(evt.which).toLowerCase();
-      externalKeyHandlers.forEach(function(handler) {
+      forEach(externalKeyHandlers, function(handler) {
         handler(evt, char, callbacks, isTypeForCmdKey);
       });
       var specialHandled = callbacks.specialHandled;

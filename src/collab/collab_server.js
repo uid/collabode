@@ -751,9 +751,6 @@ function _handleCometMessage(connection, msg) {
                                              connection.connectionId,
                                              msg.payload);
   }
-  else if (msg.type == "REQUEST_CODE_COMPLETION") {
-    workspace.codeComplete(_roomToPadId(connection.roomName), msg.offset, connection.connectionId);
-  }
 }
 
 function _correctMarkersInPad(atext, apool) {
@@ -806,14 +803,5 @@ function sendConnectionExtendedMessage(connectionId, msg) {
 function sendPadExtendedMessage(pad, msg) {
   _getPadConnections(pad).forEach(function(connection) {
     sendConnectionExtendedMessage(connection.connectionId, msg);
-  });
-}
-
-function updateClientCodeCompletionProposals(connectionId, padId, offset, proposals) {
-  sendMessage(connectionId, {
-    type: "CODE_COMPLETION_PROPOSALS",
-    id: padId,
-    offset: offset,
-    proposals: proposals
   });
 }

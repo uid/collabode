@@ -161,9 +161,9 @@ function getCollabClient(ace2editor, serverVars, initialUserInfo, options) {
   
   function handleRequestCodeCompletion(offset) {
     if (handleUserChanges(true)) {
-      sendMessage({ type: "REQUEST_CODE_COMPLETION", offset: offset });
+      sendExtendedMessage({ type: "CODECOMPLETE_REQUEST", offset: offset });
     } else {
-      setTimeout(function() {handleRequestCodeCompletion(offset);}, 250);
+      setTimeout(function() { handleRequestCodeCompletion(offset); }, 250);
     }
   }
 
@@ -361,11 +361,6 @@ function getCollabClient(ace2editor, serverVars, initialUserInfo, options) {
     else if (msg.type == "EXTENDED_MESSAGE") {
       if (callbacks.onExtendedMessage[msg.payload.type]) {
         callbacks.onExtendedMessage[msg.payload.type](msg.payload);
-      }
-    }
-    else if (msg.type == "CODE_COMPLETION_PROPOSALS") {
-      if (padId == msg.id) {
-        editor.showCodeCompletionProposals(msg.offset, msg.proposals);
       }
     }
   }

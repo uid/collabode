@@ -22,6 +22,7 @@ function onStartup() {
   PadFunctions.bind(scalaFn(3, _pdsyncPadText));
   collab_server.setExtendedHandler("RUN_REQUEST", _onRunRequest);
   collab_server.setExtendedHandler("TESTS_REQUEST", _onTestsRequest);
+  collab_server.setExtendedHandler("CODECOMPLETE_REQUEST", _onCodeCompleteRequest);
   collab_server.setExtendedHandler("FORMAT_REQUEST", _onFormatRequest);
   collab_server.setExtendedHandler("ORGIMPORTS_REQUEST", _onOrganizeImportsRequest);
   collab_server.setExtendedHandler("ORGIMPORTS_RESOLVED", _onOrganizeImportsResolved);
@@ -299,17 +300,21 @@ function _onTestsRequest(padId, connectionId, msg) {
   }
 }
 
-function codeComplete(padId, offset, connectionId) {
-  _getDocument(padId).codeComplete(offset, scalaFn(1, function(proposals) {
-    collab_server.updateClientCodeCompletionProposals(connectionId, padId, offset, proposals.map(function(proposal) {
-      return {
-        completion: "" + proposal.displayString,
-        replacement: "" + proposal.replacementString,
-        offset: proposal.replacementOffset,
-        image: (proposal.imageName ? "" + proposal.imageName : null),
-        kind: "" + proposal.kind
-      };
-    }));
+function _onCodeCompleteRequest(padId, connectionId, msg) {
+  _getDocument(padId).codeComplete(msg.offset, scalaFn(1, function(proposals) {
+    collab_server.sendConnectionExtendedMessage(connectionId, {
+      type: "CODECOMPLETE_PROPOSALS",
+      offset: msg.offset,
+      proposals: proposals.map(function(proposal) {
+        return {
+          completion: "" + proposal.displayString,
+          replacement: "" + proposal.replacementString,
+          offset: proposal.replacementOffset,
+          image: (proposal.imageName ? "" + proposal.imageName : null),
+          kind: "" + proposal.kind
+        };
+      })
+    });
   }));
 }
 
