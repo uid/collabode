@@ -902,37 +902,36 @@ function OUTER(gscope) {
   
   editorInfo.ace_setAnnotations = function($, type, annotations) {
     var document = editorInfo.frame.contentDocument||editorInfo.frame.contentWindow.document;
-    var divs = document.getElementById('sidedivinner').getElementsByTagName('div');
-    for (var ii = 0; ii < divs.length; ii++) {
-      var d = divs.item(ii);
-      if (d.className != "") {
-        d.className = "";
-        $(d).unbind('mouseenter mouseleave');
-        $('p', d).remove();
-      }
-    }
+    var sidedivinner = document.getElementById('sidedivinner');
+    
+    $('.' + type + '-annotation', sidedivinner).remove();
+    $('.' + type + '-annotation-msg', sidedivinner).remove();
+    
+    var linenos = $(sidedivinner).children('div');
+    
     forEach(annotations, function(annotation) {
-      var d = divs.item(annotation.lineNumber-1);
+      var d = linenos.get(annotation.lineNumber-1);
       if (d == null) {
         updateLineNumbers();
-        d = divs.item(annotation.lineNumber-1);
+        d = linenos.get(annotation.lineNumber-1);
       }
-      if (d.className == "") {
-        d.className = annotation.severity + "Annotation annotation";
+      d = $(d);
+      d.append('<div class="' + type + '-annotation ' + type + '-' + annotation.subtype + '-annotation annotation"></div>')
+      if ( ! d.hasClass('tipified')) {
         var tip = document.createElement('p');
         $(tip).css('display', 'none'); // XXX default style doesn't work in FF?
-        tip.innerHTML = annotation.message;
-        d.appendChild(tip);
-        $(d).hover(function() {
-          $(tip).fadeIn(100);
+        d.append(tip);
+        d.hover(function() {
+          $('p:has(div)', d).fadeIn(100);
         }, function() {
-          $(tip).fadeOut(100);
+          $('p', d).fadeOut(100);
         });
-      } else {
-        $(d).toggleClass(annotation.severity + "Annotation", true);
-        $('p', d).append("<br/>"+annotation.message);
+        d.toggleClass('tipified', true);
       }
+      $('p', d).append('<div class="' + type + '-annotation-msg">' + annotation.message + '</div>');
     });
+    
+    $('p:empty', sidedivinner).fadeOut(1);
   };
   
   var codeCompleteWidget;

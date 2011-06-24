@@ -47,9 +47,9 @@ serverhandlers.tasks.pdsyncDocumentText = function(padId, newRev, cs, author) {
 serverhandlers.tasks.pdsyncPadStyle = function(username, file, iterator) {
     workspace.taskPdsyncPadStyle(username, file, iterator);
 };
-serverhandlers.tasks.reportProblems = function(username, file, problems) {
-    workspace.taskReportProblems(username, file, problems);
-}
+serverhandlers.tasks.updateAnnotations = function(username, file, type, annotations) {
+    workspace.taskUpdateAnnotations(username, file, type, annotations);
+};
 serverhandlers.tasks.runningStateChange = function(username, file, state) {
     workspace.taskRunningStateChange(username, file, state);
 };

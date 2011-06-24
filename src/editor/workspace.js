@@ -43,22 +43,6 @@ function _pdsyncPadText(username, file, txt) { // XXX should take revisions, not
   return rev;
 }
 
-function taskReportProblems(username, file, problems) {
-  model.accessPadGlobal(_padIdFor(username, file), function(pad) {
-    collab_server.sendPadExtendedMessage(pad, {
-      type: "ANNOTATIONS",
-      annotationType: "problem",
-      annotations: problems.map(function(problem) {
-          return {
-            lineNumber: problem.getSourceLineNumber(),
-            severity: (problem.isError() ? "error" : "warning"),
-            message: problem.getMessage()
-          }
-        })
-    });
-  });
-}
-
 const everyone = "pool.everyone";
 
 function accessDocumentPad(username, file) {
@@ -288,6 +272,23 @@ function _makeChangeSetStr(pad, iterator) {
 }
 
 function onNewEditor(padId, connectionId) {
+}
+
+function taskUpdateAnnotations(userId, file, type, annotations) {
+  model.accessPadGlobal(_padIdFor(userId, file), function(pad) {
+    collab_server.sendPadExtendedMessage(pad, {
+      type: "ANNOTATIONS",
+      userId: userId,
+      annotationType: type,
+      annotations: annotations.map(function(annotation) {
+          return {
+            lineNumber: annotation.lineNumber,
+            subtype: "" + annotation.subtype,
+            message: "" + annotation.message
+          }
+        })
+    });
+  });
 }
 
 function _onTestsRequest(padId, userId, connectionId, msg) {

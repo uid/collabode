@@ -37,21 +37,21 @@ public class JavaPadDocument extends PadDocument implements IBuffer {
      * {@link PadDocumentOwner#getProblemRequestor(ICompilationUnit)}.
      */
     final IProblemRequestor problems = new IProblemRequestor() {
-        private final List<IProblem> problems = new LinkedList<IProblem>();
+        private final List<Annotation> problems = new LinkedList<Annotation>();
 
         public void beginReporting() {
             problems.clear();
         }
 
         public void acceptProblem(IProblem problem) {
-            problems.add(problem);
+            problems.add(new Annotation(problem.getSourceLineNumber(), problem.isError() ? "error" : "warning", problem.getMessage()));
         }
 
         public void endReporting() {
             // XXX can we avoid reporting if the list is unchanged?
-            Workspace.scheduleTask("reportProblems", owner.username, file, problems.toArray());
-            for (IProblem problem : problems) {
-                if (problem.isError()) { return; }
+            Workspace.scheduleTask("updateAnnotations", owner.username, file, "problem", problems.toArray());
+            for (Annotation problem : problems) {
+                if (problem.subtype.equals("error")) { return; }
             }
             commit(true);
         }

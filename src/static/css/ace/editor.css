@@ -108,14 +108,19 @@ p {
 
 #overlaysdiv { position: absolute; left: -1000px; top: -1000px; }
 
-#sidedivinner div { padding-left:16px; background-repeat: no-repeat; background-position: left center; }
-#sidedivinner .infoAnnotation { background-image: url("/static/img/eclipse/jdt.ui.obj.info.gif"); }
-#sidedivinner .warningAnnotation { background-image: url("/static/img/eclipse/jdt.ui.obj.warning.gif"); }
-#sidedivinner .errorAnnotation { background-image: url("/static/img/eclipse/jdt.ui.obj.error.gif"); }
+#sidedivinner > div { position: relative; padding-left:24px; }
+
+#sidedivinner .annotation { position: absolute; top:0; left:0; height: 16px; width: 24px; background-repeat: no-repeat; background-position: center; }
+
+#sidedivinner .problem-annotation { background-position: right center; }
+#sidedivinner .problem-annotation.problem-info-annotation { background-image: url("/static/img/eclipse/jdt.ui.obj.info.gif"); }
+#sidedivinner .problem-annotation.problem-warning-annotation { background-image: url("/static/img/eclipse/jdt.ui.obj.warning.gif"); }
+#sidedivinner .problem-annotation.problem-error-annotation { background-image: url("/static/img/eclipse/jdt.ui.obj.error.gif"); }
 
 #sidedivinner div p {
 	text-align: left;
 	font-family: Arial, sans-serif;
 	position:absolute; color:#333; background:#ffe; border:1px solid #333; padding:1px 4px;
 	opacity:.95; -webkit-box-shadow: 0 4px 6px #999;
+	z-index: 50;
 }
