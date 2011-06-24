@@ -10,6 +10,7 @@ import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.text.edits.*;
 
 public class ChangeSetOpIterator implements Iterator<ChangeSetOp> {
+    public final int revision;
     public final int length;
     
     private Queue<ChangeSetOp> rest = new LinkedList<ChangeSetOp>();
@@ -17,16 +18,18 @@ public class ChangeSetOpIterator implements Iterator<ChangeSetOp> {
     /**
      * Create a changeset for presentation changes.
      */
-    ChangeSetOpIterator(IDocument doc, TextPresentation presentation) {
+    ChangeSetOpIterator(int revision, IDocument doc, TextPresentation presentation) {
+        this.revision = revision;
         length = doc.getLength();
         
-        StyleRange first = presentation.getFirstStyleRange();
-        if (first != null) {
-            // initial keep, neither adds nor removes attributes
-            queue(doc, 0, first.start);
-        }
+        int last = 0;
         for (Iterator<?> it = presentation.getAllStyleRangeIterator(); it.hasNext(); ) {
-            queue(doc, (StyleRange)it.next());
+            StyleRange sr = (StyleRange)it.next();
+            if (sr.start > last) {
+                queue(doc, last, sr.start - last); // no style information
+            }
+            queue(doc, sr);
+            last = sr.start + sr.length;
         }
     }
     
@@ -34,7 +37,8 @@ public class ChangeSetOpIterator implements Iterator<ChangeSetOp> {
      * Create a changeset for text edits.
      * <code>doc</code> must <b>not</b> yet have <code>edit</code> applied.
      */
-    ChangeSetOpIterator(final IDocument doc, TextEdit edit) {
+    ChangeSetOpIterator(int revision, final IDocument doc, TextEdit edit) {
+        this.revision = revision;
         length = doc.getLength();
         
         edit.accept(new TextEditVisitor() {
@@ -61,13 +65,13 @@ public class ChangeSetOpIterator implements Iterator<ChangeSetOp> {
                 last = edit.getOffset() + edit.getLength();
                 return true;
             }
-        
+            
             @Override public boolean visitNode(TextEdit edit) {
                 throw new IllegalArgumentException("No visit for " + edit);
             }
         });
     }
-        
+    
     public boolean hasNext() {
         return ! rest.isEmpty();
     }

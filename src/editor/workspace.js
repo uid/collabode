@@ -197,9 +197,10 @@ function taskPdsyncDocumentText(padId, newRev, cs, author) {
   doc.pdsyncApply(newRev, _makeReplaceEdits(cs));
 }
 
-function taskPdsyncPadStyle(username, file, baseRev, iterator) {
+function taskPdsyncPadStyle(username, file, iterator) {
   model.accessPadGlobal(_padIdFor(username, file), function(pad) {
     var changeset = _makeChangeSetStr(pad, iterator);
+    var baseRev = iterator.revision;
     while (baseRev != pad.getHeadRevisionNumber()) {
       baseRev++;
       changeset = Changeset.follow(pad.getRevisionChangeset(baseRev), changeset, false, pad.pool());

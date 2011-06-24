@@ -104,7 +104,7 @@ public class JavaPadDocument extends PadDocument implements IBuffer {
      * Update syntax highlighting.
      */
     public void changeTextPresentation(TextPresentation presentation) {
-        Workspace.scheduleTask("pdsyncPadStyle", owner.username, file, revision, new ChangeSetOpIterator(this, presentation));
+        Workspace.scheduleTask("pdsyncPadStyle", owner.username, file, new ChangeSetOpIterator(revision, this, presentation));
     }
     
     /*
@@ -324,7 +324,7 @@ public class JavaPadDocument extends PadDocument implements IBuffer {
     public ChangeSetOpIterator formatDocument() throws MalformedTreeException, BadLocationException {
         CodeFormatter formatter = ToolFactory.createCodeFormatter(null);
         TextEdit edit = formatter.format(CodeFormatter.K_COMPILATION_UNIT, this.get(), 0, this.getLength(), 0, null);
-        return new ChangeSetOpIterator(this, edit);
+        return new ChangeSetOpIterator(revision, this, edit);
     }
     
     /**
@@ -335,7 +335,7 @@ public class JavaPadDocument extends PadDocument implements IBuffer {
             public void run() {
                 try {
                     TextEdit edit = PadImportOrganizer.of(connectionId).createTextEdit(workingCopy);
-                    Workspace.scheduleTask("orgImportsApply", owner.username, file, connectionId, new ChangeSetOpIterator(JavaPadDocument.this, edit));
+                    Workspace.scheduleTask("orgImportsApply", owner.username, file, connectionId, new ChangeSetOpIterator(revision, JavaPadDocument.this, edit));
                 } catch (OperationCanceledException oce) {
                     // XXX nothing to do
                 } catch (CoreException ce) {
@@ -359,6 +359,6 @@ public class JavaPadDocument extends PadDocument implements IBuffer {
         String source = method.getSource();
         int start = range.getOffset() + source.indexOf('\n', source.indexOf('{')) + 1;
         int end = range.getOffset() + source.lastIndexOf('\n', source.lastIndexOf('}'));
-        return new ChangeSetOpIterator(this, new ReplaceEdit(start, end - start, replacement));
+        return new ChangeSetOpIterator(revision, this, new ReplaceEdit(start, end - start, replacement));
     }
 }
