@@ -910,10 +910,10 @@ function OUTER(gscope) {
     var linenos = $(sidedivinner).children('div');
     
     forEach(annotations, function(annotation) {
-      var d = linenos.get(annotation.lineNumber-1);
+      var d = linenos.get(annotation.lineNumber);
       if (d == null) {
         updateLineNumbers();
-        d = linenos.get(annotation.lineNumber-1);
+        d = linenos.get(annotation.lineNumber);
       }
       d = $(d);
       d.append('<div class="' + type + '-annotation ' + type + '-' + annotation.subtype + '-annotation annotation"></div>')

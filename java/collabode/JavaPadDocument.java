@@ -44,7 +44,7 @@ public class JavaPadDocument extends PadDocument implements IBuffer {
         }
 
         public void acceptProblem(IProblem problem) {
-            problems.add(new Annotation(problem.getSourceLineNumber(), problem.isError() ? "error" : "warning", problem.getMessage()));
+            problems.add(new Annotation(problem.getSourceLineNumber()-1, problem.isError() ? "error" : "warning", problem.getMessage()));
         }
 
         public void endReporting() {
