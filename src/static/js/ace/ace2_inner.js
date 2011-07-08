@@ -946,6 +946,9 @@ function OUTER(gscope) {
       alert("Unable to show completion proposals"); // XXX
       return;
     }
+    if (proposals.length == 0) {
+      proposals = [ { completion: 'No Proposals' } ]; // XXX replace with something better
+    }
     var focusLine = (rep.selFocusAtStart ? rep.selStart[0] : rep.selEnd[0]);
     var filterPrefix = rep.alltext.substring(proposals[0].offset, caretDocChar());
     
@@ -965,6 +968,7 @@ function OUTER(gscope) {
   };
   
   editorInfo.ace_replaceBeforeCursor = function(length, replacement, cursorAdjust) {
+    if (replacement == null) { return; } // XXX
     inCallStackIfNecessary("replace", function() {
       fastIncorp(101);
       var start = (caretDocChar() != 0) ? (caretDocChar()-length) : codeCompleteWidget.replacementStartOffset; // XXX work-around for IE placing cursor back at 0
