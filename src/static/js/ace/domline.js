@@ -100,6 +100,13 @@ domline.createDomLine = function(nonEmpty, doesWrap, optBrowser, optDocument) {
         return space+"foreground";
       });
     }
+    if (cls.indexOf('background') >= 0) {
+      cls = cls.replace(/(^| )background:(\S+)/g, function(x0, space, color) {
+        if (! styles) styles = [];
+        styles.push("background:rgb(" + color + ");");
+        return space+"background";
+      });
+    }
     if ((! txt) && cls) {
       lineClass = domline.addToLineClass(lineClass, cls);
     }
