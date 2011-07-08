@@ -66,8 +66,11 @@ linestylefilter.getLineStyleFilter = function(lineLength, aline,
 	    else if (linestylefilter.ATTRIB_CLASSES[key]) {
 	      classes += ' '+linestylefilter.ATTRIB_CLASSES[key];
 	    }
-	    else if (key == 'foreground'){
+	    else if (key == 'foreground') {
 	      classes += ' foreground:'+value;
+	    }
+	    else if (key == 'background') {
+	      classes += ' background:'+value;
 	    }
 	  }
 	}
