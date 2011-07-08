@@ -231,23 +231,3 @@ linestylefilter.textAndClassFuncSplitter = function(func, splitPointsOpt) {
   }
   return spanHandler;
 };
-
-// domLineObj is like that returned by domline.createDomLine
-linestylefilter.populateDomLine = function(textLine, aline, apool,
-                                           domLineObj) {
-  // remove final newline from text if any
-  var text = textLine;
-  if (text.slice(-1) == '\n') {
-    text = text.substring(0, text.length-1);
-  }
-
-  function textAndClassFunc(tokenText, tokenClass) {
-    domLineObj.appendSpan(tokenText, tokenClass);
-  }
-
-  var func = textAndClassFunc;
-  func = linestylefilter.getURLFilter(text, func);
-  func = linestylefilter.getLineStyleFilter(text.length, aline,
-                                            func, apool);
-  func(text, '');
-};
