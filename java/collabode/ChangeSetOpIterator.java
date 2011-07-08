@@ -2,14 +2,28 @@ package collabode;
 
 import java.util.*;
 
-import org.eclipse.jface.text.BadLocationException;
-import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.TextPresentation;
+import org.eclipse.jface.text.*;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyleRange;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.text.edits.*;
 
 public class ChangeSetOpIterator implements Iterator<ChangeSetOp> {
+    
+    /**
+     * Default foreground color. Clears existing style.
+     */
+    public static final Color OPAQUE = new Color(null, new RGB(0, 0, 0));
+    /**
+     * Default background color. Clears existing style.
+     */
+    public static final Color CLEAR = new Color(null, new RGB(255, 255, 255));
+    /**
+     * No font style. Similar to <code>null</code> color. Does not clear existing style.
+     */
+    public static final int AS_IS = -1;
+    
     public final int revision;
     public final int length;
     
@@ -86,14 +100,30 @@ public class ChangeSetOpIterator implements Iterator<ChangeSetOp> {
     
     private void queue(IDocument doc, StyleRange sr) {
         List<String[]> attribs = new ArrayList<String[]>();
-        attribs.add(new String[] { "bold", sr.fontStyle == SWT.BOLD ? "true" : ""});
-        attribs.add(new String[] { "italic", sr.fontStyle == SWT.ITALIC ? "true" : "" });
-        if (sr.foreground != null) {
+        
+        if (sr.fontStyle != AS_IS) {
+            attribs.add(new String[] { "bold", (sr.fontStyle & SWT.BOLD) != 0 ? "true" : ""});
+            attribs.add(new String[] { "italic", (sr.fontStyle & SWT.ITALIC) != 0 ? "true" : "" });
+        }
+        
+        if (OPAQUE.equals(sr.foreground)) {
+            attribs.add(new String[] { "foreground", "" });
+        } else if (sr.foreground != null) {
             attribs.add(new String[] {
                     "foreground",
                     sr.foreground.getRed() + "," + sr.foreground.getGreen() + "," + sr.foreground.getBlue()
             });
-        };
+        }
+        
+        if (CLEAR.equals(sr.background)) {
+            attribs.add(new String[] { "background", "" });
+        } else if (sr.background != null) {
+            attribs.add(new String[] {
+                    "background",
+                    sr.background.getRed() + "," + sr.background.getGreen() + "," + sr.background.getBlue()
+            });
+        }
+        
         queue(doc, sr.start, sr.length, attribs.toArray(new String[0][]));
     }
     
