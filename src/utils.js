@@ -10,7 +10,7 @@ jimport("net.appjet.oui.JarVirtualFile");
 function getSession() {
   return sessions.getSession({
     cookieName: "ode",
-    domain: request.domain.indexOf(".") < 0 ? undefined : "." + request.domain
+    domain: undefined // XXX only legal value when accessed by IP addr; problematic?
   });
 }
 
