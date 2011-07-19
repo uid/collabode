@@ -32,7 +32,7 @@ public class ChangeSetOpIterator implements Iterator<ChangeSetOp> {
     /**
      * Create a changeset for presentation changes.
      */
-    ChangeSetOpIterator(int revision, IDocument doc, TextPresentation presentation) {
+    ChangeSetOpIterator(int revision, IDocument doc, TextPresentation presentation, String namespace) {
         this.revision = revision;
         length = doc.getLength();
         
@@ -42,7 +42,7 @@ public class ChangeSetOpIterator implements Iterator<ChangeSetOp> {
             if (sr.start > last) {
                 queue(doc, last, sr.start - last); // no style information
             }
-            queue(doc, sr);
+            queue(doc, sr, namespace);
             last = sr.start + sr.length;
         }
     }
@@ -98,7 +98,7 @@ public class ChangeSetOpIterator implements Iterator<ChangeSetOp> {
         throw new UnsupportedOperationException();
     }
     
-    private void queue(IDocument doc, StyleRange sr) {
+    private void queue(IDocument doc, StyleRange sr, String namespace) {
         List<String[]> attribs = new ArrayList<String[]>();
         
         if (sr.fontStyle != AS_IS) {
@@ -122,6 +122,12 @@ public class ChangeSetOpIterator implements Iterator<ChangeSetOp> {
                     "background",
                     sr.background.getRed() + "," + sr.background.getGreen() + "," + sr.background.getBlue()
             });
+        }
+        
+        if (namespace != null && ! namespace.isEmpty()) {
+            for (String[] attrib : attribs) {
+                attrib[0] = namespace + "$" + attrib[0];
+            }
         }
         
         queue(doc, sr.start, sr.length, attribs.toArray(new String[0][]));

@@ -67,6 +67,7 @@ function OUTER(gscope) {
   var doesWrap = true;
   var hasLineNumbers = true;
   var isStyled = true;
+  var styleNamespace = null;
 
   // space around the innermost iframe element
   var iframePadLeft = MIN_LINEDIV_WIDTH + LINE_NUMBER_PADDING_RIGHT + EDIT_BODY_PADDING_LEFT;
@@ -836,6 +837,9 @@ function OUTER(gscope) {
     else if (k == 'textsize') {
       setTextSize(value);
     }
+    else if (k == 'stylenamespace') {
+      styleNamespace = value;
+    }
   }
 
   editorInfo.ace_setBaseText = function(txt) {
@@ -1251,7 +1255,7 @@ function OUTER(gscope) {
     if (text.length == 0) {
       // allow getLineStyleFilter to set line-div styles
       var func = linestylefilter.getLineStyleFilter(
-        0, '', textAndClassFunc, rep.apool);
+        0, '', textAndClassFunc, rep.apool, styleNamespace);
       func('', '');
     }
     else {
@@ -1268,7 +1272,7 @@ function OUTER(gscope) {
       var lineNum = rep.lines.indexOfEntry(lineEntry);
       var aline = rep.alines[lineNum];
       filteredFunc = linestylefilter.getLineStyleFilter(
-        text.length, aline, filteredFunc, rep.apool);
+        text.length, aline, filteredFunc, rep.apool, styleNamespace);
       filteredFunc(text, '');
     }
   }

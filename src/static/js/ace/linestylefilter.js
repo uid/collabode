@@ -38,7 +38,8 @@ linestylefilter.getAuthorClassName = function(author) {
 // lineLength is without newline; aline includes newline,
 // but may be falsy if lineLength == 0
 linestylefilter.getLineStyleFilter = function(lineLength, aline,
-                                              textAndClassFunc, apool) {
+                                              textAndClassFunc, apool,
+                                              namespace) {
 
   if (lineLength == 0) return textAndClassFunc;
 
@@ -57,6 +58,15 @@ linestylefilter.getLineStyleFilter = function(lineLength, aline,
 	if (key) {
 	  var value = apool.getAttribValue(n);
 	  if (value) {
+	    if (namespace) {
+	      if (key.indexOf(namespace+"$") == 0) {
+	        key = key.substring(namespace.length+1);
+	      } else if (key.indexOf("$$") == 0) {
+	        key = key.substring(2);
+	      } else {
+	        return; // XXX namespace required if set
+	      }
+	    }
 	    if (key == 'author') {
 	      classes += ' '+linestylefilter.getAuthorClassName(value);
 	    }
