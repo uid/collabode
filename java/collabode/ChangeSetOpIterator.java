@@ -32,7 +32,7 @@ public class ChangeSetOpIterator implements Iterator<ChangeSetOp> {
     /**
      * Create a changeset for presentation changes.
      */
-    ChangeSetOpIterator(int revision, IDocument doc, TextPresentation presentation, String namespace) {
+    public ChangeSetOpIterator(int revision, IDocument doc, TextPresentation presentation, String namespace) {
         this.revision = revision;
         length = doc.getLength();
         
@@ -51,7 +51,7 @@ public class ChangeSetOpIterator implements Iterator<ChangeSetOp> {
      * Create a changeset for text edits.
      * <code>doc</code> must <b>not</b> yet have <code>edit</code> applied.
      */
-    ChangeSetOpIterator(int revision, final IDocument doc, TextEdit edit) {
+    public ChangeSetOpIterator(int revision, final IDocument doc, TextEdit edit) {
         this.revision = revision;
         length = doc.getLength();
         
