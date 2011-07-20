@@ -3,7 +3,6 @@ package collabode;
 import java.io.IOException;
 import java.util.*;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.*;
 import org.eclipse.jdt.core.*;
@@ -17,6 +16,7 @@ import org.eclipse.text.edits.*;
 import org.eclipse.ui.PlatformUI;
 
 import scala.Function1;
+import collabode.collab.CollabDocument;
 import collabode.complete.JavaPadCompletionProposalCollector;
 import collabode.orgimport.PadImportOrganizer;
 
@@ -49,11 +49,12 @@ public class JavaPadDocument extends PadDocument implements IBuffer {
 
         public void endReporting() {
             // XXX can we avoid reporting if the list is unchanged?
-            Workspace.scheduleTask("updateAnnotations", owner.username, file, "problem", problems.toArray());
-            for (Annotation problem : problems) {
-                if (problem.subtype.equals("error")) { return; }
+            try {
+                Object[] annotations = collab.localAnnotationsToUnionAnnotations(JavaPadDocument.this, problems).toArray();
+                Workspace.scheduleTask("updateAnnotations", owner.username, collab.file, "problem", annotations);
+            } catch (BadLocationException ble) {
+                ble.printStackTrace(); // XXX
             }
-            commit(true);
         }
 
         public boolean isActive() {
@@ -61,8 +62,8 @@ public class JavaPadDocument extends PadDocument implements IBuffer {
         }
     };
     
-    JavaPadDocument(PadDocumentOwner owner, IFile file, ICompilationUnit workingCopy) throws IOException {
-        super(owner, file);
+    JavaPadDocument(PadDocumentOwner owner, CollabDocument collab, ICompilationUnit workingCopy) throws IOException {
+        super(owner, collab);
         this.workingCopy = workingCopy;
         
         super.addPrenotifiedDocumentListener(new IDocumentListener() {
@@ -104,7 +105,8 @@ public class JavaPadDocument extends PadDocument implements IBuffer {
      * Update syntax highlighting.
      */
     public void changeTextPresentation(TextPresentation presentation) {
-        Workspace.scheduleTask("pdsyncPadStyle", owner.username, file, new ChangeSetOpIterator(revision, this, presentation, null));
+        ChangeSetOpIterator cs = collab.localPresentationToUnionChangeset(this, presentation);
+        Workspace.scheduleTask("pdsyncPadStyle", owner.username, collab.file, cs);
     }
     
     /*
@@ -164,7 +166,7 @@ public class JavaPadDocument extends PadDocument implements IBuffer {
     }
 
     @Override public IResource getUnderlyingResource() {
-        return file;
+        return collab.file;
     }
 
     @Override public boolean hasUnsavedChanges() {
@@ -178,7 +180,7 @@ public class JavaPadDocument extends PadDocument implements IBuffer {
     }
 
     @Override public boolean isReadOnly() {
-        return (file == null || file.isReadOnly());
+        return (collab.file == null || collab.file.isReadOnly());
     }
 
     @Override public void removeBufferChangedListener(IBufferChangedListener listener) {
@@ -214,20 +216,6 @@ public class JavaPadDocument extends PadDocument implements IBuffer {
     /*
      * End of IBuffer
      */
-    
-    /**
-     * Commit the contents of this document to the filesystem.
-     * This implementation only commits when forced.
-     */
-    @Override public void commit(boolean force) {
-        if ( ! force) { return; }
-        
-        try {
-            workingCopy.commitWorkingCopy(false, null);
-        } catch (JavaModelException jme) {
-            jme.printStackTrace(); // XXX
-        }
-    }
     
     /**
      * Returns true iff the edits are allowed.
@@ -324,7 +312,7 @@ public class JavaPadDocument extends PadDocument implements IBuffer {
     public ChangeSetOpIterator formatDocument() throws MalformedTreeException, BadLocationException {
         CodeFormatter formatter = ToolFactory.createCodeFormatter(null);
         TextEdit edit = formatter.format(CodeFormatter.K_COMPILATION_UNIT, this.get(), 0, this.getLength(), 0, null);
-        return new ChangeSetOpIterator(revision, this, edit);
+        return collab.localTextEditToUnionChangeset(this, edit);
     }
     
     /**
@@ -335,7 +323,8 @@ public class JavaPadDocument extends PadDocument implements IBuffer {
             public void run() {
                 try {
                     TextEdit edit = PadImportOrganizer.of(connectionId).createTextEdit(workingCopy);
-                    Workspace.scheduleTask("orgImportsApply", owner.username, file, connectionId, new ChangeSetOpIterator(revision, JavaPadDocument.this, edit));
+                    ChangeSetOpIterator cs = collab.localTextEditToUnionChangeset(JavaPadDocument.this, edit);
+                    Workspace.scheduleTask("orgImportsApply", owner.username, collab.file, connectionId, cs);
                 } catch (OperationCanceledException oce) {
                     // XXX nothing to do
                 } catch (CoreException ce) {
@@ -359,6 +348,6 @@ public class JavaPadDocument extends PadDocument implements IBuffer {
         String source = method.getSource();
         int start = range.getOffset() + source.indexOf('\n', source.indexOf('{')) + 1;
         int end = range.getOffset() + source.lastIndexOf('\n', source.lastIndexOf('}'));
-        return new ChangeSetOpIterator(revision, this, new ReplaceEdit(start, end - start, replacement));
+        return collab.localTextEditToUnionChangeset(this, new ReplaceEdit(start, end - start, replacement));
     }
 }

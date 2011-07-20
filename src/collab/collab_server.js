@@ -176,7 +176,7 @@ function applyUserChanges(pad, baseRev, changeset, optSocketId, optAuthor) {
   if (pad.text().lastIndexOf("\n\n") != pad.text().length-2) {
     var nlChangeset = Changeset.makeSplice(
       pad.text(), pad.text().length-1, 0, "\n");
-    pad.appendRevision(nlChangeset);
+    pad.appendRevision(nlChangeset, thisAuthor); // XXX should be null-authored
   }
 
   updatePadClients(pad);

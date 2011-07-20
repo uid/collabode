@@ -1,58 +1,27 @@
 package collabode;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
+import java.io.*;
 
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.content.IContentType;
-import org.eclipse.jface.text.*;
+import org.eclipse.jface.text.BadLocationException;
+import org.eclipse.jface.text.Document;
 import org.eclipse.text.edits.ReplaceEdit;
-import org.mortbay.util.IO;
+
+import collabode.collab.CollabDocument;
 
 /**
  * A document synchronized with an EtherPad pad.
  */
 public class PadDocument extends Document {
     
-    final PadDocumentOwner owner;
-    final IFile file;
+    public final PadDocumentOwner owner;
+    public final CollabDocument collab;
     
-    int revision;
-    
-    /**
-     * Are we currently revising this document to match its EtherPad pad?
-     */
-    final ThreadLocal<Boolean> revising = new ThreadLocal<Boolean>() {
-        @Override protected Boolean initialValue() { return false; }
-    };
-    
-    PadDocument(PadDocumentOwner owner, IFile file) throws IOException {
+    PadDocument(PadDocumentOwner owner, CollabDocument collab) throws IOException {
         super();
-        try {
-            super.set(IO.toString(file.getContents()).replaceAll("\t", "    ")); // XXX clobbers tabs
-        } catch (CoreException ce) {
-            throw new IOException(ce);
-        }
         this.owner = owner;
-        this.file = file;
-        
-        super.addPrenotifiedDocumentListener(new IDocumentListener() {
-            public void documentAboutToBeChanged(DocumentEvent event) { }
-            public void documentChanged(DocumentEvent event) {
-                if ( ! revising.get()) {
-                    System.err.println("PadFunctions.whatever(); NEED TO REVISE PAD"); // XXX
-                }
-                commit(false);
-            }
-        });
-        
-        revision = PadFunctions.syncText.apply(owner.username, file, get()).intValue();
-    }
-    
-    public IProject getProject() {
-        return file.getProject();
+        this.collab = collab;
     }
     
     /**
@@ -60,7 +29,8 @@ public class PadDocument extends Document {
      */
     public String getContentTypeName() {
         try {
-            IContentType type = file.getProject().getContentTypeMatcher().findContentTypeFor(new ByteArrayInputStream(get().getBytes()), file.getName());
+            InputStream contents = new ByteArrayInputStream(get().getBytes());
+            IContentType type = collab.file.getProject().getContentTypeMatcher().findContentTypeFor(contents, collab.file.getName());
             if (type != null) {
                 return type.getId().replaceFirst(".*\\.", "");
             }
@@ -99,40 +69,6 @@ public class PadDocument extends Document {
     
     @Override public synchronized void set(String text, long modificationStamp) {
         super.set(text, modificationStamp);
-    }
-    
-    /**
-     * Commit the contents of this document to the filesystem.
-     * This implementation always commits.
-     * @param force if false, the commit may be ignored if the document should not be committed
-     */
-    public void commit(boolean force) {
-        try {
-            file.setContents(new ByteArrayInputStream(get().getBytes()), false, true, null);
-        } catch (CoreException ce) {
-            ce.printStackTrace(); // XXX
-        }
-    }
-    
-    /**
-     * Updates the content of the document, because the pad content changed.
-     * XXX change to a TextEdit and use apply()?
-     */
-    public synchronized void pdsyncApply(int newRev, ReplaceEdit[] edits) {
-        try {
-            revising.set(true);
-            revision = newRev;
-            if (edits.length > 1) { // XXX revision is a lie until all edits have been applied
-                System.err.println("Incorrect doc rev " + newRev + " for " + (edits.length-1) + " intermediate");
-            }
-            for (ReplaceEdit edit : edits) {
-                replace(edit.getOffset(), edit.getLength(), edit.getText());
-            }
-        } catch (BadLocationException ble) {
-            ble.printStackTrace(); // XXX badly out of sync
-        } finally {
-            revising.set(false);
-        }
     }
     
     /**

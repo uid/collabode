@@ -16,7 +16,7 @@ function render_console(projectname, filename) {
   var project = Workspace.accessProject(projectname);
   var file = project.findMember(filename);
   
-  var padId = workspace.accessRunFilePad(workspace.everyone, file);
+  var padId = workspace.accessRunFilePad(getSession().userId, file);
   
   model.accessPadGlobal(padId, function(pad) {
     helpers.addClientVars({

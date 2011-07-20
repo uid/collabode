@@ -1,7 +1,6 @@
 package collabode;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.util.Hashtable;
 
 import net.appjet.ajstdlib.execution;
@@ -83,18 +82,14 @@ public class Workspace {
         project.copy(desc, false, null);
         
         for (PadDocument doc : PadDocumentOwner.of(username).documents()) {
-            if (doc.file.getProject().equals(project)) {
-                IFile file = (IFile)dest.findMember(doc.file.getProjectRelativePath());
-                // XXX duplicated from PadDocument.commit
+            if (doc.collab.file.getProject().equals(project)) {
+                IFile file = (IFile)dest.findMember(doc.collab.file.getProjectRelativePath());
+                // XXX duplicated from elsewhere
                 file.setContents(new ByteArrayInputStream(doc.get().getBytes()), false, true, null);
             }
         }
         
         return dest;
-    }
-    
-    public static void createDocument(String username, IFile file) throws IOException, JavaModelException {
-        PadDocumentOwner.of(username).create(file);
     }
     
     public static ILaunchConfiguration accessLaunchConfig(IFile file) {

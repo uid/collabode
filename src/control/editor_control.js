@@ -171,7 +171,7 @@ var _renderers = {
   },
   
   _file: function(project, file) {
-    var padId = workspace.accessDocumentPad(workspace.everyone, file);
+    var padId = workspace.accessDocumentPad(getSession().userId, file);
     
     model.accessPadGlobal(padId, function(pad) {
       helpers.addClientVars({
@@ -187,7 +187,7 @@ var _renderers = {
     });
     
     return {
-      filetype: workspace.getContentTypeName(padId)
+      filetype: workspace.getContentTypeName(getSession().userId, padId)
     }
   }
 };
@@ -290,7 +290,7 @@ function delete_path(projectname, filename) {
 
 function clone_path(projectname, filename) {
   var destination = projectname+"-"+getSession().userName;
-  var project = Workspace.cloneProject(workspace.everyone, projectname, destination);
+  var project = Workspace.cloneProject(getSession().userId, projectname, destination);
   var resource = project.findMember(filename);
   
   workspace.cloneAcl(getSession().userId, projectname, destination);

@@ -50,11 +50,11 @@ serverhandlers.tasks.pdsyncPadStyle = function(username, file, iterator) {
 serverhandlers.tasks.updateAnnotations = function(username, file, type, annotations) {
     workspace.taskUpdateAnnotations(username, file, type, annotations);
 };
-serverhandlers.tasks.runningStateChange = function(username, file, state) {
-    workspace.taskRunningStateChange(username, file, state);
+serverhandlers.tasks.runningStateChange = function(id, file, state) {
+    workspace.taskRunningStateChange(id, file, state);
 };
-serverhandlers.tasks.runningOutput = function(username, file, text, attribs) {
-    workspace.taskRunningOutput(username, file, text, attribs);
+serverhandlers.tasks.runningOutput = function(id, file, text, attribs) {
+    workspace.taskRunningOutput(id, file, text, attribs);
 };
 serverhandlers.tasks.testResult = function(project, test, result) {
     workspace.taskTestResult(project, test, result);

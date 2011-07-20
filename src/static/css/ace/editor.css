@@ -117,6 +117,12 @@ p {
 #sidedivinner .problem-annotation.problem-warning-annotation { background-image: url("/static/img/eclipse/jdt.ui.obj.warning.gif"); }
 #sidedivinner .problem-annotation.problem-error-annotation { background-image: url("/static/img/eclipse/jdt.ui.obj.error.gif"); }
 
+#sidedivinner .collab-annotation { background-position: left center; }
+#sidedivinner .collab-annotation.collab-local-add-annotation { background-image: url("/static/img/eclipse/compare.ovr/r_inadd_ov.gif"); }
+#sidedivinner .collab-annotation.collab-local-del-annotation { background-image: url("/static/img/eclipse/compare.ovr/r_indel_ov.gif"); }
+#sidedivinner .collab-annotation.collab-other-add-annotation { background-image: url("/static/img/eclipse/compare.ovr/r_outadd_ov.gif"); }
+#sidedivinner .collab-annotation.collab-other-del-annotation { background-image: url("/static/img/eclipse/compare.ovr/r_outdel_ov.gif"); }
+
 #sidedivinner div p {
 	text-align: left;
 	font-family: Arial, sans-serif;

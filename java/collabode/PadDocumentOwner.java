@@ -7,6 +7,7 @@ import java.util.concurrent.ConcurrentMap;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.jdt.core.*;
 
+import collabode.collab.Collab;
 import collabode.hilite.PadSemanticHighlighter;
 
 /**
@@ -27,21 +28,23 @@ public class PadDocumentOwner extends WorkingCopyOwner {
         return OWNERS.get(username);
     }
     
-    final String username;
+    public final String username;
+    private final Collab collaboration;
     private final ConcurrentMap<String, PadDocument> documents = new ConcurrentHashMap<String, PadDocument>();
     
     private PadDocumentOwner(String username) {
         this.username = username;
+        this.collaboration = Collab.of(username);
     }
     
     /**
-     * Create an in-memory EtherPad-synced document for the given file.
+     * Create an in-memory document for the given file and user iff one does not exist.
      * @param file file to edit
      */
-    public synchronized void create(IFile file) throws IOException, JavaModelException {
+    public synchronized PadDocument create(IFile file) throws IOException, JavaModelException {
         String path = file.getFullPath().toString();
         if (documents.containsKey(path)) {
-            return;
+            return get(path);
         }
         
         if (JavaCore.isJavaLikeFileName(file.getName())) {
@@ -49,8 +52,10 @@ public class PadDocumentOwner extends WorkingCopyOwner {
             // now that the Java model is settled, install the highlighter, which causes reconciliation
             new PadSemanticHighlighter(get(path, JavaPadDocument.class));
         } else {
-            documents.put(path, new PadDocument(this, file));
+            documents.put(path, new PadDocument(this, collaboration.get(file)));
         }
+        
+        return get(path);
     }
     
     @Override public synchronized IBuffer createBuffer(final ICompilationUnit workingCopy) {
@@ -62,7 +67,7 @@ public class PadDocumentOwner extends WorkingCopyOwner {
         JavaPadDocument doc;
         IFile file = workingCopy.getResource() instanceof IFile ? (IFile)workingCopy.getResource() : null;
         try {
-            documents.put(workingCopy.getPath().toString(), doc = new JavaPadDocument(this, file, workingCopy));
+            documents.put(workingCopy.getPath().toString(), doc = new JavaPadDocument(this, collaboration.get(file), workingCopy));
         } catch (IOException ioe) {
             ioe.printStackTrace(); // XXX
             throw new Error(ioe); // XXX

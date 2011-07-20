@@ -60,12 +60,12 @@ function create_knockout(methodAndParams, replacement, projectname, filename) {
   replacement = decodeURIComponent(replacement);
   
   var destination = projectname+"-"+method+params.length+"-"+getSession().userName; // XXX uniqueness
-  var project = Workspace.cloneProject(workspace.everyone, projectname, destination);
+  var project = Workspace.cloneProject(getSession().userId, projectname, destination);
   var file = project.findMember(filename);
   
   workspace.cloneAcl(getSession().userId, projectname, destination);
   
-  var padId = workspace.accessDocumentPad(workspace.everyone, file);
+  var padId = workspace.accessDocumentPad(getSession().userId, file);
   var lineno = workspace.knockout(padId, method, params, replacement);
   
   var description = "Implement the method '"+method+"' in "+file.getName()+", line "+lineno+".";

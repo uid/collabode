@@ -25,18 +25,18 @@ public class FileRunOwner {
     private static final String[][] STDOUT = new String[0][];
     private static final String[][] STDERR = new String[][] { { "foreground", "200,0,0" } };
     
-    public static FileRunOwner of(String username) {
-        if ( ! RUNNERS.containsKey(username)) {
-            RUNNERS.putIfAbsent(username, new FileRunOwner(username));
+    public static FileRunOwner of(String id) {
+        if ( ! RUNNERS.containsKey(id)) {
+            RUNNERS.putIfAbsent(id, new FileRunOwner(id));
         }
-        return RUNNERS.get(username);
+        return RUNNERS.get(id);
     }
     
-    final String username;
+    final String id;
     private final ConcurrentMap<String, ILaunch> launches = new ConcurrentHashMap<String, ILaunch>();
     
-    private FileRunOwner(String rusername) {
-        this.username = rusername;
+    private FileRunOwner(String id) {
+        this.id = id;
         DebugPlugin.getDefault().getLaunchManager().addLaunchListener(new ILaunchesListener2() {
             public void launchesRemoved(ILaunch[] launches) { }
             public void launchesAdded(ILaunch[] launches) { }
@@ -58,7 +58,7 @@ public class FileRunOwner {
     }
     
     private void state(IFile file, String state) {
-        Workspace.scheduleTask("runningStateChange", username, file, state);
+        Workspace.scheduleTask("runningStateChange", id, file, state);
     }
     
     /**
@@ -116,7 +116,7 @@ public class FileRunOwner {
         IType main = ((ICompilationUnit)JavaCore.create(file)).findPrimaryType();
         ILaunchManager mgr = DebugPlugin.getDefault().getLaunchManager();
         ILaunchConfigurationType type = mgr.getLaunchConfigurationType(IJavaLaunchConfigurationConstants.ID_JAVA_APPLICATION);
-        ILaunchConfigurationWorkingCopy config = type.newInstance(null, username + " Run " + main.getTypeQualifiedName());
+        ILaunchConfigurationWorkingCopy config = type.newInstance(null, id + " Run " + main.getTypeQualifiedName());
         config.setAttribute(IJavaLaunchConfigurationConstants.ATTR_PROJECT_NAME, file.getProject().getName());
         config.setAttribute(IJavaLaunchConfigurationConstants.ATTR_MAIN_TYPE_NAME, main.getFullyQualifiedName());
         
@@ -169,7 +169,7 @@ public class FileRunOwner {
         
         private void write(String text) {
             if (text == null || text.length() == 0) { return; }
-            Workspace.scheduleTask("runningOutput", username, file, text, attribs);
+            Workspace.scheduleTask("runningOutput", id, file, text, attribs);
         }
     }
 }

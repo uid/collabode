@@ -8,6 +8,7 @@ $(document).ready(function() {
       ace.scrollToLineNo(clientVars.scrollToLineNo);
     }
   });
+  ace.setProperty('stylenamespace', clientVars.userId);
   
   Layout.onResize = ace.adjustSize;
   
@@ -58,7 +59,9 @@ $(document).ready(function() {
     ace.showCodeCompletionProposals(msg.offset, msg.proposals);
   });
   collab.setOnExtendedMessage("ANNOTATIONS", function(msg) {
-    ace.setAnnotations(msg.annotationType, msg.annotations);
+    if (clientVars.userId == msg.userId) {
+      ace.setAnnotations(msg.annotationType, msg.annotations);
+    }
   });
   collab.setOnExtendedMessage("TEST_RESULT", function(msg) {
     testor.updateTest(msg.test, msg.result);
