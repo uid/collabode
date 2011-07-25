@@ -1966,3 +1966,57 @@ Changeset.followAttributes = function(att1, att2, pool) {
   }
   return buf.toString();
 };
+
+// XXX duplicates logic from follow
+Changeset.overlay = function(cs1, cs2) {
+  var unpacked1 = Changeset.unpack(cs1);
+  var unpacked2 = Changeset.unpack(cs2);
+  var len1 = unpacked1.oldLen;
+  var len2 = unpacked2.oldLen;
+  Changeset.assert(len1 == len2, "mismatched overlay");
+
+  var oldLen = unpacked1.newLen;
+  var oldPos = 0;
+  var newLen = 0;
+
+  var newOps = Changeset.applyZip(unpacked1.ops, 0, unpacked2.ops, 0, function(op1, op2, opOut) {
+    if (op1.opcode == '+' || op2.opcode == '+') {
+      Changeset.error('+ during overlay')
+    } else if (op1.opcode == '-' || op2.opcode == '-') {
+      Changeset.error('- during overlay')
+    } else if (! op1.opcode) {
+      Changeset.copyOp(op2, opOut);
+      op2.opcode = '';
+    } else if (! op2.opcode) {
+      Changeset.copyOp(op1, opOut);
+      op1.opcode = '';
+    } else {
+      // both keeps
+      opOut.opcode = '=';
+      opOut.attribs = op1.attribs + op2.attribs;
+      if (op1.chars <= op2.chars) {
+        opOut.chars = op1.chars;
+        opOut.lines = op1.lines;
+        op2.chars -= op1.chars;
+        op2.lines -= op1.lines;
+        op1.opcode = '';
+        if (! op2.chars) {
+          op2.opcode = '';
+        }
+      }
+      else {
+        opOut.chars = op2.chars;
+        opOut.lines = op2.lines;
+        op1.chars -= op2.chars;
+        op1.lines -= op2.lines;
+        op2.opcode = '';
+      }
+    }
+    switch (opOut.opcode) {
+    case '=': oldPos += opOut.chars; newLen += opOut.chars; break;
+    }
+  });
+  newLen += oldLen - oldPos;
+
+  return Changeset.pack(oldLen, newLen, newOps, unpacked2.charBank);
+};

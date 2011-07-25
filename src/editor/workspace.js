@@ -31,6 +31,10 @@ function _padIdFor(userId, file) {
   return Collab.of(userId).id + "@" + file.getFullPath();
 }
 
+function _padIdForDoc(collab) {
+  return collab.collaboration.id + "@" + collab.file.getFullPath();
+}
+
 function accessDocumentPad(userId, file) {
   var padId = _padIdFor(userId, file);
   
@@ -169,7 +173,8 @@ function taskPdsyncDocumentText(padId, newRev, cs, author) {
   doc.collab.syncUnionCoordinateEdits(doc, newRev, _makeReplaceEdits(cs));
 }
 
-function taskPdsyncPadStyle(username, file, iterator) {
+function taskPdsyncPadStyle(author, username, file, iterator) {
+  if ( ! iterator.hasNext()) { return; } // XXX nothing to do
   model.accessPadGlobal(_padIdFor(username, file), function(pad) {
     var changeset = _makeChangeSetStr(pad, iterator);
     var baseRev = iterator.revision;
@@ -178,7 +183,34 @@ function taskPdsyncPadStyle(username, file, iterator) {
       changeset = Changeset.follow(pad.getRevisionChangeset(baseRev), changeset, false, pad.pool());
     }
     pad.pdsync(function () {
-      collab_server.applyChangesetToPad(pad, changeset, "#syntaxcolor");
+      collab_server.applyChangesetToPad(pad, changeset, "#"+author);
+    });
+  });
+}
+
+function taskPdsyncPadStyles(author, collab, iterators) {
+  model.accessPadGlobal(_padIdForDoc(collab), function(pad) {
+    var changeset = null;
+    var baseRev;
+    iterators.forEach(function(iterator) {
+      if ( ! iterator.hasNext()) { return; } // XXX nothing to do
+      if (changeset == null) {
+        changeset = _makeChangeSetStr(pad, iterator);
+        baseRev = iterator.revision;
+      } else if (iterator.revision != baseRev) {
+        throw new Error("Mismatched revisions syncing multiple styles");
+      } else {
+        changeset = Changeset.overlay(changeset, _makeChangeSetStr(pad, iterator));
+      }
+    });
+    if ( ! changeset) { return; } // XXX nothing to do
+    // XXX remainder duplicated from single-style sync
+    while (baseRev != pad.getHeadRevisionNumber()) {
+      baseRev++;
+      changeset = Changeset.follow(pad.getRevisionChangeset(baseRev), changeset, false, pad.pool());
+    }
+    pad.pdsync(function () {
+      collab_server.applyChangesetToPad(pad, changeset, "#"+author);
     });
   });
 }

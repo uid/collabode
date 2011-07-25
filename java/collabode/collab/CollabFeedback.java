@@ -25,28 +25,32 @@ public class CollabFeedback implements CollabListener {
     }
     
     public void updated(PadDocument updated) {
+        List<ChangeSetOpIterator> styles = new ArrayList<ChangeSetOpIterator>();
         for (PadDocument doc : updated.collab) {
             try {
-                update(doc, new TextPresentation());
+                styles.add(update(doc, new TextPresentation()));
             } catch (BadLocationException ble) {
                 ble.printStackTrace(); // XXX
             }
         }
+        Workspace.scheduleTask("pdsyncPadStyles", "collabup", updated.collab, styles.toArray());
     }
     
     public void committed(CollabDocument doc) {
+        List<ChangeSetOpIterator> styles = new ArrayList<ChangeSetOpIterator>();
         for (PadDocument padDoc : doc) {
             TextPresentation base = new TextPresentation();
             base.mergeStyleRange(new StyleRange(0, doc.union.getLength(), null, CLEAR, AS_IS));
             try {
-                update(padDoc, base);
+                styles.add(update(padDoc, base));
             } catch (BadLocationException ble) {
                 ble.printStackTrace(); // XXX
             }
         }
+        Workspace.scheduleTask("pdsyncPadStyles", "collabco", doc, styles.toArray());
     }
     
-    private void update(PadDocument doc, TextPresentation base) throws BadLocationException {
+    private ChangeSetOpIterator update(PadDocument doc, TextPresentation base) throws BadLocationException {
         final CollabDocument collab = doc.collab;
         List<Annotation> annotations = new ArrayList<Annotation>();
         
@@ -72,7 +76,7 @@ public class CollabFeedback implements CollabListener {
             }
         }
         
-        Workspace.scheduleTask("pdsyncPadStyle", doc.owner.username, collab.file, collab.unionPresentationToUnionChangeSet(doc, base));
         Workspace.scheduleTask("updateAnnotations", doc.owner.username, collab.file, "collab", annotations.toArray());
+        return collab.unionPresentationToUnionChangeSet(doc, base);
     }
 }
