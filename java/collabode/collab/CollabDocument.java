@@ -23,7 +23,7 @@ import collabode.*;
  */
 public class CollabDocument implements Iterable<PadDocument> {
     
-    private final Collab collab;
+    public final Collab collaboration;
     public final IFile file;
     
     private int revision;
@@ -33,7 +33,7 @@ public class CollabDocument implements Iterable<PadDocument> {
     private final ConcurrentMap<PadDocument, CoordinateMap> localMaps = new ConcurrentHashMap<PadDocument, CoordinateMap>();
     
     CollabDocument(Collab collab, IFile file, Function1<String, Double> setPadText) throws IOException, CoreException {
-        this.collab = collab;
+        this.collaboration = collab;
         this.file = file;
         
         disk = new DiskDocument(file);
@@ -85,7 +85,7 @@ public class CollabDocument implements Iterable<PadDocument> {
             doc.replace(edit.getOffset(), edit.getLength(), edit.getText());
         }
         
-        collab.syncedUnionCoordinateEdits(doc, Arrays.asList(edits));
+        collaboration.syncedUnionCoordinateEdits(doc, Arrays.asList(edits));
     }
     
     /**
@@ -114,7 +114,7 @@ public class CollabDocument implements Iterable<PadDocument> {
         
         disk.commit();
         
-        collab.committedDiskCoordinateEdits(this, edits);
+        collaboration.committedDiskCoordinateEdits(this, edits);
     }
     
     private Iterable<Map.Entry<? extends IDocument, CoordinateMap>> localAndDiskMaps() {
