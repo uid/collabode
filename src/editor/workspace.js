@@ -176,15 +176,7 @@ function taskPdsyncDocumentText(padId, newRev, cs, author) {
 function taskPdsyncPadStyle(author, username, file, iterator) {
   if ( ! iterator.hasNext()) { return; } // XXX nothing to do
   model.accessPadGlobal(_padIdFor(username, file), function(pad) {
-    var changeset = _makeChangeSetStr(pad, iterator);
-    var baseRev = iterator.revision;
-    while (baseRev != pad.getHeadRevisionNumber()) {
-      baseRev++;
-      changeset = Changeset.follow(pad.getRevisionChangeset(baseRev), changeset, false, pad.pool());
-    }
-    pad.pdsync(function () {
-      collab_server.applyChangesetToPad(pad, changeset, "#"+author);
-    });
+    _pdsyncPadStyle(author, pad, _makeChangeSetStr(pad, iterator), iterator.revision);
   });
 }
 
@@ -204,14 +196,19 @@ function taskPdsyncPadStyles(author, collab, iterators) {
       }
     });
     if ( ! changeset) { return; } // XXX nothing to do
-    // XXX remainder duplicated from single-style sync
-    while (baseRev != pad.getHeadRevisionNumber()) {
-      baseRev++;
-      changeset = Changeset.follow(pad.getRevisionChangeset(baseRev), changeset, false, pad.pool());
-    }
-    pad.pdsync(function () {
-      collab_server.applyChangesetToPad(pad, changeset, "#"+author);
-    });
+    _pdsyncPadStyle(author, pad, changeset, baseRev);
+  });
+}
+
+function _pdsyncPadStyle(author, pad, changeset, baseRev) {
+  while (baseRev != pad.getHeadRevisionNumber()) {
+    baseRev++;
+    // XXX Changeset.followAttributes sets colliding attribute values lexically rather than using later changeset
+    var baseRevCs = Changeset.filterAttribNumbers(pad.getRevisionChangeset(baseRev), function() { return false; });
+    changeset = Changeset.follow(baseRevCs, changeset, false, pad.pool());
+  }
+  pad.pdsync(function () {
+    collab_server.applyChangesetToPad(pad, changeset, "#"+author);
   });
 }
 
