@@ -211,7 +211,10 @@ public class CollabDocument implements Iterable<PadDocument> {
         final CoordinateMap map = localMaps.get(doc);
         for (Iterator<?> it = presentation.getAllStyleRangeIterator(); it.hasNext(); ) {
             StyleRange sr = (StyleRange)it.next();
-            sr.start = map.localToUnion(sr.start);
+            int start = map.localToUnion(sr.start);
+            int end = map.localToUnion(sr.start + sr.length);
+            sr.start = start;
+            sr.length = end - start;
         }
         return new ChangeSetOpIterator(revision, union, presentation, doc.owner.username);
     }
