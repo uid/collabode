@@ -67,7 +67,9 @@ public class JavaCommitter extends WorkingCopyOwner implements CollabListener, R
     private void handleEdits(CollabDocument doc, List<ReplaceEdit> options) throws BadLocationException, JavaModelException, InterruptedException {
         Collections.sort(options, new Comparator<ReplaceEdit>() {
             public int compare(ReplaceEdit e1, ReplaceEdit e2) {
-                return e2.getOffset() - e1.getOffset();
+                int offset = e2.getOffset() - e1.getOffset();
+                if (offset != 0) { return offset; }
+                return e2.getLength() - e1.getLength(); // deletions first
             }
         });
         
