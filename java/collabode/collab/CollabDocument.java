@@ -225,6 +225,10 @@ public class CollabDocument implements Iterable<PadDocument> {
     ChangeSetOpIterator unionPresentationToUnionChangeSet(PadDocument doc, TextPresentation presentation) {
         return new ChangeSetOpIterator(revision, union, presentation, doc.owner.username);
     }
+    
+    @Override public String toString() {
+        return getClass().getSimpleName() + "<" + collaboration.id + "," + file + "," + revision + "," + localMaps.keySet() + ">";
+    }
 }
 
 /**

@@ -83,6 +83,10 @@ public class Collab {
             listener.committed(doc);
         }
     }
+    
+    @Override public String toString() {
+        return getClass().getSimpleName() + "<" + id + "," + docs + ">";
+    }
 }
 
 /**

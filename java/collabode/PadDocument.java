@@ -78,4 +78,8 @@ public class PadDocument extends Document {
     public synchronized boolean isAllowed(ReplaceEdit[] edits, String[] permissions) {
         return true;
     }
+    
+    @Override public String toString() {
+        return getClass().getSimpleName() + "<" + owner.username + "," + collab.collaboration.id + "," + collab.file + ">";
+    }
 }
