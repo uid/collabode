@@ -150,7 +150,7 @@ class CoordinateMap {
         if (edit.getLength() > 0) {
             for (UL pair : pairsByUnion.tailSet(u(edit.getOffset())).toArray(new UL[0])) {
                 remove(pair);
-                if (pair.union > edit.getOffset() + edit.getLength()) {
+                if (pair.union >= edit.getOffset() + edit.getLength()) {
                     add(ul(pair.union - edit.getLength(), pair.local - edit.getLength()));
                 } // else XXX
             }
@@ -163,6 +163,7 @@ class CoordinateMap {
             }
             addAll(add);
         }
+        reduce();
     }
     
     /**
