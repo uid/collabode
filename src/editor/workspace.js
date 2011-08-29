@@ -173,30 +173,27 @@ function taskPdsyncDocumentText(padId, newRev, cs, author) {
   doc.collab.syncUnionCoordinateEdits(doc, newRev, _makeReplaceEdits(cs));
 }
 
-function taskPdsyncPadStyle(author, username, file, iterator) {
-  if ( ! iterator.hasNext()) { return; } // XXX nothing to do
-  model.accessPadGlobal(_padIdFor(username, file), function(pad) {
-    _pdsyncPadStyle(author, pad, _makeChangeSetStr(pad, iterator), iterator.revision);
-  });
-}
-
-function taskPdsyncPadStyles(author, collab, iterators) {
+function taskPdsyncQueuedStyles(collab) {
+  if (collab.styleQueue.isEmpty()) { return; }
   model.accessPadGlobal(_padIdForDoc(collab), function(pad) {
     var changeset = null;
     var baseRev;
-    iterators.forEach(function(iterator) {
-      if ( ! iterator.hasNext()) { return; } // XXX nothing to do
+    var iterator;
+    while ((iterator = collab.styleQueue.poll()) != null) {
+      if ( ! iterator.hasNext()) { continue; }
       if (changeset == null) {
         changeset = _makeChangeSetStr(pad, iterator);
         baseRev = iterator.revision;
       } else if (iterator.revision != baseRev) {
-        throw new Error("Mismatched revisions syncing multiple styles");
+        _pdsyncPadStyle('styleq', pad, changeset, baseRev);
+        changeset = _makeChangeSetStr(pad, iterator);
+        baseRev = iterator.revision;
       } else {
         changeset = Changeset.overlay(changeset, _makeChangeSetStr(pad, iterator));
       }
-    });
-    if ( ! changeset) { return; } // XXX nothing to do
-    _pdsyncPadStyle(author, pad, changeset, baseRev);
+    }
+    if ( ! changeset) { return; }
+    _pdsyncPadStyle('styleq', pad, changeset, baseRev);
   });
 }
 

@@ -1973,11 +1973,10 @@ Changeset.overlay = function(cs1, cs2) {
   var unpacked2 = Changeset.unpack(cs2);
   var len1 = unpacked1.oldLen;
   var len2 = unpacked2.oldLen;
-  Changeset.assert(len1 == len2, "mismatched overlay");
+  Changeset.assert(len1 == len2, "mismatched overlay " + len1 + "/" + len2);
 
-  var oldLen = unpacked1.newLen;
-  var oldPos = 0;
-  var newLen = 0;
+  var oldLen = len1;
+  var newLen = len1;
 
   var newOps = Changeset.applyZip(unpacked1.ops, 0, unpacked2.ops, 0, function(op1, op2, opOut) {
     if (op1.opcode == '+' || op2.opcode == '+') {
@@ -2012,11 +2011,7 @@ Changeset.overlay = function(cs1, cs2) {
         op2.opcode = '';
       }
     }
-    switch (opOut.opcode) {
-    case '=': oldPos += opOut.chars; newLen += opOut.chars; break;
-    }
   });
-  newLen += oldLen - oldPos;
 
   return Changeset.pack(oldLen, newLen, newOps, unpacked2.charBank);
 };

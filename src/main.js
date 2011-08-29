@@ -17,7 +17,7 @@ import("pad.dbwriter");
 
 import("editor.workspace");
 
-jimport("java.lang.System.out.println");
+jimport("java.lang.System");
 
 serverhandlers.startupHandler = function() {
     sqlcommon.init(appjet.config.dbDriver,
@@ -44,11 +44,10 @@ serverhandlers.tasks.writePad = function(padId) {
 serverhandlers.tasks.pdsyncDocumentText = function(padId, newRev, cs, author) {
     workspace.taskPdsyncDocumentText(padId, newRev, cs, author);
 };
-serverhandlers.tasks.pdsyncPadStyle = function(author, username, file, iterator) {
-    workspace.taskPdsyncPadStyle(author, username, file, iterator);
-};
-serverhandlers.tasks.pdsyncPadStyles = function(author, collab, iterators) {
-    workspace.taskPdsyncPadStyles(author, collab, iterators);
+serverhandlers.tasks.pdsyncQueuedStyles = function(collab) {
+  try {
+    workspace.taskPdsyncQueuedStyles(collab);
+  } catch (e if e.easysync) { System.err.println("Easysync error during pdsyncQueuedStyles: " + e); }
 };
 serverhandlers.tasks.updateAnnotations = function(username, file, type, annotations) {
     workspace.taskUpdateAnnotations(username, file, type, annotations);
@@ -86,14 +85,14 @@ serverhandlers.cometHandler = function(op, id, data) {
         try {
             wrapper = fastJSON.parse(data + '}');
         } catch (err) {
-            println("[comet] invalid JSON");
+            System.out.println("[comet] invalid JSON");
             throw err;
         }
     }
     if (wrapper.type == "COLLABROOM") {
         collabroom_server.handleComet(op, id, wrapper.data);
     } else {
-        println("[comet] incorrectly wrapped " + wrapper['type']);
+        System.out.println("[comet] incorrectly wrapped " + wrapper['type']);
     }
 };
 
