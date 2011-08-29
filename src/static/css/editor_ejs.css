@@ -30,7 +30,7 @@ body.fullwidth #editorpage { width: auto; margin-left: 6px; margin-right: 6px; }
 }
 #docbarfile {
 	position: absolute; height: auto; left: 265px;
-	width: 380px; font-size: 1.6em; color: #444; font-weight: normal;
+	width: 40%; font-size: 1.6em; color: #444; font-weight: normal;
 	line-height: 22px; margin-left: 2px; height: 22px; top: 4px;
 	overflow: hidden; text-overflow: ellipsis /*not supported in FF*/;
 	white-space:nowrap;
