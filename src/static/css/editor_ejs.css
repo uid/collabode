@@ -87,6 +87,26 @@ body.fullwidth #editorpage { width: auto; margin-left: 6px; margin-right: 6px; }
     padding: 4px 4px;
 }
 
+#editorbottom {
+    position: absolute; bottom: -30px; width: 100%;
+}
+
+#footerbar {
+	margin: 0; height: 20px; position: relative; zoom: 1;
+	background: #fbfbfb; border: 1px solid #c4c4c4; -webkit-border-radius:6px; -moz-border-radius:6px;
+	padding: 0 11px;
+	color:#444; font-weight:normal;
+	line-height: 20px;
+}
+
+#footerbar a {
+	float:right; height:22px; width:22px; margin-left:4px;
+}
+
+#feedback {
+    background: url(/static/img/eclipse/wst.server.ui.obj.server_started_debug.bubbled.gif) no-repeat center center;
+}
+
 #sidebarbox {
 	position: absolute;
 	margin-top: 6px;

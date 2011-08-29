@@ -5,6 +5,8 @@ import("utils.renderTemplateAsString");
 
 import("globals.*");
 
+jimport("collabode.Application");
+
 var _UniqueArray = function() {
     this._a = [];
     this._m = {};
@@ -190,4 +192,12 @@ function renderView(name, item) {
 
 function renderPartial(name, data) {
   return renderTemplateAsString(name + ".ejs", data);
+}
+
+function feedbackUrl() {
+  var key = appjet.config.feedbackKey;
+  if ( ! key) { return null };
+  key = key.replace('%USER_AGENT%', encodeURIComponent(request.headers["User-Agent"]));
+  key = key.replace('%VERSION%', encodeURIComponent(Application.BUNDLE.getVersion()));
+  return "https://spreadsheets.google.com/spreadsheet/viewform?formkey=" + key;
 }
