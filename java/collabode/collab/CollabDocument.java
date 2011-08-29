@@ -33,6 +33,8 @@ public class CollabDocument implements Iterable<PadDocument> {
     
     public final Queue<ChangeSetOpIterator> styleQueue = new ConcurrentLinkedQueue<ChangeSetOpIterator>();
     
+    private final Set<CollabListener> listeners = new CopyOnWriteArraySet<CollabListener>();
+    
     CollabDocument(Collab collab, IFile file, Function1<String, Double> setPadText) throws IOException, CoreException {
         this.collaboration = collab;
         this.file = file;
@@ -43,10 +45,16 @@ public class CollabDocument implements Iterable<PadDocument> {
         revision = setPadText.apply(disk.get()).intValue();
         
         union = new Document(disk.get());
+        
+        listeners.add(collab);
     }
     
     public Iterator<PadDocument> iterator() {
         return localMaps.keySet().iterator();
+    }
+    
+    public void addListener(CollabListener listener) {
+        listeners.add(listener);
     }
     
     synchronized void createPadDocument(String userId) throws IOException, JavaModelException {
@@ -122,7 +130,9 @@ public class CollabDocument implements Iterable<PadDocument> {
             }
         }
         
-        collaboration.syncedUnionCoordinateEdits(doc, Arrays.asList(edits));
+        for (CollabListener listener : listeners) {
+            listener.updated(doc);
+        }
     }
     
     /**
@@ -151,7 +161,9 @@ public class CollabDocument implements Iterable<PadDocument> {
         
         disk.commit();
         
-        collaboration.committedDiskCoordinateEdits(this, edits);
+        for (CollabListener listener : listeners) {
+            listener.committed(this);
+        }
     }
     
     private Iterable<Map.Entry<? extends IDocument, CoordinateMap>> localAndDiskMaps() {

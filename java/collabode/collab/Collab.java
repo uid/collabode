@@ -1,13 +1,11 @@
 package collabode.collab;
 
 import java.io.IOException;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
+import java.util.Set;
+import java.util.concurrent.*;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.text.edits.ReplaceEdit;
 
 import scala.Function1;
 import collabode.PadDocument;
@@ -15,7 +13,7 @@ import collabode.PadDocument;
 /**
  * A collaboration between users who share changes.
  */
-public class Collab {
+public class Collab implements CollabListener {
     
     private static final Collab CHOIR = new Collab("choir");
     
@@ -31,7 +29,7 @@ public class Collab {
     public final String id;
     
     private final ConcurrentMap<String, CollabDocument> docs = new ConcurrentHashMap<String, CollabDocument>();
-    private final Set<CollabListener> listeners = new HashSet<CollabListener>();
+    private final Set<CollabListener> listeners = new CopyOnWriteArraySet<CollabListener>();
     
     private Collab(String id) {
         this.id = id;
@@ -69,7 +67,7 @@ public class Collab {
     /**
      * Notify listeners that edits were synchronized from pad to documents.
      */
-    synchronized void syncedUnionCoordinateEdits(PadDocument doc, Collection<ReplaceEdit> edits) {
+    public synchronized void updated(PadDocument doc) {
         for (CollabListener listener : listeners) {
             listener.updated(doc);
         }
@@ -78,7 +76,7 @@ public class Collab {
     /**
      * Notify listeners that edits were committed to disk.
      */
-    synchronized void committedDiskCoordinateEdits(CollabDocument doc, Collection<ReplaceEdit> edits) {
+    public synchronized void committed(CollabDocument doc) {
         for (CollabListener listener : listeners) {
             listener.committed(doc);
         }
@@ -87,12 +85,4 @@ public class Collab {
     @Override public String toString() {
         return getClass().getSimpleName() + "<" + id + "," + docs + ">";
     }
-}
-
-/**
- * Collaboration event listener.
- */
-interface CollabListener {
-    void updated(PadDocument doc);
-    void committed(CollabDocument doc);
 }
