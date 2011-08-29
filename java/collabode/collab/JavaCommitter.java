@@ -93,19 +93,25 @@ public class JavaCommitter extends WorkingCopyOwner implements CollabListener, R
     private Collection<ReplaceEdit> bestEdits(ICompilationUnit wc, String disk, List<ReplaceEdit> options) throws JavaModelException, InterruptedException {
         if (options.isEmpty()) { return options; }
         
-        Collection<ReplaceEdit> best = Collections.emptyList();
+        Collection<ReplaceEdit> best = new ArrayList<ReplaceEdit>();
         
-        for (Collection<ReplaceEdit> subset : new PowerSet<ReplaceEdit>(options)) {
-            if (subset.size() <= best.size()) { continue; }
-            
-            wc.getBuffer().setContents(disk);
-            for (ReplaceEdit edit : subset) {
-                wc.getBuffer().replace(edit.getOffset(), edit.getLength(), edit.getText());
+        int compilations = 0;
+        for (int ii = 0; ii < options.size(); ii += LargeToSmallPowerSet.MAX_SIZE) {
+            List<ReplaceEdit> considerable = options.subList(ii, Math.min(options.size(), ii + LargeToSmallPowerSet.MAX_SIZE));
+            for (Collection<ReplaceEdit> subset : new LargeToSmallPowerSet<ReplaceEdit>(considerable)) {
+                wc.getBuffer().setContents(disk);
+                for (ReplaceEdit edit : subset) {
+                    wc.getBuffer().replace(edit.getOffset(), edit.getLength(), edit.getText());
+                }
+                compilations++;
+                wc.reconcile(ICompilationUnit.NO_AST, true, this, null);
+                IProblem[] problems = reported.take();
+                
+                if (problems.length == 0) {
+                    best.addAll(subset);
+                    break;
+                }
             }
-            wc.reconcile(ICompilationUnit.NO_AST, true, this, null);
-            IProblem[] problems = reported.take();
-            
-            if (problems.length == 0) { best = subset; }
         }
         
         return best;
@@ -139,17 +145,20 @@ public class JavaCommitter extends WorkingCopyOwner implements CollabListener, R
 }
 
 /**
- * Power set.
- * XXX Would be nice to enumerate subsets from largest to smallest.
- * 
+ * Power set enumerating subsets from largest to smallest.
+ * Only enumerates subsets of size <code>Integer.SIZE - 1</code> and smaller.
+ *
+ * @see http://graphics.stanford.edu/~seander/bithacks.html#NextBitPermutation
  * @see http://code.google.com/p/guava-libraries/source/browse/trunk/guava/src/com/google/common/collect/Sets.java
  * @see http://www.pingel.org/xref/org/pingel/util/PowerSet.html
  */
-class PowerSet<E> extends AbstractCollection<Collection<E>> {
+class LargeToSmallPowerSet<E> extends AbstractCollection<Collection<E>> {
+    
+    public static final int MAX_SIZE = Integer.SIZE - 1;
     
     private final List<E> elements;
     
-    PowerSet(Collection<E> elements) {
+    LargeToSmallPowerSet(Collection<E> elements) {
         this.elements = new ArrayList<E>(elements);
     }
     
@@ -159,26 +168,37 @@ class PowerSet<E> extends AbstractCollection<Collection<E>> {
     
     public Iterator<Collection<E>> iterator() {
         return new Iterator<Collection<E>>() { // iterator over power set sets
-            int next = 1 << elements.size(); // start with the full set...
+            final int size = Math.min(MAX_SIZE, elements.size());
+            int selected = size + 1;
+            int itMask = 0;
             
             public void remove() {
                 throw new UnsupportedOperationException();
             }
             
             public boolean hasNext() {
-                return next > 0; // ... and end with the empty set
+                return selected > 0;
             }
             
             public Collection<E> next() {
-                final int next = --this.next;
+                if (Integer.numberOfTrailingZeros(itMask) >= size - selected) {
+                    selected--;
+                    itMask = (1 << selected) - 1; // lexically first
+                } else {
+                    int t = itMask | (itMask - 1);
+                    itMask = (t + 1) | (((~t & -~t) - 1) >> (Integer.numberOfTrailingZeros(itMask) + 1)); // lexically next
+                }
+                
                 return new AbstractCollection<E>() {
+                    final int setMask = itMask;
+                    
                     public int size() {
-                        return Integer.bitCount(next);
+                        return Integer.bitCount(setMask);
                     }
                     
                     public Iterator<E> iterator() { // iterator over power set set elements
                         return new Iterator<E>() {
-                            int mask = next; // bitmask of elements to include
+                            int mask = setMask; // bitmask of elements to include
                             
                             public void remove() {
                                 throw new UnsupportedOperationException();
