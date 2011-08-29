@@ -33,7 +33,7 @@ public class CollabFeedback implements CollabListener {
                 ble.printStackTrace(); // XXX
             }
         }
-        Workspace.scheduleTask("pdsyncPadStyles", "collabup", updated.collab, styles.toArray());
+        updated.collab.syncStyles(styles);
     }
     
     public void committed(CollabDocument doc) {
@@ -47,7 +47,7 @@ public class CollabFeedback implements CollabListener {
                 ble.printStackTrace(); // XXX
             }
         }
-        Workspace.scheduleTask("pdsyncPadStyles", "collabco", doc, styles.toArray());
+        doc.syncStyles(styles);
     }
     
     private ChangeSetOpIterator update(PadDocument doc, TextPresentation base) throws BadLocationException {

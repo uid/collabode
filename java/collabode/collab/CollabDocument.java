@@ -3,8 +3,7 @@ package collabode.collab;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.*;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
@@ -31,6 +30,8 @@ public class CollabDocument implements Iterable<PadDocument> {
     public final DiskDocument disk;
     private final CoordinateMap diskMap;
     private final ConcurrentMap<PadDocument, CoordinateMap> localMaps = new ConcurrentHashMap<PadDocument, CoordinateMap>();
+    
+    public final Queue<ChangeSetOpIterator> styleQueue = new ConcurrentLinkedQueue<ChangeSetOpIterator>();
     
     CollabDocument(Collab collab, IFile file, Function1<String, Double> setPadText) throws IOException, CoreException {
         this.collaboration = collab;
@@ -146,6 +147,16 @@ public class CollabDocument implements Iterable<PadDocument> {
                 entry.getKey().replace(localOffset, 0, text);
             }
         }
+    }
+    
+    public void syncStyles(ChangeSetOpIterator style) {
+        styleQueue.add(style);
+        Workspace.scheduleTask("pdsyncQueuedStyles", this);
+    }
+
+    public void syncStyles(Collection<ChangeSetOpIterator> styles) {
+        styleQueue.addAll(styles);
+        Workspace.scheduleTask("pdsyncQueuedStyles", this);
     }
     
     List<IRegion> unionOnlyRegionsOfDisk() {
