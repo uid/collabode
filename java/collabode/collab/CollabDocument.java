@@ -61,29 +61,65 @@ public class CollabDocument implements Iterable<PadDocument> {
      * Synchronize edits from pad to documents.
      */
     public synchronized void syncUnionCoordinateEdits(PadDocument doc, int newRevision, ReplaceEdit[] edits) throws BadLocationException {
-        List<ReplaceEdit> localEdits = new ArrayList<ReplaceEdit>(edits.length);
-        for (ReplaceEdit edit : edits) {
-            diskMap.unionOnly(edit);
-            for (Map.Entry<PadDocument, CoordinateMap> entry : localMaps.entrySet()) {
-                if (entry.getKey().equals(doc)) {
-                    localEdits.add(new ReplaceEdit(entry.getValue().unionToLocal(edit.getOffset()), edit.getLength(), edit.getText()));
-                    entry.getValue().unionAndLocal(edit);
-                } else {
-                    entry.getValue().unionOnly(edit);
-                }
-            }
-        }
-        
         revision = newRevision;
         if (edits.length > 1) { // XXX revision is a lie until all edits have been applied
             System.err.println("Incorrect doc revision " + revision + " for " + (edits.length-1) + " intermediate");
         }
         
+        SortedSet<Integer> breaks = null;
+        List<ReplaceEdit> broken = new ArrayList<ReplaceEdit>();
         for (ReplaceEdit edit : edits) {
-            union.replace(edit.getOffset(), edit.getLength(), edit.getText());
+            if (edit.getLength() <= 1) {
+                broken.add(edit);
+                continue;
+            }
+            if (breaks == null) {
+                breaks = new TreeSet<Integer>();
+                for (Map.Entry<? extends IDocument, CoordinateMap> entry : localAndDiskMaps()) {
+                    for (IRegion region : entry.getValue().unionOnlyRegions()) {
+                        breaks.add(region.getOffset());
+                        breaks.add(region.getOffset() + region.getLength());
+                    }
+                    for (IRegion region : entry.getValue().localOnlyRegions()) {
+                        breaks.add(region.getOffset());
+                    }
+                }
+            }
+            int offset = edit.getOffset();
+            for (int br : breaks) {
+                if (br <= offset) { continue; }
+                if (br >= offset + edit.getLength()) { break; }
+                int length = br - offset;
+                offset = br;
+                broken.add(new ReplaceEdit(edit.getOffset(), length, edit.getText()));
+                edit = new ReplaceEdit(edit.getOffset() + edit.getText().length(), edit.getLength() - length, "");
+            }
+            broken.add(edit);
         }
-        for (ReplaceEdit edit : localEdits) {
-            doc.replace(edit.getOffset(), edit.getLength(), edit.getText());
+        
+        for (ReplaceEdit edit : broken) {
+            boolean editingUncommitted = diskMap.unionOnlyRegionContaining(edit.getRegion()) != null;
+            
+            diskMap.unionOnly(edit);
+            union.replace(edit.getOffset(), edit.getLength(), edit.getText());
+            
+            for (Map.Entry<PadDocument, CoordinateMap> entry : localMaps.entrySet()) {
+                if (editingUncommitted) {
+                    if (entry.getValue().unionOnlyRegionContaining(edit.getRegion()) != null) {
+                        entry.getValue().unionOnly(edit);
+                    } else {
+                        entry.getKey().replace(entry.getValue().unionToLocal(edit.getOffset()), edit.getLength(), edit.getText());
+                        entry.getValue().unionAndLocal(edit);
+                    }
+                } else {
+                    if (entry.getKey().equals(doc)) {
+                        entry.getKey().replace(entry.getValue().unionToLocal(edit.getOffset()), edit.getLength(), edit.getText());
+                        entry.getValue().unionAndLocal(edit);
+                    } else {
+                        entry.getValue().unionOnly(edit);
+                    }
+                }
+            }
         }
         
         collaboration.syncedUnionCoordinateEdits(doc, Arrays.asList(edits));
@@ -131,20 +167,25 @@ public class CollabDocument implements Iterable<PadDocument> {
     
     private void commitUnionDelete(IRegion localOnly) throws BadLocationException {
         for (Map.Entry<? extends IDocument, CoordinateMap> entry : localAndDiskMaps()) {
-            if (entry.getValue().localOnlyRegions().contains(localOnly)) {
-                int localOffset = entry.getValue().unionToLocal(localOnly.getOffset()) - localOnly.getLength();
-                entry.getValue().localCatchup(new ReplaceEdit(localOffset, localOnly.getLength(), ""));
-                entry.getKey().replace(localOffset, localOnly.getLength(), "");
+            List<IRegion> parts = entry.getValue().localOnlyRegionsContainedBy(localOnly);
+            if (parts.isEmpty()) { continue; }
+            for (IRegion part : parts) {
+                int localOffset = entry.getValue().unionToLocal(part.getOffset()) - part.getLength();
+                entry.getValue().localCatchup(new ReplaceEdit(localOffset, part.getLength(), ""));
+                entry.getKey().replace(localOffset, part.getLength(), "");
             }
         }
     }
     
     private void commitUnionInsert(IRegion unionOnly, String text) throws BadLocationException {
         for (Map.Entry<? extends IDocument, CoordinateMap> entry : localAndDiskMaps()) {
-            if (entry.getValue().unionOnlyRegions().contains(unionOnly)) {
-                int localOffset = entry.getValue().unionToLocal(unionOnly.getOffset());
-                entry.getValue().localCatchup(new ReplaceEdit(localOffset, 0, text));
-                entry.getKey().replace(localOffset, 0, text);
+            List<IRegion> parts = entry.getValue().unionOnlyRegionsContainedBy(unionOnly);
+            if (parts.isEmpty()) { continue; }
+            for (IRegion part : parts) {
+                int localOffset = entry.getValue().unionToLocal(part.getOffset());
+                String localText = union.get(part.getOffset(), part.getLength()); // XXX not using text argument
+                entry.getValue().localCatchup(new ReplaceEdit(localOffset, 0, localText));
+                entry.getKey().replace(localOffset, 0, localText);
             }
         }
     }
@@ -153,7 +194,7 @@ public class CollabDocument implements Iterable<PadDocument> {
         styleQueue.add(style);
         Workspace.scheduleTask("pdsyncQueuedStyles", this);
     }
-
+    
     public void syncStyles(Collection<ChangeSetOpIterator> styles) {
         styleQueue.addAll(styles);
         Workspace.scheduleTask("pdsyncQueuedStyles", this);

@@ -252,6 +252,39 @@ class CoordinateMap {
         return cachedLocalOnlyRegions;
     }
     
+    IRegion unionOnlyRegionContaining(IRegion sub) {
+        for (IRegion region : unionOnlyRegions()) {
+            if (region.getOffset() + region.getLength() >= sub.getOffset() + sub.getLength()
+                    && region.getOffset() <= sub.getOffset()) {
+                return region;
+            }
+        }
+        return null; // XXX
+    }
+    
+    List<IRegion> unionOnlyRegionsContainedBy(IRegion sup) {
+        List<IRegion> subs = new ArrayList<IRegion>(4);
+        for (IRegion region : unionOnlyRegions()) {
+            if (region.getOffset() + region.getLength() > sup.getOffset() + sup.getLength()) {
+                break;
+            } else if (region.getOffset() >= sup.getOffset()) {
+                subs.add(region);
+            }
+        }
+        return subs;
+    }
+    
+    List<IRegion> localOnlyRegionsContainedBy(IRegion sup) {
+        List<IRegion> subs = new ArrayList<IRegion>(4);
+        for (IRegion region : localOnlyRegions()) {
+            if (region.getOffset() >= sup.getOffset()
+                    && region.getOffset() + region.getLength() <= sup.getOffset() + sup.getLength()) {
+                subs.add(region);
+            }
+        }
+        return subs;
+    }
+    
     @Override public synchronized String toString() {
         StringBuffer buff = new StringBuffer();
         Iterator<UL> unions = pairsByUnion.iterator();
