@@ -11,6 +11,15 @@
       <%= data.failure ? H1({ style: 'color:rgb(200,0,0);' }, failure) + BR() : '' %>
       <table>
         <tr><td colspan="2"><h1>Please log in</h1></td></tr>
+        
+        <% if (appjet.config.authProvider) { %>
+        <% var host = new java.net.URL(appjet.config.authProvider).getHost(); %>
+        <tr><td colspan="2">
+          <a href="<%= appjet.config.authProvider %><%= request.url.replace('/login/', '/') %>">Authenticate via <%= host %></a>
+        </td></tr>
+        <tr><td colspan="2"><br/><h1>or use local credentials</h1></td></tr>
+        <% } %>
+        
         <tr><td>Username:&nbsp;</td><td><input name="username"/></td></tr>
         <tr><td>Password:&nbsp;</td><td><input name="password" type="password"/></td></tr>
         

@@ -110,6 +110,7 @@ function handlePath() {
     [PrefixMatcher('/static/'), forward(static_control)],
     ['/', editor_control.render_root],
     [/^\/login:([\w]+)(\/.*)$/, auth_control.render_login],
+    [/^\/login:([\w]+):([^\/]+)(\/.*)$/, auth_control.external_login],
     [/^\/login()(\/.*)$/, auth_control.render_login],
     ['/logout', auth_control.logout],
     [_file('turk:([\\w]+)'), turk_control.render_task],
