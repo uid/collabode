@@ -6,6 +6,9 @@
 <td>
 <select name="acl_userid">
 <option value="anyone">anyone</option>
+<% auth.recent_users().forEach(function(userId) { %>
+<option value="<%= userId %>"><%= userId %></option>
+<% }); %>
 </select>
 </td><td><%= resource.getProjectRelativePath().toString() %></td><td>
 <select name="acl_permission">

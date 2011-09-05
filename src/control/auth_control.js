@@ -70,6 +70,7 @@ function do_login(clazz, username, destination) {
   getSession().userId = clazz + '.' + username;
   getSession().userName = username;
   getSession().restricted = workspace.restricted(getSession().userId);
+  appjet.cache.recent_users[getSession().userId] = new Date();
   response.redirect(destination);
 }
 

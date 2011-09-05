@@ -28,6 +28,7 @@ serverhandlers.startupHandler = function() {
     collab_server.onStartup();
     dbwriter.onStartup();
     collabroom_server.onStartup();
+    auth.onStartup();
     workspace.onStartup();
 };
 

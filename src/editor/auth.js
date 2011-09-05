@@ -1,3 +1,5 @@
+import("jsutils");
+
 jimport("collabode.Workspace");
 
 jimport("java.lang.System");
@@ -9,6 +11,14 @@ const WRITE = 'write';
 const OWNER = 'owner';
 const PERMISSIONS = { read: READ, claim: CLAIM, write: WRITE, owner: OWNER };
 const PERMISSION_VALUE = { read: 1, claim: 2, write: 3, owner: 4 };
+
+function onStartup() {
+  appjet.cache.recent_users = {};
+}
+
+function recent_users() {
+  return jsutils.keys(appjet.cache.recent_users).sort();
+}
 
 function acl(project) {
   var prefs = Workspace.getProjectPrefs(project, "acl");
