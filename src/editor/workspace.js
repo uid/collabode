@@ -381,7 +381,7 @@ function _testResultMessage(test, result) {
 function taskTestResult(project, test, result) {
   var projectName = "" + project.getName();
   var padIds = collab_server.getAllPadsWithConnections().filter(function(padId) {
-    return projectName == _filenameFor(padId).split("/", 3)[1];
+    return _filenameFor(padId) && (projectName == _filenameFor(padId).split("/", 3)[1]);
   });
   var msg = _testResultMessage(test, result);
   padIds.forEach(function(padId) {
