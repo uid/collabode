@@ -15,6 +15,8 @@ import org.eclipse.jdt.core.*;
 import org.eclipse.jdt.core.formatter.DefaultCodeFormatterConstants;
 import org.eclipse.jdt.junit.JUnitCore;
 import org.eclipse.jdt.launching.JavaRuntime;
+import org.osgi.service.prefs.BackingStoreException;
+import org.osgi.service.prefs.Preferences;
 
 import collabode.testing.AnnotationsInitializer;
 
@@ -45,6 +47,10 @@ public class Workspace {
     
     public static IProject accessProject(String projectname) {
         return getWorkspace().getRoot().getProject(projectname);
+    }
+    
+    public static Preferences getProjectPrefs(IProject project, String node) {
+        return new ProjectScope(project).getNode(Application.BUNDLE.getSymbolicName()).node(node);
     }
     
     public static IProject createJavaProject(String projectname) throws CoreException {
@@ -80,6 +86,14 @@ public class Workspace {
         desc.setLocation(null);
         desc.setName(destinationname);
         project.copy(desc, false, null);
+        
+        Preferences prefs = getProjectPrefs(dest, "clone");
+        prefs.put("origin", projectname);
+        try {
+            prefs.flush();
+        } catch (BackingStoreException bse) {
+            bse.printStackTrace(); // XXX
+        }
         
         for (PadDocument doc : PadDocumentOwner.of(username).documents()) {
             if (doc.collab.file.getProject().equals(project)) {
