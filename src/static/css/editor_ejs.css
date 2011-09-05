@@ -267,6 +267,13 @@ body.nosidebar #padeditor { margin-left: 0; }
 #wizardcontainerbox a {
     text-decoration: none;
 }
+#wizardcontainerbox a.delete {
+	padding-left:18px;
+	background: url(/static/img/eclipse/ui.tool.delete.disabled.gif) no-repeat left;
+}
+#wizardcontainerbox a.delete:hover {
+	background: url(/static/img/eclipse/ui.tool.delete.enabled.gif) no-repeat left;
+}
 
 #wizardcontainerbox .wideselect {
 	width: 300px;
@@ -274,16 +281,6 @@ body.nosidebar #padeditor { margin-left: 0; }
 
 #filegrid tr ~ tr td { padding-top:1em; }
 #filegrid td ~ td { padding-left:2em; }
-#filegrid a {
-	text-decoration: none;
-}
-#filegrid a.delete {
-	padding-left:18px;
-	background: url(/static/img/eclipse/ui.tool.delete.disabled.gif) no-repeat left;
-}
-#filegrid a.delete:hover {
-	background: url(/static/img/eclipse/ui.tool.delete.enabled.gif) no-repeat left;
-}
 
 #createsub td ~ td { padding-left:3em; }
 

@@ -138,10 +138,11 @@ function handlePath() {
   function deny(handler) {
     return function() { utils.renderError(403); return true; };
   }
-  function check(handler, shift, fakeId) {
+  function check(handler, permission, shift, fakeId) {
+    permission = permission || auth.READ;
     shift = shift || 0;
     return function() {
-      if (auth.has_acl(arguments[0+shift], arguments[1+shift], fakeId || userId, auth.READ)) {
+      if (auth.has_acl(arguments[0+shift], arguments[1+shift], fakeId || userId, permission)) {
         return handler.apply(this, arguments);
       } else {
         return deny()(); // what is this, Perl?
@@ -163,18 +164,22 @@ function handlePath() {
     [_file('console'), r(console_control.render_console)],
     [_proj('delete'), u(editor_control.render_confirm_delete)],
     [_file('delete'), u(editor_control.render_confirm_delete)],
+    [_proj('delacl:([\\w\\.]+)'), r(editor_control.render_confirm_delacl, auth.OWNER, 1)],
+    [_file('delacl:([\\w\\.]+)'), r(editor_control.render_confirm_delacl, auth.OWNER, 1)],
     [_file('clone'), r(editor_control.clone_path)],
-    [_file('knockout:([\\w,.\\[;]+)"([\\s\\S]*)"'), r(turk_control.render_knockout, 2, 'clones')],
+    [_file('knockout:([\\w,.\\[;]+)"([\\s\\S]*)"'), r(turk_control.render_knockout, auth.READ, 2, 'clones')],
     [_proj(), r(editor_control.render_project)],
     [_file(), r(editor_control.render_path)]
   ]);
   authed.POST.addLocations([
     [_proj('delete'), u(editor_control.delete_path)],
     [_file('delete'), u(editor_control.delete_path)],
-    [_file('knockout:([\\w,.\\[;]+)"([\\s\\S]*)"'), r(turk_control.create_knockout, 2, 'clones')],
+    [_proj('delacl:([\\w\\.]+)'), r(editor_control.delete_acl, auth.OWNER, 1)],
+    [_file('delacl:([\\w\\.]+)'), r(editor_control.delete_acl, auth.OWNER, 1)],
+    [_file('knockout:([\\w,.\\[;]+)"([\\s\\S]*)"'), r(turk_control.create_knockout, auth.READ, 2, 'clones')],
     ['/', u(editor_control.create_project)],
-    [_proj(), u(editor_control.modify_path)],
-    [_file(), u(editor_control.modify_path)]
+    [_proj(), r(editor_control.modify_path, auth.OWNER)],
+    [_file(), r(editor_control.modify_path, auth.OWNER)]
   ]);
   
   if (authed[request.method].dispatch()) {

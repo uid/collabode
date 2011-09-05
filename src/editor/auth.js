@@ -24,6 +24,7 @@ function acl(project) {
   var prefs = Workspace.getProjectPrefs(project, "acl");
   return prefs.keys().map(function(key) {
     return {
+      projectname: project.getName(),
       userId: key.split('/', 1)[0],
       path: key.split('/').slice(1).join('/'),
       permission: prefs.get(key, '').split(',')[0],

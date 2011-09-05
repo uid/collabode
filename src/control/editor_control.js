@@ -293,6 +293,29 @@ function delete_path(projectname, filename) {
   return true;
 }
 
+function render_confirm_delacl(userId, projectname, filename) {
+  var project = Workspace.accessProject(projectname);
+  var resource = project.findMember(filename);
+  
+  renderHtml("editor/acl_delete.ejs", {
+    project: project,
+    projects: Workspace.listProjects(),
+    resource: resource,
+    userId: userId
+  });
+  return true;
+}
+
+function delete_acl(userId, projectname, filename) {
+  var project = Workspace.accessProject(projectname);
+  var resource = project.findMember(filename);
+  
+  auth.del_acl(project, resource.getProjectRelativePath(), userId);
+  
+  response.redirect(''+resource.getFullPath());
+  return true;
+}
+
 function clone_path(projectname, filename) {
   var destination = projectname+"-"+getSession().userName;
   var project = Workspace.cloneProject(getSession().userId, projectname, destination);

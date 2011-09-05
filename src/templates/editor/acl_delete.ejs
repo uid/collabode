@@ -1,0 +1,26 @@
+<% helpers.setHtmlTitle("Confirm Delete Permission") %>
+<% helpers.includeCss("editor_ejs.css") %>
+
+<div id="editorpage">
+
+<%= helpers.renderPartial("docbar", { project: project.getName() }) %>
+
+<div id="sidebarbox">
+  <div class="sidebarsection">
+    <%= helpers.renderList("explorer", projects) %>
+  </div>
+</div>
+
+<div id="padmain">
+  <div id="padeditor">
+    <form id="wizardcontainerbox" method="post">
+      <h1>Delete permission</h1></h1>
+      <p>User: <%= userId %><br/>File: <%= resource.getFullPath() %><br/>
+         Are you sure you want to remove this permission?</p>
+      
+      <div id="wizardbottom">
+        <button type="submit">Delete permission</button>
+      </div>
+    </form>
+  </div>
+</div>

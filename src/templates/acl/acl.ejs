@@ -2,3 +2,8 @@
 <td><%= item.path %></td>
 <td><%= item.permission %></td>
 <td><%= item.restrictions %></td>
+<td>
+<% if (( ! session.restricted) || (session.userId != item.userId)) { %>
+<a class="delete" href="/delacl:<%= item.userId %>/<%= item.projectname %>/<%= item.path %>">Delete</a>
+<% } %>
+</td>
