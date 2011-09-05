@@ -3,6 +3,8 @@ import("jsutils.scalaFn");
 import("collab.ace.easysync2.{AttribPool,Changeset}");
 import("collab.collab_server");
 
+import("editor.auth");
+
 import("pad.model");
 
 jimport("collabode.PadDocumentOwner");
@@ -65,86 +67,15 @@ function restricted(userId) {
   return userId[0] != 'u';
 }
 
-function accessAclPad() {
-  var padId = "*acl*";
-  
-  model.accessPadGlobal(padId, function(pad) {
-    if ( ! pad.exists()) {
-      pad.create(false);
-    }
-  });
-  
-  return padId;
-}
-
-function _findAcl(userId, f) {
-  model.accessPadGlobal(accessAclPad(), function(pad) {
-    var lines = pad.text().split('\n');
-    for (idx in lines) {
-      if ( ! lines.hasOwnProperty(idx)) { continue; }
-      var line = lines[idx];
-      if (line == '') { continue; }
-      var acl = line.split(/\s+/);
-      if (acl.length < 2) { continue; }
-      if ((acl[0] != 'anyone') && (acl[0] != userId)) { continue; }
-      
-      if (f(acl)) { break; }
-    }
-  });
-}
-
-function cloneAcl(userId, project, destination) {
-  var additions = [];
-  _findAcl('clones', function(acl) {
-    var match = acl[1].match('^/'+project+'(/.*)');
-    if (match) {
-      acl[0] = userId;
-      acl[1] = '/'+destination+match[1];
-      additions.push(acl.join(' '));
-    }
-    return false;
-  });
-  _findAcl(userId, function(acl) {
-    additions = additions.filter(function(line) {
-      return line != acl.join(' ');
-    });
-  });
-  additions = additions.map(function(line) { return line+'\n'; });
-  model.accessPadGlobal(accessAclPad(), function(pad) {
-    collab_server.setPadText(pad, pad.text() + additions.join(''));
-  });
-}
-
-function _isAllowedBySomeAcl(userId, allowed) {
-  var ret = false;
-  _findAcl(userId, function(acl) {
-    ret = ret || allowed(acl);
-    return ret;
-  });
-  return ret;
-}
-
-function isRenderAllowed(projectname, filename, userId) {
-  var path = '/'+((filename == '') ? projectname : projectname+'/'+filename);
-  return _isAllowedBySomeAcl(userId, function(acl) {
-    if (acl[1].length > path.length) {
-      return acl[1].indexOf(path) == 0;
-    } else {
-      return path.indexOf(acl[1]) == 0;
-    }
-  });
-}
-
 function isChangesetAllowed(padId, changeset, author) {
   if (author == '') { return true; } // XXX always internal?
   if (author[0] == '#') { return true; } // XXX always internal?
   if ( ! restricted(author)) { return true; }
   
-  var filename = _filenameFor(padId);
-  return _isAllowedBySomeAcl(author, function(acl) {
-    if (acl[1] != filename) { return false; }
-    var doc = PadDocumentOwner.of(author).get(_filenameFor(padId));
-    return doc.isAllowed(_makeReplaceEdits(changeset), acl.slice(2));
+  var doc = PadDocumentOwner.of(author).get(_filenameFor(padId));
+  var file = doc.collab.file;
+  return auth.has_acl(file.getProject().getName(), file.getProjectRelativePath().toString(), author, auth.WRITE, function(restrictions) {
+    return doc.isAllowed(_makeReplaceEdits(changeset), restrictions);
   });
 }
 

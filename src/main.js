@@ -15,6 +15,7 @@ import("collab.collab_server");
 import("pad.model");
 import("pad.dbwriter");
 
+import("editor.auth");
 import("editor.workspace");
 
 jimport("java.lang.System");
@@ -139,7 +140,7 @@ function handlePath() {
   function check(handler, shift, fakeId) {
     shift = shift || 0;
     return function() {
-      if (workspace.isRenderAllowed(arguments[0+shift], arguments[1+shift], fakeId || userId)) {
+      if (auth.has_acl(arguments[0+shift], arguments[1+shift], fakeId || userId, auth.READ)) {
         return handler.apply(this, arguments);
       } else {
         return deny()(); // what is this, Perl?
@@ -156,7 +157,6 @@ function handlePath() {
   };
   authed.HEAD = authed.GET;
   authed.GET.addLocations([
-    ['/acl', u(auth_control.render_acl)],
     ['/settings', u(auth_control.render_settings)],
     ['/new', u(editor_control.render_new_project)],
     [_file('console'), r(console_control.render_console)],
@@ -172,8 +172,8 @@ function handlePath() {
     [_file('delete'), u(editor_control.delete_path)],
     [_file('knockout:([\\w,.\\[;]+)"([\\s\\S]*)"'), r(turk_control.create_knockout, 2, 'clones')],
     ['/', u(editor_control.create_project)],
-    [_proj(), u(editor_control.create_path)],
-    [_file(), u(editor_control.create_path)]
+    [_proj(), u(editor_control.modify_path)],
+    [_file(), u(editor_control.modify_path)]
   ]);
   
   if (authed[request.method].dispatch()) {

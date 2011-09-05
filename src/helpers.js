@@ -181,7 +181,7 @@ function renderList(name, list, here, wrap) {
       r.push('<'+wrap.item+(item.equals(here) ? ' class="here">' : '>') + renderView(name, item) + '</'+wrap.item+'>');
     }
   });
-  return '<'+wrap.list+'>' + r.join('\n') + '</'+wrap.list+'>';
+  return (wrap.list ? '<'+wrap.list+'>' : '') + r.join('\n') + (wrap.list ? '</'+wrap.list+'>' : '');
 }
 
 function renderView(name, item) {

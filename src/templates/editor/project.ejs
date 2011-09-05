@@ -20,6 +20,7 @@
       
       <div><%= helpers.renderPartial("filegrid", { members: project.members() }) %></div>
       <div><%= helpers.renderPartial("create", { inside: "project" }) %></div>
+      <div><%= helpers.renderPartial("acl", { acl: acl, resource: project }) %></div>
       <div><%= helpers.renderPartial("markers", { markers: markers }) %></div>
     </form>
   </div>

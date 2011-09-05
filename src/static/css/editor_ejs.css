@@ -287,7 +287,10 @@ body.nosidebar #padeditor { margin-left: 0; }
 
 #createsub td ~ td { padding-left:3em; }
 
-#markers .icon { padding-left:20px; background-repeat: no-repeat; background-position: left center; }
+#acl td { padding-right: 0.5em; }
+
+#markers td { padding-right: 0.5em; }
+#markers .icon { padding-left:16px; background-repeat: no-repeat; background-position: left center; }
 #markers .noteMarker { }
 #markers .infoMarker { background-image: url("/static/img/eclipse/jdt.ui.obj.info.gif"); }
 #markers .warningMarker { background-image: url("/static/img/eclipse/jdt.ui.obj.warning.gif"); }

@@ -1,6 +1,7 @@
 import("helpers");
 import("utils.*");
 
+import("editor.auth");
 import("editor.turk");
 import("editor.workspace");
 
@@ -63,7 +64,14 @@ function create_knockout(methodAndParams, replacement, projectname, filename) {
   var project = Workspace.cloneProject(getSession().userId, projectname, destination);
   var file = project.findMember(filename);
   
-  workspace.cloneAcl(getSession().userId, projectname, destination);
+  // XXX duplicated from editor_control.clone_path (except CLAIM gives WRITE)
+  auth.acl(project).forEach(function(acl) {
+    if ((acl.userId != auth.ANYONE) && (acl.userId != getSession().userId)) { return; };
+    if (acl.permission == auth.CLAIM) {
+      auth.del_acl(project, acl.path, acl.userId);
+      auth.add_acl(project, acl.path, getSession().userId, auth.WRITE);
+    }
+  });
   
   var padId = workspace.accessDocumentPad(getSession().userId, file);
   var lineno = workspace.knockout(padId, method, params, replacement);

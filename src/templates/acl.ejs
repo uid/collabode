@@ -1,0 +1,20 @@
+<h2>Permissions</h2>
+<div id="acl">
+<table>
+<%= helpers.renderList("acl", acl, null, { item: 'tr' }) %>
+<tr>
+<td>
+<select name="acl_userid">
+<option value="anyone">anyone</option>
+</select>
+</td><td><%= resource.getProjectRelativePath().toString() %></td><td>
+<select name="acl_permission">
+<option value="read">Read</option>
+<option value="claim">Claim</option>
+<option value="write">Write</option>
+<option value="owner">Owner</option>
+</select>
+</td><td><button name="acl" type="submit" value="1">Add permission</button></td>
+</tr>
+</table>
+</div>

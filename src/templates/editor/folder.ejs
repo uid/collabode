@@ -16,6 +16,7 @@
     <form id="wizardcontainerbox" method="post">
       <%= helpers.renderPartial("filegrid", { members: folder.members() }) %>
       <div><%= helpers.renderPartial("create", { inside: "folder" }) %></div>
+      <div><%= helpers.renderPartial("acl", { acl: acl, resource: folder }) %></div>
       <div><%= helpers.renderPartial("markers", { markers: markers }) %></div>
     </form>
   </div>

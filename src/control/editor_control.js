@@ -3,6 +3,7 @@ import("utils.*");
 
 import("collab.collab_server");
 
+import("editor.auth");
 import("editor.workspace");
 
 import("pad.model");
@@ -63,6 +64,7 @@ function render_project(projectname) {
   renderHtml("editor/project.ejs", {
     project: project,
     projectfiles: projectfiles,
+    acl: auth.acl(project, project),
     markers: _find_markers(project)
   });
   return true;
@@ -118,6 +120,7 @@ function render_path(projectname, filename, lineno) {
       project: project,
       folder: resource,
       projectfiles: tree(resource),
+      acl: auth.acl(project, resource),
       markers: _find_markers(resource)
     });
     return true;
@@ -234,7 +237,7 @@ function render_confirm_delete(projectname, filename) {
   return true;
 }
 
-function create_path(projectname, filename) {
+function modify_path(projectname, filename) {
   var project = Workspace.accessProject(projectname);
   var folder = project.findMember(filename);
   
@@ -253,12 +256,15 @@ function create_path(projectname, filename) {
     _create_path_file(project, folder, filename);
   }
   
+  if (request.params["acl"]) {
+    auth.add_acl(project, folder.getProjectRelativePath(), request.params["acl_userid"], request.params["acl_permission"]);
+  }
+  
   response.redirect(request.url);
   return true;
 }
 
 function _create_path_folder(project, parent, foldername) {
-  System.err.println("_create_path_folder(" + project + ", " + parent + ", " + foldername + ")");
   var folder = parent.getFolder(foldername);
   if (folder.exists()) {
     return true;
@@ -268,7 +274,6 @@ function _create_path_folder(project, parent, foldername) {
 }
 
 function _create_path_file(project, parent, filename) {
-  System.err.println("_create_path_file(" + project + ", " + parent + ", " + filename + ")");
   var file = parent.getFile(filename);
   if (file.exists()) {
     return true;
@@ -293,7 +298,13 @@ function clone_path(projectname, filename) {
   var project = Workspace.cloneProject(getSession().userId, projectname, destination);
   var resource = project.findMember(filename);
   
-  workspace.cloneAcl(getSession().userId, projectname, destination);
+  auth.acl(project).forEach(function(acl) {
+    if ((acl.userId != auth.ANYONE) && (acl.userId != getSession().userId)) { return; }
+    if (acl.permission == auth.CLAIM) {
+      auth.del_acl(project, acl.path, acl.userId);
+      auth.add_acl(project, acl.path, getSession().userId, auth.OWNER);
+    }
+  });
   
   response.redirect(''+resource.getFullPath());
   return true;
