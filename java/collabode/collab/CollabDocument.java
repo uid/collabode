@@ -304,7 +304,10 @@ class DiskDocument extends Document {
     
     DiskDocument(IFile file) throws IOException, CoreException {
         this.file = file;
-        set(IO.toString(file.getContents()).replaceAll("\t", "    ")); // XXX clobbers tabs
+        String contents = IO.toString(file.getContents())
+                .replaceAll("\t", "    ") // XXX clobbers tabs
+                .replaceAll("\r\n?", "\n"); // XXX clobbers line endings
+        set(contents);
     }
     
     /**
