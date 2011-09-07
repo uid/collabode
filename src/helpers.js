@@ -194,10 +194,14 @@ function renderPartial(name, data) {
   return renderTemplateAsString(name + ".ejs", data);
 }
 
+function version() {
+  return Application.BUNDLE.getVersion();
+}
+
 function feedbackUrl() {
   var key = appjet.config.feedbackKey;
   if ( ! key) { return null };
   key = key.replace('%USER_AGENT%', encodeURIComponent(request.headers["User-Agent"]));
-  key = key.replace('%VERSION%', encodeURIComponent(Application.BUNDLE.getVersion()));
+  key = key.replace('%VERSION%', encodeURIComponent(version()));
   return "https://spreadsheets.google.com/spreadsheet/viewform?formkey=" + key;
 }
