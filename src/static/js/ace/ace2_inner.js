@@ -68,6 +68,7 @@ function OUTER(gscope) {
   var hasLineNumbers = true;
   var isStyled = true;
   var styleNamespace = null;
+  var autoscroll = false;
 
   // space around the innermost iframe element
   var iframePadLeft = MIN_LINEDIV_WIDTH + LINE_NUMBER_PADDING_RIGHT + EDIT_BODY_PADDING_LEFT;
@@ -840,6 +841,9 @@ function OUTER(gscope) {
     else if (k == 'stylenamespace') {
       styleNamespace = value;
     }
+    else if (k == 'autoscroll') {
+      autoscroll = value;
+    }
   }
 
   editorInfo.ace_setBaseText = function(txt) {
@@ -852,7 +856,7 @@ function OUTER(gscope) {
   editorInfo.ace_applyChangesToBase = function(c, optAuthor, apoolJsonObj) {
     var needsScrolling = determineEditorNeedsScroll();
     changesetTracker.applyChangesToBase(c, optAuthor, apoolJsonObj);
-    if (needsScrolling || determineEditorNeedsScroll()) {
+    if (autoscroll && (needsScrolling || determineEditorNeedsScroll())) {
       doScrollToBottom();
     }
   };

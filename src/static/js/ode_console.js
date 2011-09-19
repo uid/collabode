@@ -5,6 +5,7 @@ $(document).ready(function() {
     $("#editorloadingbox").hide();
   });
   ace.setProperty("showslinenumbers", false);
+  ace.setProperty("autoscroll", true);
   ace.setEditable(false);
   
   Layout.onResize = ace.adjustSize;
