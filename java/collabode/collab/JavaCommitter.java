@@ -34,7 +34,7 @@ public class JavaCommitter extends WorkingCopyOwner implements CollabListener, R
         while (true) {
             try {
                 CollabDocument doc = queue.take();
-                queue.remove(doc);
+                queue.removeAll(Collections.singleton(doc));
                 handleUpdated(doc);
             } catch (BadLocationException ble) {
                 ble.printStackTrace(); // XXX
