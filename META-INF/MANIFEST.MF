@@ -31,3 +31,4 @@ Bundle-ClassPath: lib/appjet-eth-dev.jar,
  lib/hsqldb.jar,
  lib/turkit.jar,
  .
+Export-Package: collabode

@@ -41,10 +41,9 @@ public class Application implements IApplication {
         config.load(new FileInputStream(configFile));
         
         setupDatabase(config);
-        net.appjet.oui.main.main(new String[] {
-                "--modulePath=" + bundleResourcePath("src"),
-                "--useVirtualFileRoot=" + bundleResourcePath("src"),
-                "--configFile=" + configFile });
+        startAppjet("--modulePath=" + bundleResourcePath("src"),
+                    "--useVirtualFileRoot=" + bundleResourcePath("src"),
+                    "--configFile=" + configFile);
         setupTesting();
         setupShutdown();
         
@@ -74,7 +73,7 @@ public class Application implements IApplication {
         return FileLocator.toFileURL(url).getPath();
     }
     
-    private void setupDatabase(Properties config) throws Exception {
+    static void setupDatabase(Properties config) throws Exception {
         Class.forName(config.getProperty("dbDriver"));
         Connection db = DriverManager.getConnection(config.getProperty("dbURL"), "u", "");
         Scanner schema = new Scanner(new File(bundleResourcePath("config/schema.sql"))).useDelimiter(";");
@@ -95,7 +94,11 @@ public class Application implements IApplication {
         db.close();
     }
     
-    private void setupTesting() {
+    static void startAppjet(String... args) {
+        net.appjet.oui.main.main(args);
+    }
+    
+    static void setupTesting() {
         new Thread(ContinuousTesting.getTester(), "continuous testing").start();
         
         Workspace.getWorkspace().addResourceChangeListener(new IResourceChangeListener() {
