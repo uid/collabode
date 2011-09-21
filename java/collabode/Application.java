@@ -73,7 +73,7 @@ public class Application implements IApplication {
         return FileLocator.toFileURL(url).getPath();
     }
     
-    static void setupDatabase(Properties config) throws Exception {
+    public static void setupDatabase(Properties config) throws Exception {
         Class.forName(config.getProperty("dbDriver"));
         Connection db = DriverManager.getConnection(config.getProperty("dbURL"), "u", "");
         Scanner schema = new Scanner(new File(bundleResourcePath("config/schema.sql"))).useDelimiter(";");
@@ -94,11 +94,11 @@ public class Application implements IApplication {
         db.close();
     }
     
-    static void startAppjet(String... args) {
+    public static void startAppjet(String... args) {
         net.appjet.oui.main.main(args);
     }
     
-    static void setupTesting() {
+    public static void setupTesting() {
         new Thread(ContinuousTesting.getTester(), "continuous testing").start();
         
         Workspace.getWorkspace().addResourceChangeListener(new IResourceChangeListener() {
