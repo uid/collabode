@@ -915,13 +915,13 @@ function OUTER(gscope) {
     $('.' + type + '-annotation', sidedivinner).remove();
     $('.' + type + '-annotation-msg', sidedivinner).remove();
     
-    var linenos = $(sidedivinner).children('div');
+    var linenos = $(sidedivinner);
     
     forEach(annotations, function(annotation) {
-      var d = linenos.get(annotation.lineNumber);
+      var d = linenos.children('div').get(annotation.lineNumber);
       if (d == null) {
         updateLineNumbers();
-        d = linenos.get(annotation.lineNumber);
+        d = linenos.children('div').get(annotation.lineNumber);
       }
       d = $(d);
       d.append('<div class="' + type + '-annotation ' + type + '-' + annotation.subtype + '-annotation annotation"></div>')
