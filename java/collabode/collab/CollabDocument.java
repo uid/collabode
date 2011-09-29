@@ -308,6 +308,7 @@ class DiskDocument extends Document {
                 .replaceAll("\t", "    ") // XXX clobbers tabs
                 .replaceAll("\r\n?", "\n"); // XXX clobbers line endings
         set(contents);
+        commit(); // XXX writes clobbering to disk
     }
     
     /**
