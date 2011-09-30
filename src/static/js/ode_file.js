@@ -43,7 +43,10 @@ $(document).ready(function() {
     if (state == "CONNECTED") {
       $("#connstatusconnecting").css('display', 'none');
       $("#connstatusdisconnected").css('display', 'none');
-      setTimeout(function() { collab.sendExtendedMessage({ type: "TESTS_REQUEST", action: "state" }); }, 0);
+      setTimeout(function() {
+        collab.sendExtendedMessage({ type: "ANNOTATIONS_REQUEST" });
+        collab.sendExtendedMessage({ type: "TESTS_REQUEST", action: "state" });
+      }, 0);
     } else if (state == "DISCONNECTED") {
       $("#connstatusconnecting").css('display', 'none');
       $("#connstatusdisconnected").css('display', 'block');

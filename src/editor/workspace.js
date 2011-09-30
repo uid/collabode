@@ -17,11 +17,15 @@ jimport("org.eclipse.text.edits.ReplaceEdit");
 
 jimport("java.io.StringReader");
 jimport("java.util.Properties");
+jimport("java.util.concurrent.ConcurrentHashMap");
 
 jimport("java.lang.System");
 
 function onStartup() {
+  appjet.cache.pad_annotations = new ConcurrentHashMap();
+  
   collab_server.setExtendedHandler("RUN_REQUEST", _onRunRequest);
+  collab_server.setExtendedHandler("ANNOTATIONS_REQUEST", _onAnnotationsRequest);
   collab_server.setExtendedHandler("TESTS_REQUEST", _onTestsRequest);
   collab_server.setExtendedHandler("CODECOMPLETE_REQUEST", _onCodeCompleteRequest);
   collab_server.setExtendedHandler("FORMAT_REQUEST", _onFormatRequest);
@@ -219,9 +223,18 @@ function _makeChangeSetStr(pad, iterator) {
 function onNewEditor(padId, connectionId) {
 }
 
+function _onAnnotationsRequest(padId, userId, connectionId, msg) {
+  var cached = appjet.cache.pad_annotations.get(padId);
+  if ( ! cached) { return; }
+  cached.values().toArray().forEach(function(message) {
+    collab_server.sendConnectionExtendedMessage(connectionId, message);
+  });
+}
+
 function taskUpdateAnnotations(userId, file, type, annotations) {
-  model.accessPadGlobal(_padIdFor(userId, file), function(pad) {
-    collab_server.sendPadExtendedMessage(pad, {
+  var padId = _padIdFor(userId, file);
+  model.accessPadGlobal(padId, function(pad) {
+    var message = {
       type: "ANNOTATIONS",
       userId: userId,
       annotationType: type,
@@ -232,7 +245,16 @@ function taskUpdateAnnotations(userId, file, type, annotations) {
             message: "" + annotation.message
           }
         })
-    });
+    };
+    
+    var cached = appjet.cache.pad_annotations.get(padId);
+    if ( ! cached) {
+      cached = new ConcurrentHashMap();
+      appjet.cache.pad_annotations.put(padId, cached);
+    }
+    cached.put(type + "@" + userId, message); // XXX ok key?
+    
+    collab_server.sendPadExtendedMessage(pad, message);
   });
 }
 
