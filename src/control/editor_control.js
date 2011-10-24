@@ -46,19 +46,31 @@ function render_new_project(projectname) {
   return true;
 }
 
+function _list_accessible_projects(revealed) {
+  var projects = Workspace.listProjects().slice();
+  var userId = getSession().userId;
+  if (workspace.restricted(userId)) {
+    projects = projects.filter(function(project) {
+      return (project == revealed) || ( ! workspace.restricted(userId)) || auth.has_acl(project.getName(), '', userId, auth.READ);
+    });
+  }
+  return projects;
+}
+
 function render_project(projectname) {
   var project = Workspace.accessProject(projectname);
+  
+  var projectfiles = _list_accessible_projects(project);
   
   if ( ! project.exists()) {
     renderHtml("editor/none.ejs", {
       project: project,
       filename: "",
-      projectfiles: Workspace.listProjects()
+      projectfiles: projectfiles
     });
     return true;
   }
   
-  var projectfiles = Workspace.listProjects().slice();
   projectfiles.splice(projectfiles.indexOf(project)+1, 0, project.members());
   
   renderHtml("editor/project.ejs", {
@@ -87,7 +99,7 @@ function render_path(projectname, filename, lineno) {
   var project = Workspace.accessProject(projectname);
   var resource = project.findMember(filename);
   
-  var projectfiles = Workspace.listProjects().slice();
+  var projectfiles = _list_accessible_projects(project);
   
   if (resource == null) {
     renderHtml("editor/none.ejs", {
@@ -231,7 +243,7 @@ function render_confirm_delete(projectname, filename) {
   
   renderHtml("editor/path_delete.ejs", {
     project: project,
-    projects: Workspace.listProjects(),
+    projects: _list_accessible_projects(project),
     resource: resource
   });
   return true;
@@ -299,7 +311,7 @@ function render_confirm_delacl(userId, projectname, filename) {
   
   renderHtml("editor/acl_delete.ejs", {
     project: project,
-    projects: Workspace.listProjects(),
+    projects: _list_accessible_projects(project),
     resource: resource,
     userId: userId
   });
