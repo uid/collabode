@@ -9,3 +9,8 @@ listen = 9000
 dbDriver = org.hsqldb.jdbc.JDBCDriver
 dbURL = jdbc:hsqldb:mem:pads
 dbAlreadyExists = 42504
+
+# authKey = ...
+# authProvider = https://...
+
+# feedbackKey = ...&entry_3=%USER_AGENT%&entry_4=%VERSION%
