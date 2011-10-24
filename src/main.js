@@ -6,6 +6,7 @@ import("utils");
 
 import("control.static_control");
 import("control.auth_control");
+import("control.clone_control");
 import("control.console_control");
 import("control.editor_control");
 import("control.turk_control");
@@ -166,7 +167,7 @@ function handlePath() {
     [_file('delete'), u(editor_control.render_confirm_delete)],
     [_proj('delacl:([\\w\\.]+)'), r(editor_control.render_confirm_delacl, auth.OWNER, 1)],
     [_file('delacl:([\\w\\.]+)'), r(editor_control.render_confirm_delacl, auth.OWNER, 1)],
-    [_file('clone'), r(editor_control.clone_path)],
+    [_file('clone'), r(clone_control.clone_path)],
     [_file('knockout:([\\w,.\\[;]+)"([\\s\\S]*)"'), r(turk_control.render_knockout, auth.READ, 2, 'clones')],
     [_proj(), r(editor_control.render_project)],
     [_file(), r(editor_control.render_path)]
