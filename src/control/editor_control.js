@@ -322,10 +322,11 @@ function clone_path(projectname, filename) {
   var resource = project.findMember(filename);
   
   auth.acl(project).forEach(function(acl) {
-    if ((acl.userId != auth.ANYONE) && (acl.userId != getSession().userId)) { return; }
     if (acl.permission == auth.CLAIM) {
       auth.del_acl(project, acl.path, acl.userId);
-      auth.add_acl(project, acl.path, getSession().userId, auth.OWNER);
+      if ((acl.userId == auth.ANYONE) || (acl.userId == getSession().userId)) {
+        auth.add_acl(project, acl.path, getSession().userId, auth.OWNER);
+      }      
     }
   });
   
