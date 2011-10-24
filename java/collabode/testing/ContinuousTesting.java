@@ -4,8 +4,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.concurrent.*;
 
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.resources.*;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.*;
@@ -32,6 +31,23 @@ public class ContinuousTesting implements Runnable {
     
     private final BlockingQueue<IProject> toRun = new LinkedBlockingQueue<IProject>();
     private final ConcurrentMap<ILaunch, CountDownLatch> latches = new ConcurrentHashMap<ILaunch, CountDownLatch>();
+    
+    public final IResourceChangeListener listener = new IResourceChangeListener() {
+        public void resourceChanged(IResourceChangeEvent event) {
+            try {
+                event.getDelta().accept(new IResourceDeltaVisitor() {
+                    public boolean visit(IResourceDelta delta) throws CoreException {
+                        IProject project = delta.getResource().getProject();
+                        if (project == null) { return true; }
+                        runTests(project);
+                        return false;
+                    }
+                });
+            } catch (CoreException ce) {
+                ce.printStackTrace(); // XXX
+            }
+        }
+    };
     
     private ContinuousTesting() {
         DebugPlugin.getDefault().getLaunchManager().addLaunchListener(new ILaunchesListener2() {

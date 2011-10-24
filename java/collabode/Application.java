@@ -44,7 +44,7 @@ public class Application implements IApplication {
         startAppjet("--modulePath=" + bundleResourcePath("src"),
                     "--useVirtualFileRoot=" + bundleResourcePath("src"),
                     "--configFile=" + configFile);
-        setupTesting();
+        setupTesting(config);
         setupShutdown();
         
         final Display display = PlatformUI.createDisplay();
@@ -98,27 +98,13 @@ public class Application implements IApplication {
         net.appjet.oui.main.main(args);
     }
     
-    public static void setupTesting() {
-        new Thread(ContinuousTesting.getTester(), "continuous testing").start();
+    public static void setupTesting(Properties config) {
+        ContinuousTesting tester = ContinuousTesting.getTester();
+        new Thread(tester, "continuous testing").start();
         
-        Workspace.getWorkspace().addResourceChangeListener(new IResourceChangeListener() {
-            public void resourceChanged(IResourceChangeEvent event) {
-                try {
-                    event.getDelta().accept(new IResourceDeltaVisitor() {
-                        public boolean visit(IResourceDelta delta) throws CoreException {
-                            IProject project = delta.getResource().getProject();
-                            if (project == null) {
-                                return true;
-                            }
-                            ContinuousTesting.getTester().runTests(project);
-                            return false;
-                        }
-                    });
-                } catch (CoreException ce) {
-                    ce.printStackTrace(); // XXX
-                }
-            }
-        }, IResourceChangeEvent.POST_CHANGE);
+        if ("true".equals(config.getProperty("continuousTesting"))) {
+            Workspace.getWorkspace().addResourceChangeListener(tester.listener, IResourceChangeEvent.POST_CHANGE);
+        }
     }
     
     private void setupShutdown() {

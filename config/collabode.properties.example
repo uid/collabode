@@ -10,6 +10,8 @@ dbDriver = org.hsqldb.jdbc.JDBCDriver
 dbURL = jdbc:hsqldb:mem:pads
 dbAlreadyExists = 42504
 
+continuousTesting = true
+
 # authKey = ...
 # authProvider = https://...
 
