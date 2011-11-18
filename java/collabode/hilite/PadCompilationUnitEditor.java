@@ -33,9 +33,13 @@ class PadCompilationUnitEditor extends CompilationUnitEditor implements JavaPadR
         return config;
     }
     
-    public void reconciled(JavaPadDocument doc, CompilationUnit ast) {
+    public void reconciled(JavaPadDocument doc, final CompilationUnit ast) {
         // the SemanticHighlightingReconciler added itself as an IJavaReconcilingListener
-        reconciled(ast, false, new NullProgressMonitor());
+        PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() {
+            public void run() {
+                reconciled(ast, false, new NullProgressMonitor());
+            }
+        });
     }
 }
 
