@@ -3,11 +3,11 @@ package collabode;
 import java.io.*;
 import java.net.URL;
 import java.sql.*;
-import java.util.Properties;
-import java.util.Scanner;
+import java.util.*;
 
-import org.eclipse.core.resources.*;
-import org.eclipse.core.runtime.*;
+import org.eclipse.core.resources.IResourceChangeEvent;
+import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
 import org.eclipse.swt.widgets.Display;
@@ -26,6 +26,7 @@ public class Application implements IApplication {
      */
     public static Bundle BUNDLE;
     public static Shell SHELL;
+    public static Map<String, String> CONFIG;
 
     public Object start(IApplicationContext context) throws Exception {
         BUNDLE = Platform.getBundle("collabode.etherpad");
@@ -39,12 +40,13 @@ public class Application implements IApplication {
         }
         Properties config = new Properties();
         config.load(new FileInputStream(configFile));
+        setConfig(config);
         
-        setupDatabase(config);
+        setupDatabase();
         startAppjet("--modulePath=" + bundleResourcePath("src"),
                     "--useVirtualFileRoot=" + bundleResourcePath("src"),
                     "--configFile=" + configFile);
-        setupTesting(config);
+        setupTesting();
         setupShutdown();
         
         final Display display = PlatformUI.createDisplay();
@@ -73,11 +75,16 @@ public class Application implements IApplication {
         return FileLocator.toFileURL(url).getPath();
     }
     
-    public static void setupDatabase(Properties config) throws Exception {
-        Class.forName(config.getProperty("dbDriver"));
-        Connection db = DriverManager.getConnection(config.getProperty("dbURL"), "u", "");
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    public static void setConfig(Map config) {
+        CONFIG = Collections.unmodifiableMap(config);
+    }
+    
+    public static void setupDatabase() throws Exception {
+        Class.forName(CONFIG.get("dbDriver"));
+        Connection db = DriverManager.getConnection(CONFIG.get("dbURL"), "u", "");
         Scanner schema = new Scanner(new File(bundleResourcePath("config/schema.sql"))).useDelimiter(";");
-        String alreadyExists = config.getProperty("dbAlreadyExists");
+        String alreadyExists = CONFIG.get("dbAlreadyExists");
         while (schema.hasNext()) {
             String stmt = schema.next().trim();
             if (stmt.isEmpty()) { continue; }
@@ -98,11 +105,11 @@ public class Application implements IApplication {
         net.appjet.oui.main.main(args);
     }
     
-    public static void setupTesting(Properties config) {
+    public static void setupTesting() {
         ContinuousTesting tester = ContinuousTesting.getTester();
         new Thread(tester, "continuous testing").start();
         
-        if ("true".equals(config.getProperty("continuousTesting"))) {
+        if ("true".equals(CONFIG.get("continuousTesting"))) {
             Workspace.getWorkspace().addResourceChangeListener(tester.listener, IResourceChangeEvent.POST_CHANGE);
         }
     }
