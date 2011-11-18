@@ -11,6 +11,7 @@ dbURL = jdbc:hsqldb:mem:pads
 dbAlreadyExists = 42504
 
 continuousTesting = true
+unsafeLaunches = false
 
 # authKey = ...
 # authProvider = https://...

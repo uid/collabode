@@ -73,7 +73,13 @@ public class FileRunOwner {
         IFile file = (IFile)Workspace.getWorkspace().getRoot().findMember(path);
         ILaunchConfiguration config;
         if (file.getFileExtension().equals("launch")) {
-            config = DebugPlugin.getDefault().getLaunchManager().getLaunchConfiguration(file);
+            if ("true".equals(Application.CONFIG.get("unsafeLaunches"))) {
+                config = DebugPlugin.getDefault().getLaunchManager().getLaunchConfiguration(file);
+            } else {
+                System.err.println("Unsafe launches disabled: cannot run " + file); // XXX
+                state(file, "failed");
+                return;
+            }
         } else {
             try {
                 config = javaMainLaunchConfig(file);
