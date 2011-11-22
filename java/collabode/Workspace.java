@@ -11,6 +11,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunchConfiguration;
+import org.eclipse.debug.internal.core.IInternalDebugCoreConstants;
 import org.eclipse.jdt.core.*;
 import org.eclipse.jdt.core.formatter.DefaultCodeFormatterConstants;
 import org.eclipse.jdt.junit.JUnitCore;
@@ -20,12 +21,18 @@ import org.osgi.service.prefs.Preferences;
 
 import collabode.testing.AnnotationsInitializer;
 
+@SuppressWarnings("restriction")
+interface Restricted {
+    public static final String DEBUG_PREF_ENABLE_STATUS_HANDLERS = IInternalDebugCoreConstants.PREF_ENABLE_STATUS_HANDLERS;
+}
+
 public class Workspace {
     private static IWorkspace WORKSPACE;
     
     public static synchronized IWorkspace getWorkspace() {
         if (WORKSPACE == null) {
             InstanceScope.INSTANCE.getNode(ResourcesPlugin.PI_RESOURCES).putBoolean(ResourcesPlugin.PREF_AUTO_REFRESH, true);
+            InstanceScope.INSTANCE.getNode(DebugPlugin.getUniqueIdentifier()).putBoolean(Restricted.DEBUG_PREF_ENABLE_STATUS_HANDLERS, false);
             Hashtable<String,String> options = getJavaCoreOptions();
             options.put(JavaCore.CODEASSIST_VISIBILITY_CHECK, "enabled");
             options.put(JavaCore.CODEASSIST_FORBIDDEN_REFERENCE_CHECK, "enabled");
