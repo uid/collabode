@@ -1,0 +1,52 @@
+<% helpers.setHtmlTitle("Statistics") %>
+<% helpers.addBodyClass("fullwidth") %>
+<% helpers.addBodyClass("nosidebar") %>
+<% helpers.includeCss("editor_ejs.css") %>
+
+<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+
+<script type="text/javascript">
+google.load('visualization', '1', {packages: ['corechart']});
+
+document.body.setAttribute('style', 'overflow-y: scroll;');
+
+var graphs = <%= fastJSON.stringify(graphs) %>;
+
+graphs.graphs.forEach(function(graph, i) {
+  google.setOnLoadCallback(function() {
+    var data = google.visualization.arrayToDataTable(graph.data);
+    
+    var container = document.createElement('div');
+    container.setAttribute('id', 'graph' + i);
+    container.setAttribute('style', 'height: 450px;');
+    document.getElementById('charts').appendChild(container);
+    var chart = new google.visualization.ScatterChart(container);
+    
+    chart.draw(data, {
+      title: graph.title,
+      lineWidth: 1,
+      pointSize: 5,
+      hAxis: { minValue: 0, maxValue: graphs.t_max, title: graph.x },
+      vAxis: { title: graph.y }
+    });
+  });
+});
+</script>
+
+<div id="editorpage">
+
+<%= helpers.renderPartial("docbar", { project: "Statistics",
+                                      file: start.toLocaleString() + ' &ndash; ' + end.toLocaleString() }) %>
+
+<div id="padmain">
+  <div id="padeditor">
+    <div id="wizardcontainerbox">
+      <% graphs.graphs.forEach(function(graph, i) { %>
+        &middot; <a href="#graph<%= i %>"><%= graph.title %></a>
+      <% }); %> &middot;
+      <div id="charts"></div>
+    </div>
+  </div>
+</div>
+
+</div>
