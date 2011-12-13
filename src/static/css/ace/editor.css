@@ -103,7 +103,7 @@ p {
   color: white;
   z-index: -1;
   font-size: 12px; /* overridden by lineMetricsDiv.style */
-  font-family: monospace; /* overridden by lineMetricsDiv.style */
+  font-family: Consolas, Menlo, monospace; /* overridden by lineMetricsDiv.style */
 }
 
 #overlaysdiv { position: absolute; left: -1000px; top: -1000px; }
@@ -130,3 +130,11 @@ p {
 	opacity:.95; -webkit-box-shadow: 0 4px 6px #999;
 	z-index: 50;
 }
+
+.selection {
+  position: absolute;
+  width: 100%;
+  background-color: rgba(0,100,200,0.05);
+}
+.selection div { position: absolute; }
+.selection .cursor { border-right: 1px solid rgb(0,100,200); }

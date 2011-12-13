@@ -27,6 +27,7 @@ import("pad.pad_events");
 import("fastJSON");
 import("fileutils.readFile");
 import("jsutils.{eachProperty,keys}");
+import("cache_utils.syncedWithCache");
 import("collab.collabroom_server.*");
 
 import("editor.workspace");
@@ -201,6 +202,26 @@ function applyUserChanges(pad, baseRev, changeset, optSocketId, optAuthor) {
   pad_events.onEditPad(pad, thisAuthor);
 }
 
+function _getSelectionCache(pad) {
+  return syncedWithCache('collab_server.selectioncache', function(cache) {
+    if (! cache.map) {
+      cache.map = new ConcurrentHashMap();
+    }
+    cache.map.putIfAbsent(pad.getId(), new ConcurrentHashMap());
+    return cache.map.get(pad.getId());
+  });
+}
+
+function updateUserSelection(pad, selection, socketId) {
+  var connectionId = getSocketConnectionId(socketId);
+  if ( ! connectionId) { return; }
+  var connection = getConnection(connectionId);
+  if ( ! connection) { return; }
+  author = connection.data.userInfo.userId;
+  
+  _getSelectionCache(pad).put(author, selection);
+}
+
 function updateClient(pad, connectionId) {
   var conn = getConnection(connectionId);
   if (! conn) {
@@ -225,6 +246,10 @@ function updateClient(pad, connectionId) {
       sendMessage(connectionId, msg);
     }
   }
+  var selectionCache = _getSelectionCache(pad);
+  selectionCache.keySet().toArray().forEach(function(author) {
+    sendMessage(connectionId, { type: "NEW_SELECTION", author: author, selection: selectionCache.get(author) });
+  });
   conn.data.lastRev = pad.getHeadRevisionNumber();
   updateRoomConnectionData(connectionId, conn.data);
 }
@@ -235,6 +260,8 @@ function updatePadClients(pad) {
   });
 
   // XXX readonly_server.updatePadClients(pad);
+  
+  _getSelectionCache(pad).clear();
 }
 
 function applyMissedChanges(pad, missedChanges) {
@@ -717,6 +744,9 @@ function _handleCometMessage(connection, msg) {
         var baseRev = msg.baseRev;
         var wireApool = (new AttribPool()).fromJsonable(msg.apool);
         var changeset = msg.changeset;
+        if (msg.selection) {
+          updateUserSelection(pad, msg.selection, connection.socketId);
+        }
         if (changeset) {
           _checkChangesetAndPool(changeset, wireApool);
           changeset = pad.adoptChangesetAttribs(changeset, wireApool);
@@ -726,6 +756,17 @@ function _handleCometMessage(connection, msg) {
     }
     catch (e if e.easysync) {
       _doWarn("Changeset error handling USER_CHANGES: "+e);
+    }
+  }
+  else if (msg.type == "USER_SELECTION") {
+    try {
+      _accessConnectionPad(connection, "USER_SELECTION", function(pad) {
+        updateUserSelection(pad, msg.selection, connection.socketId);
+        updatePadClients(pad);
+      });
+    }
+    catch (e if e.easysync) {
+      _doWarn("Error handling USER_SELECTION: "+e);
     }
   }
   else if (msg.type == "USERINFO_UPDATE") {

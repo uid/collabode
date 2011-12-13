@@ -143,11 +143,14 @@ function getCollabClient(ace2editor, serverVars, initialUserInfo, options) {
       state = "COMMITTING";
       stateMessage = {type:"USER_CHANGES", baseRev:rev,
                       changeset:userChangesData.changeset,
-                      apool: userChangesData.apool };
+                      apool: userChangesData.apool,
+                      selection: userChangesData.selection };
       stateMessageSocketId = socketId;
       sendMessage(stateMessage);
       sentMessage = true;
       callbacks.onInternalAction("commitPerformed");
+    } else if (userChangesData.selection) {
+      sendMessage({ type: "USER_SELECTION", selection: userChangesData.selection });
     }
 
     if (sentMessage) {
@@ -288,6 +291,11 @@ function getCollabClient(ace2editor, serverVars, initialUserInfo, options) {
       }
       rev = newRev;
       editor.applyChangesToBase(changeset, author, apool);
+    }
+    else if (msg.type == "NEW_SELECTION") {
+      if (msg.author != userId) {
+        editor.displaySelection(msg.author, msg.selection);
+      }
     }
     else if (msg.type == "ACCEPT_COMMIT") {
       var newRev = msg.newRev;

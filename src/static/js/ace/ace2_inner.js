@@ -129,6 +129,8 @@ function OUTER(gscope) {
       });
     }
   });
+  
+  var selectionTracker = makeSelectionTracker(scheduler);
 
   var authorInfos = {}; // presence of key determines if author is present in doc
 
@@ -861,7 +863,9 @@ function OUTER(gscope) {
     }
   };
   editorInfo.ace_prepareUserChangeset = function() {
-    return changesetTracker.prepareUserChangeset();
+    var data = changesetTracker.prepareUserChangeset();
+    data.selection = selectionTracker.prepareSelection();
+    return data;
   };
   editorInfo.ace_applyPreparedChangesetToBase = function() {
     changesetTracker.applyPreparedChangesetToBase();
@@ -871,6 +875,7 @@ function OUTER(gscope) {
   };
   editorInfo.ace_setUserChangeNotificationCallback = function(f) {
     changesetTracker.setUserChangeNotificationCallback(f);
+    selectionTracker.setUserChangeNotificationCallback(f);
   };
   editorInfo.ace_setAuthorInfo = function(author, info) {
     setAuthorInfo(author, info);
@@ -1008,6 +1013,39 @@ function OUTER(gscope) {
     var index = externalClickHandlers.indexOf(handler);
     externalClickHandlers.splice(index, 1);
   }
+  
+  editorInfo.ace_displaySelection = function($, author, selection) {
+    var document = editorInfo.frame.contentDocument||editorInfo.frame.contentWindow.document;
+    var highlight = document.getElementById('selection-' + author);
+    if (highlight) {
+      highlight = $(highlight);
+    } else {
+      highlight = document.createElement('div');
+      highlight.id = 'selection-' + author;
+      highlight = $(highlight);
+      highlight.attr('class', 'selection');
+      highlight.append('<div class="cursor"></div>');
+      $(document.getElementById("outerdocbody")).prepend(highlight);
+    }
+    var iframe = $('iframe', document);
+    var framepos = iframe.position();
+    var start = $(rep.lines.atIndex(selection.selectStart[0]).lineNode);
+    var height = start.height();
+    var width = $('#linemetricsdiv', document).width();
+    var lines = selection.selectEnd[0] - selection.selectStart[0];
+    highlight.css({
+      top: '' + (framepos.top + start.position().top) + 'px',
+      left: '' + framepos.left + 'px',
+      height: '' + (height * (lines + 1)) + 'px',
+      width: '' + iframe.width() + 'px'
+    });
+    $('.cursor', highlight).css({
+      top: selection.focusAtStart ? 0 : '',
+      bottom: selection.focusAtStart ? '' : 0,
+      left: '' + (width * (selection.focusAtStart ? selection.selectStart[1] : selection.selectEnd[1])) + 'px',
+      height: '' + height + 'px'
+    });
+  };
   
 
   function now() { return (new Date()).getTime(); }
@@ -2569,6 +2607,8 @@ function OUTER(gscope) {
       rep.selFocusAtStart = newSelFocusAtStart;
       if (mozillaFakeArrows) mozillaFakeArrows.notifySelectionChanged();
       currentCallStack.repChanged = true;
+
+      selectionTracker.selectionChanged(selectStart, selectEnd, focusAtStart);
 
       return true;
       //console.log("selStart: %o, selEnd: %o, focusAtStart: %s", rep.selStart, rep.selEnd,
