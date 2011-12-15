@@ -103,7 +103,7 @@ domline.createDomLine = function(nonEmpty, doesWrap, optBrowser, optDocument) {
     if (cls.indexOf('background') >= 0) {
       cls = cls.replace(/(^| )background:(\S+)/g, function(x0, space, color) {
         if (! styles) styles = [];
-        styles.push("background:rgb(" + color + ");");
+        styles.push("background:rgb(" + color + "); background:rgba(" + color + ",0.5);");
         return space+"background";
       });
     }

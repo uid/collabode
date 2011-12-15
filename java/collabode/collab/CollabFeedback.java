@@ -18,8 +18,8 @@ import collabode.*;
  */
 public class CollabFeedback implements CollabListener {
     
-    private static final Color MINE = new Color(null, new RGB(255, 255, 200));
-    private static final Color OTHER = new Color(null, new RGB(230, 230, 230));
+    private static final Color MINE = new Color(null, new RGB(255, 255, 155));
+    private static final Color OTHER = new Color(null, new RGB(200, 200, 200));
     
     public CollabFeedback(Collab collab) {
     }
