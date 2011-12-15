@@ -134,7 +134,9 @@ p {
 .selection {
   position: absolute;
   width: 100%;
-  background-color: rgba(0,100,200,0.05);
 }
-.selection div { position: absolute; }
+.selection div { position: absolute; background-color: rgb(217,232,247); background-color: rgba(0,100,200,0.15); }
 .selection .cursor { border-right: 1px solid rgb(0,100,200); }
+.selection .leading { top: 0; }
+.selection .bulk { left: 0; width: 100%; }
+.selection .trailing { bottom: 0; }

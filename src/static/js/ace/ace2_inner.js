@@ -1024,7 +1024,7 @@ function OUTER(gscope) {
       highlight.id = 'selection-' + author;
       highlight = $(highlight);
       highlight.attr('class', 'selection');
-      highlight.append('<div class="cursor"></div>');
+      highlight.append('<div class="cursor"></div><div class="leading"></div><div class="bulk"></div><div class="trailing"></div>');
       $(document.getElementById("outerdocbody")).prepend(highlight);
     }
     var iframe = $('iframe', document);
@@ -1032,11 +1032,11 @@ function OUTER(gscope) {
     var start = $(rep.lines.atIndex(selection.selectStart[0]).lineNode);
     var height = start.height();
     var width = $('#linemetricsdiv', document).width();
-    var lines = selection.selectEnd[0] - selection.selectStart[0];
+    var lines = selection.selectEnd[0] - selection.selectStart[0] + 1;
     highlight.css({
       top: '' + (framepos.top + start.position().top) + 'px',
       left: '' + framepos.left + 'px',
-      height: '' + (height * (lines + 1)) + 'px',
+      height: '' + (height * lines) + 'px',
       width: '' + iframe.width() + 'px'
     });
     $('.cursor', highlight).css({
@@ -1045,6 +1045,34 @@ function OUTER(gscope) {
       left: '' + (width * (selection.focusAtStart ? selection.selectStart[1] : selection.selectEnd[1])) + 'px',
       height: '' + height + 'px'
     });
+    if (lines == 1) {
+      $('.leading', highlight).css({
+        height: 0
+      });
+      $('.bulk', highlight).css({
+        height: 0
+      });
+      $('.trailing', highlight).css({
+        left: '' + (width * selection.selectStart[1]) + 'px',
+        height: '' + height + 'px',
+        width: '' + (width * (selection.selectEnd[1] - selection.selectStart[1])) + 'px'
+      });
+    } else {
+      $('.leading', highlight).css({
+        left: '' + (width * selection.selectStart[1]) + 'px',
+        right: 0,
+        height: '' + height + 'px'
+      });
+      $('.bulk', highlight).css({
+        top: '' + height + 'px',
+        height: '' + (height * (lines - 2)) + 'px'
+      });
+      $('.trailing', highlight).css({
+        left: 0,
+        height: '' + height + 'px',
+        width: '' + (width * selection.selectEnd[1]) + 'px'
+      });
+    }
   };
   
 
