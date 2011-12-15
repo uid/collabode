@@ -1027,6 +1027,10 @@ function OUTER(gscope) {
       highlight.append('<div class="cursor"></div><div class="leading"></div><div class="bulk"></div><div class="trailing"></div>');
       $(document.getElementById("outerdocbody")).prepend(highlight);
     }
+    if ( ! (selection && selection.selectStart)) {
+      highlight.remove();
+      return;
+    }
     var iframe = $('iframe', document);
     var framepos = iframe.position();
     var start = $(rep.lines.atIndex(selection.selectStart[0]).lineNode);

@@ -356,6 +356,7 @@ function getCollabClient(ace2editor, serverVars, initialUserInfo, options) {
         callbacks.onUserLeave(userInfo);
         dmesgUsers();
       }
+      editor.displaySelection(id, null);
     }
     else if (msg.type == "DISCONNECT_REASON") {
       appLevelDisconnectReason = msg.reason;
