@@ -84,6 +84,11 @@ function _jslog_collectors() {
       ],
       'streaming-events': [
         { key: 'type', value: 'event', collector: _streaming_events_collector() }
+      ],
+      'debug': [
+        { key: 'event', value: 'bestEdits', collector: _integration_collector() },
+        { key: 'event', value: 'bestEdits', collector: _compilation_collector() },
+        { key: 'ended', value: false, collector: _timing_collector() }
       ]
     }
   };
@@ -221,6 +226,113 @@ function _streaming_events_collector() {
       if ( ! data[time]) { data[time] = {} };
       events[event] = 1;
       data[time][event] = (data[time][event] || 0) + 1;
+    }
+  };
+}
+
+function _integration_collector() {
+  var series = [ 'unintegrated', 'accepted' ];
+  var raw = {};
+  var data = false;
+  return {
+    title: function() { return 'Integration'; },
+    series: function() { return series.map(function(s) { return 'max '+s; }).concat(series.map(function(s) { return 'avg '+s; })); },
+    units: function() { return 'Regions'; },
+    data: function() {
+      if (data) { return data; }
+      data = {};
+      keys(raw).forEach(function(time) {
+        var datum = {};
+        series.forEach(function(s) {
+          var values = raw[time].map(function(e) { return e[s]; });
+          datum['max '+s] = Math.max.apply(Math, values);
+          var sum = 0;
+          values.forEach(function(v) { sum += v; });
+          datum['avg '+s] = sum / values.length;
+        });
+        data[time] = datum;
+      });
+      return data;
+    },
+    add: function(entry) {
+      var time = entry.date - (entry.date % WINDOW);
+      if ( ! raw[time]) { raw[time] = []; };
+      raw[time].push({
+        unintegrated: entry.options,
+        accepted: entry.accepted
+      });
+    }
+  };
+}
+
+function _compilation_collector() {
+  var series = [ 'compilations' ];
+  var raw = {};
+  var data = false;
+  return {
+    title: function() { return 'Compilation'; },
+    series: function() { return series.map(function(s) { return 'max '+s; }).concat(series.map(function(s) { return 'avg '+s; })); },
+    units: function() { return 'Compilations'; },
+    data: function() {
+      if (data) { return data; }
+      data = {};
+      keys(raw).forEach(function(time) {
+        var datum = {};
+        series.forEach(function(s) {
+          var values = raw[time].map(function(e) { return e[s]; });
+          datum['max '+s] = Math.max.apply(Math, values);
+          var sum = 0;
+          values.forEach(function(v) { sum += v; });
+          datum['avg '+s] = sum / values.length;
+        });
+        data[time] = datum;
+      });
+      return data;
+    },
+    add: function(entry) {
+      var time = entry.date - (entry.date % WINDOW);
+      if ( ! raw[time]) { raw[time] = []; };
+      raw[time].push({
+        compilations: entry.compilations
+      });
+    }
+  };
+}
+
+function _timing_collector() {
+  var events = {};
+  var raw = {};
+  var data = false;
+  return {
+    title: function() { return 'Timing'; },
+    series: function() {
+      var series = keys(events).sort();
+      return series.map(function(s) { return 'max '+s; }).concat(series.map(function(s) { return 'avg '+s; }));
+    },
+    units: function() { return 'ms'; },
+    data: function() {
+      if (data) { return data; }
+      data = {};
+      keys(raw).forEach(function(time) {
+        var datum = {};
+        keys(events).forEach(function(s) {
+          var values = raw[time][s];
+          if ( ! values) { return; }
+          datum['max '+s] = Math.max.apply(Math, values);
+          var sum = 0;
+          values.forEach(function(v) { sum += v; });
+          datum['avg '+s] = sum / values.length;
+        });
+        data[time] = datum;
+      });
+      return data;
+    },
+    add: function(entry) {
+      var time = entry.date - (entry.date % WINDOW);
+      if ( ! raw[time]) { raw[time] = {}; };
+      if ( ! raw[time][entry.event]) { raw[time][entry.event] = []; }
+      raw[time][entry.event].push(entry.ended - entry.started);
+      events[entry.event] = 1;
     }
   };
 }
