@@ -95,7 +95,6 @@ public class JavaCommitter extends WorkingCopyOwner implements CollabListener, R
         
         Collection<ReplaceEdit> best = new ArrayList<ReplaceEdit>();
         
-        int compilations = 0;
         for (int ii = 0; ii < options.size(); ii += LargeToSmallPowerSet.MAX_SIZE) {
             List<ReplaceEdit> considerable = options.subList(ii, Math.min(options.size(), ii + LargeToSmallPowerSet.MAX_SIZE));
             for (Collection<ReplaceEdit> subset : new LargeToSmallPowerSet<ReplaceEdit>(considerable)) {
@@ -103,7 +102,6 @@ public class JavaCommitter extends WorkingCopyOwner implements CollabListener, R
                 for (ReplaceEdit edit : subset) {
                     wc.getBuffer().replace(edit.getOffset(), edit.getLength(), edit.getText());
                 }
-                compilations++;
                 wc.reconcile(ICompilationUnit.NO_AST, true, this, null);
                 IProblem[] problems = reported.take();
                 
