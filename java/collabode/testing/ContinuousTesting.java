@@ -116,7 +116,7 @@ public class ContinuousTesting implements Runnable {
         config.setAttribute("org.eclipse.jdt.junit.CONTAINER", project.getHandleIdentifier());
         config.setAttribute("org.eclipse.jdt.junit.TEST_KIND", "org.eclipse.jdt.junit.loader.junit4");
         
-        String policy = "'" + Application.bundleResourcePath("config/security.test.policy") + "'";
+        String policy = "'" + Application.bundleResourcePath("config/export/security.test.policy") + "'";
         config.setAttribute(IJavaLaunchConfigurationConstants.ATTR_VM_ARGUMENTS,
                 "-Dorg.eclipse.osgi.framework.internal.core.FrameworkSecurityManager " + // XXX does nothing?
                 "-Djava.security.manager -Djava.security.policy==" + policy + " -ea");

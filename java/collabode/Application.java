@@ -83,7 +83,7 @@ public class Application implements IApplication {
     public static void setupDatabase() throws Exception {
         Class.forName(CONFIG.get("dbDriver"));
         Connection db = DriverManager.getConnection(CONFIG.get("dbURL"), "u", "");
-        Scanner schema = new Scanner(new File(bundleResourcePath("config/schema.sql"))).useDelimiter(";");
+        Scanner schema = new Scanner(new File(bundleResourcePath("config/export/schema.sql"))).useDelimiter(";");
         String alreadyExists = CONFIG.get("dbAlreadyExists");
         while (schema.hasNext()) {
             String stmt = schema.next().trim();
