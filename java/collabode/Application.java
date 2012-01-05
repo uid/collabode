@@ -31,9 +31,24 @@ public class Application implements IApplication {
     public Object start(IApplicationContext context) throws Exception {
         BUNDLE = Platform.getBundle("collabode.etherpad");
         
+        Map<String, String> args = new HashMap<String, String>();
+        String[] argv = Platform.getCommandLineArgs();
+        for (int ii = 0; ii < argv.length; ii++) {
+            if (argv[ii].startsWith("-") && ii < argv.length-1 && ! argv[ii+1].startsWith("-")) {
+                args.put(argv[ii], argv[ii+1]);
+                ii++;
+            } else {
+                args.put(argv[ii], "");
+            }
+        }
+        
         String configFile;
         try {
-            configFile = bundleResourcePath("config/collabode.properties");
+            if (args.containsKey("-config")) {
+                configFile = args.get("-config");
+            } else {
+                configFile = bundleResourcePath("config/collabode.properties");
+            }
         } catch (FileNotFoundException fnfe) {
             System.err.println("Missing config file: " + fnfe.getMessage());
             throw fnfe;
