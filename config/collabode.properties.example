@@ -1,5 +1,6 @@
-appjetHome = ./data/appjet
-logDir = ./data/logs
+appjetHomeTemplate = %BUNDLE_STATE%/data/appjet
+logDirTemplate = %BUNDLE_STATE%/data/logs
+
 transportPrefix = /comet
 transportUseWildcardSubdomains = false
 
@@ -7,7 +8,7 @@ devMode = true
 listen = 9000
 
 dbDriver = org.hsqldb.jdbc.JDBCDriver
-dbURL = jdbc:hsqldb:mem:pads
+dbURLTemplate = jdbc:hsqldb:mem:pads
 dbAlreadyExists = 42504
 
 continuousTesting = true

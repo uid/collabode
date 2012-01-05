@@ -53,15 +53,9 @@ public class Application implements IApplication {
             System.err.println("Missing config file: " + fnfe.getMessage());
             throw fnfe;
         }
-        Properties config = new Properties();
-        config.load(new FileInputStream(configFile));
-        setConfig(config);
         
-        setupDatabase();
-        startAppjet("--modulePath=" + bundleResourcePath("src"),
-                    "--useVirtualFileRoot=" + bundleResourcePath("src"),
-                    "--configFile=" + configFile);
-        setupTesting();
+        setupAndStart(configFile);
+        
         setupShutdown();
         
         final Display display = PlatformUI.createDisplay();
@@ -82,6 +76,29 @@ public class Application implements IApplication {
     }
 
     public void stop() {
+    }
+    
+    public static void setupAndStart(String configFile) throws Exception {
+        String statePath = Platform.getStateLocation(BUNDLE).toOSString();
+        
+        Properties config = new Properties();
+        config.load(new FileInputStream(configFile));
+        
+        List<String> appjetArgs = new ArrayList<String>();
+        appjetArgs.add("--modulePath=" + bundleResourcePath("src"));
+        appjetArgs.add("--useVirtualFileRoot=" + bundleResourcePath("src"));
+        
+        for (String key : new String[] { "appjetHome", "logDir", "dbURL" }) {
+            if ( ! config.containsKey(key + "Template")) { continue; }
+            config.put(key, config.getProperty(key + "Template").replace("%BUNDLE_STATE%", statePath));
+            appjetArgs.add("--" + key + "=" + config.get(key));
+        }
+        setConfig(config);
+        appjetArgs.add("--configFile=" + configFile);
+        
+        setupDatabase();
+        startAppjet(appjetArgs.toArray(new String[0]));
+        setupTesting();
     }
     
     public static String bundleResourcePath(String relativePath) throws IOException {
