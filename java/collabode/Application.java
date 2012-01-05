@@ -21,15 +21,16 @@ import collabode.testing.ContinuousTesting;
 
 public class Application implements IApplication {
     
+    public static final String ID = "collabode.etherpad";
     /**
      * The Collabode bundle.
      */
     public static Bundle BUNDLE;
     public static Shell SHELL;
     public static Map<String, String> CONFIG;
-
+    
     public Object start(IApplicationContext context) throws Exception {
-        BUNDLE = Platform.getBundle("collabode.etherpad");
+        BUNDLE = Platform.getBundle(ID);
         
         Map<String, String> args = new HashMap<String, String>();
         String[] argv = Platform.getCommandLineArgs();
@@ -74,8 +75,14 @@ public class Application implements IApplication {
         
         return IApplication.EXIT_OK;
     }
-
+    
     public void stop() {
+    }
+    
+    public static void startInWorkbench(Shell shell) throws Exception {
+        BUNDLE = Platform.getBundle(ID);
+        SHELL = shell;
+        setupAndStart(bundleResourcePath("config/export/collabode.properties"));
     }
     
     public static void setupAndStart(String configFile) throws Exception {

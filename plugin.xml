@@ -42,5 +42,31 @@
             migrationDelegate="collabode.testing.JUnitRestrictedMigrationDelegate">
       </launchConfigurationType>
    </extension>
+   <extension
+         point="org.eclipse.ui.views">
+      <category
+            id="collabode.views"
+            name="Collabode">
+      </category>
+      <view
+            category="collabode.views"
+            class="collabode.view.ServerView"
+            icon="src/static/img/collabode.gif"
+            id="collabode.view.ServerView"
+            name="Collabode Server">
+      </view>
+   </extension>
+   <extension
+         point="org.eclipse.ui.perspectiveExtensions">
+      <perspectiveExtension
+            targetID="org.eclipse.jdt.ui.JavaPerspective">
+         <view
+               id="collabode.view.ServerView"
+               ratio="0.6"
+               relationship="right"
+               relative="org.eclipse.ui.views.ProblemView">
+         </view>
+      </perspectiveExtension>
+   </extension>
 
 </plugin>
