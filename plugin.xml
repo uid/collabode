@@ -19,6 +19,10 @@
       <product
             application="collabode.etherpad.app"
             name="Collabode Server">
+         <property
+               name="appName"
+               value="Collabode Server">
+         </property>
       </product>
    </extension>
    <extension
