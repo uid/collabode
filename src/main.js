@@ -9,6 +9,7 @@ import("control.auth_control");
 import("control.clone_control");
 import("control.console_control");
 import("control.editor_control");
+import("control.mobile_control");
 import("control.stats_control");
 import("control.turk_control");
 
@@ -163,6 +164,7 @@ function handlePath() {
   authed.GET.addLocations([
     ['/settings', u(auth_control.render_settings)],
     ['/new', u(editor_control.render_new_project)],
+    ['/mobile', u(mobile_control.render_mobile)],
     [_file('console'), r(console_control.render_console)],
     [_proj('delete'), u(editor_control.render_confirm_delete)],
     [_file('delete'), u(editor_control.render_confirm_delete)],
