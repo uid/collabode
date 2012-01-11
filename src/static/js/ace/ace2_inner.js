@@ -991,10 +991,25 @@ function OUTER(gscope) {
     });
   }
   
-  editorInfo.ace_scrollToLineNo = function(lineno) {
+  editorInfo.ace_scrollToLineNo = function($, lineno) {
+    var node;
     inCallStackIfNecessary("scroll", function() {
-      scrollNodeVerticallyIntoView(rep.lines.atIndex(lineno).lineNode);
+      node = rep.lines.atIndex(lineno-1).lineNode;
+      scrollNodeVerticallyIntoCenter(node);
     });
+    node = $(node);
+    var document = editorInfo.frame.contentDocument||editorInfo.frame.contentWindow.document;
+    var highlight = $(document.createElement('div'));
+    highlight.attr('class', 'ephemeral');
+    $(document.getElementById("outerdocbody")).prepend(highlight);
+    var iframe = $('iframe', document);
+    var framepos = iframe.position();
+    highlight.css({
+      top: '' + (framepos.top + node.position().top) + 'px',
+      left: '' + framepos.left + 'px',
+      height: '' + node.height() + 'px',
+      width: '' + iframe.width() + 'px'
+    }).delay(1000).fadeOut(2000);
   };
   
   var externalKeyHandlers = [];
@@ -4511,6 +4526,13 @@ function OUTER(gscope) {
     var win = outerWin;
     var odoc = win.document;
     return odoc.documentElement.clientWidth;
+  }
+  
+  function scrollNodeVerticallyIntoCenter(node) {
+    var win = outerWin;
+    var odoc = outerWin.document;
+    var distFromCenter = (node.offsetTop + iframePadTop + node.offsetHeight/2) - (win.scrollY + getInnerHeight()/2);
+    win.scrollBy(0, distFromCenter);
   }
 
   function scrollNodeVerticallyIntoView(node) {

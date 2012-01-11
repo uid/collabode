@@ -140,3 +140,5 @@ p {
 .selection .leading { top: 0; }
 .selection .bulk { left: 0; width: 100%; }
 .selection .trailing { bottom: 0; }
+
+.ephemeral { position: absolute; background-color: rgb(253,253,128); background-color: rgba(250,250,0,0.5); }

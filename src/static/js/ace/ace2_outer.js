@@ -138,7 +138,7 @@ function Ace2Editor() {
     info.ace_replaceBeforeCursor(length, replacement);
   });
   editor.scrollToLineNo = pendingInit(function(lineno) {
-    info.ace_scrollToLineNo(lineno);
+    info.ace_scrollToLineNo($, lineno);
   });
   editor.addKeyHandler = pendingInit(function(handler) {
     info.ace_addKeyHandler(handler);
