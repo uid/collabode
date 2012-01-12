@@ -73,8 +73,9 @@ function create_knockout(methodAndParams, replacement, projectname, filename) {
     }
   });
   
-  var padId = workspace.accessDocumentPad(getSession().userId, file);
-  var lineno = workspace.knockout(padId, method, params, replacement);
+  var userId = getSession().userId;
+  var padId = workspace.accessDocumentPad(userId, file);
+  var lineno = workspace.knockout(padId, userId, method, params, replacement);
   
   var description = "Implement the method '"+method+"' in "+file.getName()+", line "+lineno+".";
   response.redirect('/frame"'+description+'"'+file.getFullPath()+':'+lineno);

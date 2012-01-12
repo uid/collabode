@@ -292,12 +292,12 @@ function getContentTypeName(author, padId) {
   return PadDocumentOwner.of(author).get(_filenameFor(padId)).getContentTypeName();
 }
 
-function knockout(padId, method, params, replacement) {
+function knockout(padId, userId, method, params, replacement) {
   var changeset;
   model.accessPadGlobal(padId, function(pad) {
     var iterator = PadDocumentOwner.of(userId).get(_filenameFor(padId)).knockout(method, params, replacement);
     changeset = _makeChangeSetStr(pad, iterator);
-    collab_server.applyChangesetToPad(pad, changeset, "#knockout");
+    collab_server.applyChangesetToPad(pad, changeset, userId);
   });
   return Changeset.opIterator(Changeset.unpack(changeset).ops).next().lines;
 }
