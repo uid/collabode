@@ -29,7 +29,7 @@ function Testor() {
       
       node.append($('<a>').html('<div></div>').click(function() { onTestToggleTrace(node); }));
       var trace = $('<div>').addClass('testtrace');
-      trace.append($('<table><tr><td class="expected"></td><td class="actual"></td></tr><table><div class="stackTrace"></div>'));
+      trace.append($('<table><tr><td class="expected"></td><td class="actual"></td></tr><tr><td colspan="2" class="stackTrace"></td></tr></table>'));
       node.append(trace);
       
       container.append(node);
@@ -39,13 +39,14 @@ function Testor() {
     node.addClass(result.status);
     if (result.trace) {
       node.addClass('hasDetails');
-      $('.testtrace .stackTrace', node).html(result.trace.stackTrace);
-      $('.testtrace .expected', node).html(result.trace.expected);
-      $('.testtrace .actual', node).html(result.trace.actual);
+      $('.testtrace .stackTrace', node).text(result.trace.stackTrace);
+      $('.testtrace .expected', node).text(result.trace.expected);
+      $('.testtrace .actual', node).text(result.trace.actual);
     } else {
-      $('.testtrace .stackTrace', node).html("");
-      $('.testtrace .expected', node).html("");
-      $('.testtrace .actual', node).html("");
+      $('.testtrace .stackTrace', node).text("");
+      $('.testtrace .expected', node).text("");
+      $('.testtrace .actual', node).text("");
+      $('.testtrace', node).toggle(false);
     }
   };
   

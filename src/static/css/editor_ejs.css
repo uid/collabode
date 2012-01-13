@@ -123,14 +123,6 @@ body.fullwidth #editorpage { width: auto; margin-left: 6px; margin-right: 6px; }
 	-webkit-border-radius:6px; -moz-border-radius:6px;
 }
 
-.sidebarsection ~ .sidebarsection:last-child {
-	position:absolute;
-	margin-bottom:0;
-	bottom:0;
-	left:0;
-	right:0;
-}
-
 #sidebarbox ul {
 	list-style-type: none;
 }
@@ -300,6 +292,9 @@ body.nosidebar #padeditor { margin-left: 0; }
 	display: none;
 }
 
+#testorcontainer {
+	overflow: visible;
+}
 .test {
 	border-width:1px;
 	border-style:solid;
@@ -310,15 +305,15 @@ body.nosidebar #padeditor { margin-left: 0; }
 .test .testclass {
 	font-size: smaller;
 }
-.test.ok {
+.test.ok, .test.ok table {
 	border-color:#360;
 	background:#efe;
 }
-.test.failure {
+.test.failure, .test.failure table {
 	border-color:#900;
 	background:#fee;
 }
-.test.error {
+.test.error, .test.error table {
 	border-color:#009;
 	background:#eef;
 }
@@ -401,9 +396,13 @@ body.nosidebar #padeditor { margin-left: 0; }
 .test.hasDetails a {
 	display: block;
 }
+.test td {
+	padding: 0.5em 0.5em 0 0;
+}
 .test .testtrace {
 	display: none;
-	margin-top: 1.5em;
-	font-size: x-small;
+	margin-top: 0.5em;
+	font-size: 11px;
 	white-space: pre;
+	font-family: Consolas, Menlo, monospace;
 }
