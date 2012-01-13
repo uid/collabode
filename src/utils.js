@@ -21,12 +21,32 @@ import("jsutils.eachProperty");
 
 import("helpers");
 
+import("collab.collab_server");
+
+import("pad.model");
+import("pad.revisions");
+
 jimport("net.appjet.oui.JarVirtualFile");
 
 function getSession() {
   return sessions.getSession({
     cookieName: "ode",
     domain: undefined // XXX only legal value when accessed by IP addr; problematic?
+  });
+}
+
+function addPadClientVars(padId) {
+  model.accessPadGlobal(padId, function(pad) {
+    helpers.addClientVars({
+      padId: padId,
+      collab_client_vars: collab_server.getCollabClientVars(pad),
+      initialRevisionList: revisions.getRevisionList(pad),
+      serverTimestamp: +(new Date),
+      initialOptions: pad.getPadOptionsObj(),
+      userId: getSession().userId,
+      userName: getSession().userName,
+      opts: {}
+    });
   });
 }
 

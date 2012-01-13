@@ -18,6 +18,7 @@ jimport("org.eclipse.core.resources.IContainer");
 jimport("java.lang.System");
 
 function render_root() {
+  addPadClientVars(workspace.accessDummyPad(getSession().userId));
   renderHtml("editor/root.ejs", {
     projects: Workspace.listProjects()
   });
@@ -187,20 +188,7 @@ var _renderers = {
   
   _file: function(project, file) {
     var padId = workspace.accessDocumentPad(getSession().userId, file);
-    
-    model.accessPadGlobal(padId, function(pad) {
-      helpers.addClientVars({
-        padId: padId,
-        collab_client_vars: collab_server.getCollabClientVars(pad),
-        initialRevisionList: revisions.getRevisionList(pad),
-        serverTimestamp: +(new Date),
-        initialOptions: pad.getPadOptionsObj(),
-        userId: getSession().userId,
-        userName: getSession().userName,
-        opts: {}
-      });
-    });
-    
+    addPadClientVars(padId);
     return {
       filetype: workspace.getContentTypeName(getSession().userId, padId)
     }

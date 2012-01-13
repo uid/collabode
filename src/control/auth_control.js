@@ -24,18 +24,7 @@ const localhost = /((^0:0:0:0:0:0:0:1(%0)?)|(127.0.0.1))$/;
 function render_settings() {
   var padId = workspace.accessSettingsPad(getSession().userId);
   
-  model.accessPadGlobal(padId, function(pad) {
-    helpers.addClientVars({
-      padId: padId,
-      collab_client_vars: collab_server.getCollabClientVars(pad),
-      initialRevisionList: revisions.getRevisionList(pad),
-      serverTimestamp: +(new Date),
-      initialOptions: pad.getPadOptionsObj(),
-      userId: getSession().userId,
-      userName: getSession().userName,
-      opts: {}
-    });
-  });
+  addPadClientVars(padId);
   
   renderHtml("editor/settings.ejs", {
     projects: Workspace.listProjects()

@@ -24,6 +24,13 @@ jimport("java.lang.System");
 function onStartup() {
   appjet.cache.pad_annotations = new ConcurrentHashMap();
   
+  // XXX debug
+  collab_server.setExtendedHandler("CLIENT_TO_SERVER_MSG", function(padId, userId, connectionId, msg) {
+    collab_server.sendConnectionExtendedMessage(connectionId, {
+      type: "SERVER_TO_CLIENT_MSG",
+      bar: msg.foo
+    });
+  });
   collab_server.setExtendedHandler("RUN_REQUEST", _onRunRequest);
   collab_server.setExtendedHandler("ANNOTATIONS_REQUEST", _onAnnotationsRequest);
   collab_server.setExtendedHandler("TESTS_REQUEST", _onTestsRequest);
@@ -32,6 +39,18 @@ function onStartup() {
   collab_server.setExtendedHandler("FORMAT_REQUEST", _onFormatRequest);
   collab_server.setExtendedHandler("ORGIMPORTS_REQUEST", _onOrganizeImportsRequest);
   collab_server.setExtendedHandler("ORGIMPORTS_RESOLVED", _onOrganizeImportsResolved);
+}
+
+function accessDummyPad(userId) {
+  var padId = userId + "*dummy*";
+  
+  model.accessPadGlobal(padId, function(pad) {
+    if ( ! pad.exists()) {
+      pad.create(false);
+    }
+  });
+  
+  return padId;
 }
 
 function _padIdFor(userId, file) {
