@@ -20,6 +20,7 @@ import("pad.dbwriter");
 
 import("editor.auth");
 import("editor.workspace");
+import("editor.mobile");
 
 jimport("java.lang.System");
 
@@ -33,6 +34,7 @@ serverhandlers.startupHandler = function() {
     collabroom_server.onStartup();
     auth.onStartup();
     workspace.onStartup();
+    mobile.onStartup();
 };
 
 serverhandlers.requestHandler = function() {
@@ -164,7 +166,7 @@ function handlePath() {
   authed.GET.addLocations([
     ['/settings', u(auth_control.render_settings)],
     ['/new', u(editor_control.render_new_project)],
-    ['/mobile', u(mobile_control.render_mobile)],
+    ['/mobile', mobile_control.render_mobile],
     [_file('console'), r(console_control.render_console)],
     [_proj('delete'), u(editor_control.render_confirm_delete)],
     [_file('delete'), u(editor_control.render_confirm_delete)],
