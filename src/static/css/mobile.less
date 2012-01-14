@@ -1,6 +1,10 @@
-/* This page is written with Less css */
+/* This page is written with Less.js CSS.  
+ * For reference, see: http://lesscss.org/
+ */
 
-/* Color definitions */
+/********************
+ * Color definitions 
+ */
 @white: #FFF;
 @darkgray: #333;
 
@@ -32,10 +36,12 @@ body {
     }
 }
 
-/* CARDS */
+/********
+ * CARDS 
+ */
 @cardw: 75px;
 @cardh: 100px;
-.card {
+.card, .qcard {
     position: relative;
     width: @cardw;
     height: @cardh;
@@ -45,8 +51,8 @@ body {
     margin: 5px;
     display: inline-block;
     img {
-		max-width: @cardw;
-		max-height: @cardh;
+		/*max-width: @cardw;
+		max-height: @cardh;*/
 		width: inherit;   /* TODO: consider removing these */
 		height: inherit;  /* TODO: consider removing these */
     }
@@ -60,6 +66,11 @@ body {
 		z-index: 1;
 		font-size: 12px;
     }
+    .badge {
+    	position: absolute;
+    	top: -5px;
+    	right: -5px;
+    }
     .thumb {
 		img {
 		    width: inherit;
@@ -68,7 +79,9 @@ body {
     }
 }
 
-/* TEST GRID */
+/*************
+ * TEST GRID 
+ */
 .test-progress-div {
     overflow: auto;
     margin: 5px;
@@ -97,3 +110,43 @@ body {
 		}
     }
 }
+
+/******************
+ * Layout trays
+ */
+div#card-tray {
+	position: absolute;
+ 	right: 0px;
+ 	z-index: 0px;
+}
+ 
+div#queue-tray {
+ 	position: absolute;
+ 	left: 0px;
+ 	z-index: 10;
+ 	background-color: #555;
+ 	border: 1px solid @darkgray;
+ 	overflow: hidden;
+ 	
+ 	/* Chrome, Safari4+ */
+	background: -webkit-gradient(linear, left top, right top, 
+		color-stop(95%, rgba(0,0,0,0.3)), 
+		color-stop(100%,rgba(0,0,0,0.65)));
+}
+
+/******************
+ * Other
+ */
+ div#debugbar {
+ 	position: absolute;
+ 	top: 50px;
+ 	right: 25px;
+ 	margin: 0 auto;
+ 	min-width: 10px;
+ 	background: lighten(@darkgray, 5%);
+ 	border: 1px solid @darkgray;
+ 	color: white;
+ 	border-radius: 10px;
+ 	padding: 5px;
+ 	z-index: 10;
+ }

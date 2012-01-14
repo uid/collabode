@@ -5,35 +5,31 @@
 <% helpers.addToHead('<link rel="stylesheet/less" type="text/css" href="static/css/mobile.less"/>') %>
 <% helpers.addToHead('<script type="text/javascript" src="static/js/less-1.1.3.min.js"></script>') %>
 
+<% helpers.includeCometJs() %>
 <% helpers.includeJQuery() %>
-<% helpers.includeJs("jquery.mobile-1.0.min.js") %>
-<% helpers.includeJs("jquery-ui-1.8.16.custom.min.js") %>
-<% helpers.includeJs("jquery.ui.touch.js") %>
-<% helpers.includeJs("mobile.js") %>
+<% helpers.includeMobileJs() %>
+<% helpers.includeJs("collab_client.js") %>
+<% helpers.includeJs("ode_mobile.js") %>
 
 <div data-role="page" class="page">
-	<div data-role="header" id="header">
-		<div data-role="controlgroup" data-type="horizontal" id="filterBar">
-			<a data-role="button" class="filter" id="filter-tests">Test grid</a>
-			<a data-role="button" class="filter" id="filter-error">Error graph</a>
-			<a data-role="button" class="filter" id="filter-code">Code graph</a>
-			<a data-role="button" class="filter">...</a>
-		</div>
-		<!--<div data-role="fieldcontain">
-			<label for="flip-b">Hide filtered: </label>
-	        <select name="slider" id="flip-b" data-role="slider">
-	        	<option value="no">No</option>
-	          	<option value="yes">Yes</option>
-	        </select> 
-	    </div>-->
-    	<!--<a data-role="button" data-inline="true" class="ui-btn-left" id="reload">Reload</a>-->
-    	<a data-role="button" data-inline="true" class="ui-btn-left" id="queue">Help Queue</a>
-    	<a data-role="button" data-inline="true" class="ui-btn-right" id="details">View Details</a>
+  <div data-role="header" id="header">
+    <div data-role="controlgroup" data-type="horizontal" id="filterBar">
+      <a data-role="button" class="filter" id="filter-tests">Test grid</a>
+      <a data-role="button" class="filter" id="filter-error">Error graph</a>
+      <a data-role="button" class="filter" id="filter-code">Code graph</a>
+      <a data-role="button" class="filter">...</a>
     </div>
+    <a data-role="button" data-inline="true" class="ui-btn-left" id="queue-toggle">Hide Queue</a>
+    <a data-role="button" data-inline="true" class="ui-btn-right" id="details">View Details</a>
+  </div>
     
-    <div data-role="content" id="content" class="content">
-      	<% for (var i = 0; i < users.size(); i++) { %>
-        	<%= helpers.renderPartial("mobile/card", { user: users.get(i) }) %>
-        <% } %>
+  <div data-role="content" id="content" class="content">
+  	<div id="debugbar"></div>
+  	<div id="queue-tray"></div>
+  	<div id="card-tray">
+  	  <% for (var i = 0; i < users.size(); i++) { %>
+        <%= helpers.renderPartial("mobile/card", { user: users.get(i) }) %>
+      <% } %>
     </div>
+  </div>
 </div>
