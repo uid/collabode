@@ -27,6 +27,7 @@ function onStartup() {
   collab_server.setExtendedHandler("RUN_REQUEST", _onRunRequest);
   collab_server.setExtendedHandler("ANNOTATIONS_REQUEST", _onAnnotationsRequest);
   collab_server.setExtendedHandler("TESTS_REQUEST", _onTestsRequest);
+  collab_server.setExtendedHandler("TESTS_RUN_REQUEST", _onTestsRunRequest);
   collab_server.setExtendedHandler("CODECOMPLETE_REQUEST", _onCodeCompleteRequest);
   collab_server.setExtendedHandler("FORMAT_REQUEST", _onFormatRequest);
   collab_server.setExtendedHandler("ORGIMPORTS_REQUEST", _onOrganizeImportsRequest);
@@ -267,6 +268,11 @@ function _onTestsRequest(padId, userId, connectionId, msg) {
     }));
     break;
   }
+}
+
+function _onTestsRunRequest(padId, userId, connectionId, msg) {
+  var doc = PadDocumentOwner.of(userId).get(_filenameFor(padId));
+  ProjectTestsOwner.of(doc.collab.file.getProject()).scheduleRun();
 }
 
 function _onCodeCompleteRequest(padId, userId, connectionId, msg) {

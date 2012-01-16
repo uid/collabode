@@ -114,4 +114,8 @@ $(document).ready(function() {
     collab.sendExtendedMessage({ type: "ORGIMPORTS_REQUEST" });
     return false;
   });
+  $("#runtests").click(function() {
+    collab.sendExtendedMessage({ type: "TESTS_RUN_REQUEST" });
+    return false;
+  });
 });

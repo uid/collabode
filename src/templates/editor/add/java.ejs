@@ -4,4 +4,6 @@
 <a href="#" id="format" class="docbarbutton enabled" title="Format Source"></a>
 <a href="#" id="orgimports" class="docbarbutton enabled" title="Organize Imports"></a>
 <a href="/console<%= file.getFullPath() %>" target="java_console_<%= file.getName() %>" id="console" class="docbarbutton <%= isTest ? '' : 'enabled' %>" title="Show Console"></a>
-
+<% if (appjet.config.continuousTesting != 'true') { %>
+<a href="#" id="runtests" class="docbarbutton enabled" title="Run Tests"></a>
+<% } %>

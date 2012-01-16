@@ -62,7 +62,7 @@ body.fullwidth #editorpage { width: auto; margin-left: 6px; margin-right: 6px; }
 
 #docbartools {
 	position:absolute; height:auto; right:0;
-	width:120px; font-size: 1.6em; color:#444; font-weight:normal;
+	width:160px; font-size: 1.6em; color:#444; font-weight:normal;
 	line-height: 22px; margin-right: 2px; height:22px; top:4px;
 	white-space:nowrap;
 }
@@ -196,6 +196,9 @@ body.nosidebar #padeditor { margin-left: 0; }
 }
 #orgimports.enabled {
     background: url(/static/img/eclipse/ant.ui.obj.import.gif) no-repeat center center;
+}
+#runtests.enabled {
+    background: url(/static/img/eclipse/jdt.junit.obj.tsuiterun.gif) no-repeat center center;
 }
 
 #editorcontainerbox {

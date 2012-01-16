@@ -40,6 +40,13 @@ public class ProjectTestsOwner {
     }
     
     /**
+     * Schedule test execution.
+     */
+    public void scheduleRun() {
+        ContinuousTesting.getTester().runTests(project.getProject());
+    }
+    
+    /**
      * Update the recorded test results with new or changed results.
      * Reports any change.
      */
