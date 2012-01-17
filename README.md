@@ -6,6 +6,17 @@ http://uid.csail.mit.edu/collabode
 Collabode is a web-based collaborative software development environment
 powered by Eclipse and EtherPad.
 
+To try out Collabode if you already have the [Eclipse][] IDE for Java
+installed, download the [Collabode plug-in][] and follow the "two-headed
+hydra" instructions below.
+
+  [Eclipse]: http://www.eclipse.org/
+  [Collabode plug-in]: http://uid.csail.mit.edu/collabode/download
+
+This system is a research prototype. The software is provided "as is", without
+warranty of any kind. Do not use Collabode in a workspace containing code you
+have not backed up.
+
 
 Running Collabode in development
 --------------------------------
@@ -39,3 +50,4 @@ Running Collabode as a two-headed hydra
    different workspace for Collabode**
  * If needed, use *Window &rarr; Show View &rarr; Other...* and enable
    "Collabode Server"
+ * After launching the server, browse to <http://localhost:9000/>
