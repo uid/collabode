@@ -67,7 +67,7 @@ public class Collab implements CollabListener {
     /**
      * Notify listeners that edits were synchronized from pad to documents.
      */
-    public synchronized void updated(PadDocument doc) {
+    public void updated(PadDocument doc) {
         for (CollabListener listener : listeners) {
             listener.updated(doc);
         }
@@ -76,7 +76,7 @@ public class Collab implements CollabListener {
     /**
      * Notify listeners that edits were committed to disk.
      */
-    public synchronized void committed(CollabDocument doc) {
+    public void committed(CollabDocument doc) {
         for (CollabListener listener : listeners) {
             listener.committed(doc);
         }
