@@ -341,6 +341,48 @@ public class JavaPadDocument extends PadDocument implements IBuffer {
         PadImportOrganizer.of(connectionId).chose(userChoices);
     }
     
+    private boolean imported(String packageName, String className) throws JavaModelException {
+        for (IImportDeclaration imp : workingCopy.getImports()) {
+            String imported = imp.getElementName();
+            if (imported.equals(packageName + "." + className) || imported.equals(packageName + ".*")) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    public ChangeSetOpIterator setAnnotation(String[] remove, String[] add, String className, String methodName, String[] paramSigs) throws JavaModelException {
+        MultiTextEdit edit = new MultiTextEdit();
+        if ( ! imported(add[0], add[1])) {
+            ISourceRange range = workingCopy.getImportContainer().getSourceRange();
+            // XXX can't use ICompilationUnit.createImport(...), but this is a hack
+            edit.addChild(new ReplaceEdit(range.getOffset() + range.getLength(), 0, "\n\nimport " + add[0] + ".*;"));
+        }
+        IType type = workingCopy.getType(className);
+        IMethod method = type.getMethod(methodName, paramSigs);
+        boolean added = false;
+        for (IAnnotation ann : method.getAnnotations()) {
+            for (String[] name : type.resolveType(ann.getElementName())) {
+                if (Arrays.equals(name, add)) {
+                    added = true;
+                }
+            }
+        }
+        for (IAnnotation ann : method.getAnnotations()) {
+            for (String[] name : type.resolveType(ann.getElementName())) {
+                if (Arrays.equals(name, remove)) {
+                    ISourceRange range = ann.getSourceRange();
+                    edit.addChild(new ReplaceEdit(range.getOffset(), range.getLength(), added ? "" : "@" + add[1]));
+                    added = true;
+                }
+            }
+        }
+        if ( ! added) {
+            edit.addChild(new ReplaceEdit(method.getSourceRange().getOffset(), 0, "@" + add[1] + " "));
+        }
+        return collab.localTextEditToUnionChangeset(this, edit);
+    }
+    
     public ChangeSetOpIterator knockout(String methodName, String[] paramSigs, String replacement) throws JavaModelException {
         IMethod method = workingCopy.findPrimaryType().getMethod(methodName, paramSigs);
         ISourceRange range = method.getSourceRange();

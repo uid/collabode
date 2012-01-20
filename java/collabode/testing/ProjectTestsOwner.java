@@ -1,18 +1,20 @@
 package collabode.testing;
 
+import static collabode.testing.AnnotationsInitializer.PACKAGE;
+import static collabode.testing.AnnotationsInitializer.STATUSES;
+
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import org.eclipse.core.resources.IProject;
-import org.eclipse.jdt.core.IJavaProject;
-import org.eclipse.jdt.core.JavaCore;
-import org.eclipse.jdt.junit.model.ITestCaseElement;
-import org.eclipse.jdt.junit.model.ITestElement;
-import org.eclipse.jdt.junit.model.ITestElementContainer;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.jdt.core.*;
+import org.eclipse.jdt.junit.model.*;
 
+import scala.Function1;
 import scala.Function2;
-import collabode.Workspace;
+import collabode.*;
 
 /**
  * Keeps track of continuous test results for a project.
@@ -118,5 +120,11 @@ public class ProjectTestsOwner {
         for (Test test : results.keySet()) {
             reporter.apply(test, results.get(test));
         }
+    }
+    
+    public ChangeSetOpIterator advanceStatus(String className, String methodName, String from, Function1<IResource,JavaPadDocument> getDocument) throws JavaModelException {
+        JavaPadDocument doc = getDocument.apply(project.findType(className).getUnderlyingResource());
+        String to = STATUSES.get(STATUSES.indexOf(from) + 1);
+        return doc.setAnnotation(new String[] { PACKAGE, from }, new String[] { PACKAGE, to }, className, methodName, new String[0]);
     }
 }

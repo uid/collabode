@@ -1,6 +1,8 @@
 package collabode.testing;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
 import org.eclipse.core.runtime.*;
 import org.eclipse.jdt.core.*;
@@ -8,6 +10,10 @@ import org.eclipse.jdt.core.*;
 import collabode.Application;
 
 public class AnnotationsInitializer extends ClasspathContainerInitializer {
+    
+    public static final String PACKAGE = "collabode";
+    
+    public static final List<String> STATUSES = Arrays.asList(new String[] { "New", "NeedsImpl", "NeedsReview", "Accepted" });
     
     public static final IPath PATH = new Path("collabode.ANNOTATIONS_CONTAINER");
     

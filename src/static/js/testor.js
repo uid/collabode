@@ -1,7 +1,20 @@
-function Testor() {
+function Testor(collab) {
   
   var testNodes = {};
   var container = $('#testorcontainer');
+  
+  function onTestToggleTrace(div) {
+    $('.testtrace', div).toggle("fast");
+  }
+  
+  function onTestUpdateStatus(test, result) {
+    collab.sendExtendedMessage({
+      type: "TESTS_REQUEST",
+      action: "update",
+      test: test,
+      from: result.status
+    });
+  }
   
   var testor = {};
   
@@ -19,13 +32,13 @@ function Testor() {
         return;
       }
       
-      var node = $('<div>');
+      node = $('<div>');
       testNodes[test.name] = node;
       
       node.append($('<div>').addClass('testclass').html(test.className));
       node.append($('<div>').addClass('testmethod').html(test.methodName));
       
-      node.append($('<button>').html('<div></div>').click(onTestUpdateStatus));
+      node.append($('<button>').html('<div></div>'));
       
       node.append($('<a>').html('<div></div>').click(function() { onTestToggleTrace(node); }));
       var trace = $('<div>').addClass('testtrace');
@@ -36,7 +49,7 @@ function Testor() {
     }
     node.attr('class', 'test');
     node.addClass(result.resultName);
-    node.addClass(result.status);
+    node.addClass(result.status.toLowerCase());
     if (result.trace) {
       node.addClass('hasDetails');
       $('.testtrace .stackTrace', node).text(result.trace.stackTrace);
@@ -48,14 +61,8 @@ function Testor() {
       $('.testtrace .actual', node).text("");
       $('.testtrace', node).toggle(false);
     }
+    $('button', node).unbind('click.testor').bind('click.testor', function() { onTestUpdateStatus(test, result); });
   };
   
   return testor;
 };
-
-function onTestToggleTrace(div) {
-  $('.testtrace', div).toggle("fast");
-}
-
-function onTestUpdateStatus(b) {
-}

@@ -18,12 +18,12 @@ $(document).ready(function() {
     // ip, colorId, userAgent
   };
   
-  var testor = new Testor();
-  
   var collab = getCollabClient(ace,
                                clientVars.collab_client_vars,
                                user,
                                { });
+  
+  var testor = new Testor(collab);
   
   var orgImportsWidget = makeOrgImportsWidget($, ace, function(selection) {
     collab.sendExtendedMessage({ type: "ORGIMPORTS_RESOLVED" , choices: selection});

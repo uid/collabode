@@ -1,5 +1,8 @@
 package collabode.testing;
 
+import static collabode.testing.AnnotationsInitializer.PACKAGE;
+import static collabode.testing.AnnotationsInitializer.STATUSES;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 
@@ -26,7 +29,7 @@ public class TestResult {
     TestResult(ITestCaseElement elt, IJavaProject project) {
         result = elt.getTestResult(true);
         trace = elt.getFailureTrace();
-        status = getStatus(elt, project).toLowerCase();
+        status = getStatus(elt, project);
     }
     
     private String getStatus(ITestCaseElement elt, IJavaProject project) {
@@ -35,7 +38,7 @@ public class TestResult {
             IMethod method = type.getMethod(elt.getTestMethodName(), new String[0]);
             for (IAnnotation ann : method.getAnnotations()) {
                 for (String[] name : type.resolveType(ann.getElementName())) {
-                    if (name[0].equals("collabode")) {
+                    if (name[0].equals(PACKAGE)) {
                         return name[1];
                     }
                 }
@@ -43,7 +46,7 @@ public class TestResult {
         } catch (JavaModelException jme) {
             jme.printStackTrace();
         }
-        return "New";
+        return STATUSES.get(0);
     }
     
     /**

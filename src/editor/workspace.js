@@ -260,12 +260,23 @@ function taskUpdateAnnotations(userId, file, type, annotations) {
 }
 
 function _onTestsRequest(padId, userId, connectionId, msg) {
+  var doc = PadDocumentOwner.of(userId).get(_filenameFor(padId));
+  var owner = ProjectTestsOwner.of(doc.collab.file.getProject());
   switch (msg.action) {
   case 'state':
-    var doc = PadDocumentOwner.of(userId).get(_filenameFor(padId));
-    ProjectTestsOwner.of(doc.collab.file.getProject()).reportResults(scalaFn(2, function(test, result) {
+    owner.reportResults(scalaFn(2, function(test, result) {
       collab_server.sendConnectionExtendedMessage(connectionId, _testResultMessage(test, result));
     }));
+    break;
+  case 'update':
+    var testsPadId;
+    var iterator = owner.advanceStatus(msg.test.className, msg.test.methodName, msg.from, scalaFn(1, function(testsFile) {
+      testsPadId = accessDocumentPad(userId, testsFile); // ensure existence
+      return PadDocumentOwner.of(userId).get(_filenameFor(testsPadId));
+    }));
+    model.accessPadGlobal(testsPadId, function(pad) {
+      collab_server.applyChangesetToPad(pad, _makeChangeSetStr(pad, iterator), userId);
+    });
     break;
   }
 }
