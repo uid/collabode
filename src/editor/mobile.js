@@ -12,6 +12,7 @@ function onStartup() {
   	});
   });
   collab_server.setExtendedHandler("REQUEST_ADD_TO_QUEUE", _onAddToQueue);
+  collab_server.setExtendedHandler("REQUEST_STUDENT_DETAILS", _onRequestStudentDetails);
 }
 
 function _onAddToQueue(padId, userId, connectionId, msg) {
@@ -22,6 +23,9 @@ function _onAddToQueue(padId, userId, connectionId, msg) {
   });
 }
 
-function taskAddToQueue() {
-  // TODO?
+function _onRequestStudentDetails(padId, userId, connectionId, msg) {
+  // Collect student details and send a reply
+  var reply = msg;
+  reply.type = "STUDENT_DETAILS";
+  collab_server.sendConnectionExtendedMessage(connectionId, reply);
 }

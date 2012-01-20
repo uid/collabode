@@ -10,6 +10,7 @@
 <% helpers.includeMobileJs() %>
 <% helpers.includeJs("collab_client.js") %>
 <% helpers.includeJs("ode_mobile.js") %>
+<% helpers.includeJs("mobile/student_panel.js") %>
 
 <div data-role="page" class="page">
   <div data-role="header" id="header">
@@ -27,9 +28,23 @@
   	<div id="debugbar"></div>
   	<div id="queue-tray"></div>
   	<div id="card-tray">
+  	  <!-- Load the cards -->
   	  <% for (var i = 0; i < users.size(); i++) { %>
         <%= helpers.renderPartial("mobile/card", { user: users.get(i) }) %>
       <% } %>
+      
+      <!-- Student details overlay -->
+      <div id="student-details-panel">
+		<div data-role="content" data-theme="c">
+		  <h2 id="username">username</h2>
+		  <img src="static/img/mobile/placeholder-photo.png" id="photo">
+		  <p>Student info goes here...</p>
+		  <p>... like this sample graph ...</p>
+		  <div id="placeholder"></div>
+		  <a href="" data-role="button" data-inline="true" data-theme="a" id="student-details-button-remove">Remove from queue</a>
+		  <a href="" data-role="button" data-inline="true" data-theme="a" class="ui-btn-right" id="student-details-button-close">Close</a>
+		</div>
+	  </div>
     </div>
   </div>
 </div>

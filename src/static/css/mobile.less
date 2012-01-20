@@ -53,8 +53,14 @@ body {
     img {
 		/*max-width: @cardw;
 		max-height: @cardh;*/
-		width: inherit;   /* TODO: consider removing these */
-		height: inherit;  /* TODO: consider removing these */
+		width: inherit;   /* TODO: consider scaling instead */
+		height: inherit;  /* TODO: consider scaling instead */
+    }
+    a { /* TODO: make this nicer */
+    	img {
+    		width: 75px;
+			height: 100px;
+    	}
     }
     .nametag {
 		position: absolute;
@@ -135,11 +141,29 @@ div#queue-tray {
 }
 
 /******************
+ * Student details
+ */
+#student-details-panel {
+	z-index: 20;
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	width: 100%;
+	overflow: auto;
+	#placeholder {
+		width: 400px;
+		height: 400px;
+		margin: 0 auto;
+		text-align: center;
+	}
+}
+
+/******************
  * Other
  */
- div#debugbar {
- 	position: absolute;
- 	top: 50px;
+div#debugbar {
+	position: absolute;
+	top: 50px;
  	right: 25px;
  	margin: 0 auto;
  	min-width: 10px;
@@ -150,3 +174,4 @@ div#queue-tray {
  	padding: 5px;
  	z-index: 10;
  }
+ 

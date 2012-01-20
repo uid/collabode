@@ -101,6 +101,11 @@ function includeMobileJs() {
   includeJs("jquery.mobile-1.0.min.js");
   includeJs("jquery-ui-1.8.16.custom.min.js");
   includeJs("jquery.ui.touch.js");
+  includeJs("flot/jquery.flot.min.js");
+  includeJs("mobile/utils.js");
+  includeJs("mobile/card_tray.js");
+  includeJs("mobile/queue_tray.js");
+  //includeJs("mobile/student_panel.js");
 }
 
 function hideHeader() {
