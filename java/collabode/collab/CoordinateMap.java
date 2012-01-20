@@ -10,7 +10,39 @@ import org.eclipse.text.edits.ReplaceEdit;
 /**
  * Map between character offsets in local and union documents.
  */
-class CoordinateMap {
+interface CoordinateTranslation {
+    
+    /**
+     * Convert a union offset to a local offset.
+     */
+    public int unionToLocal(int offset);
+    
+    /**
+     * Convert a local offset to a union offset.
+     */
+    public int localToUnion(int offset);
+}
+
+/**
+ * Immutable character offset identity mapping.
+ */
+class IdentityMap implements CoordinateTranslation {
+    
+    public static final IdentityMap IDENT = new IdentityMap();
+    
+    public int unionToLocal(int offset) {
+        return offset;
+    }
+    
+    public int localToUnion(int offset) {
+        return offset;
+    }
+}
+
+/**
+ * Mutable character offset mapping.
+ */
+class CoordinateMap implements CoordinateTranslation {
     
     private static class UL {
         final int union;
@@ -186,9 +218,6 @@ class CoordinateMap {
         reduce();
     }
     
-    /**
-     * Convert a union offset to a local offset.
-     */
     public synchronized int unionToLocal(int offset) {
         UL unionFloor = pairsByUnion.floor(u(offset));
         int local = unionFloor.local + (offset - unionFloor.union);
@@ -200,9 +229,6 @@ class CoordinateMap {
         }
     }
     
-    /**
-     * Convert a local offset to a union offset.
-     */
     public synchronized int localToUnion(int offset) {
         UL localFloor = pairsByLocal.floor(l(offset));
         int union = localFloor.union + (offset - localFloor.local);
