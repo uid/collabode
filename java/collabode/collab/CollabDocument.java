@@ -53,10 +53,6 @@ public class CollabDocument implements Iterable<PadDocument> {
         return localMaps.keySet().iterator();
     }
     
-    public void addListener(CollabListener listener) {
-        listeners.add(listener);
-    }
-    
     synchronized void createPadDocument(String userId) throws IOException, JavaModelException {
         PadDocument doc = PadDocumentOwner.of(userId).create(file); // XXX relies on create not to duplicate
         if ( ! localMaps.containsKey(doc)) {
