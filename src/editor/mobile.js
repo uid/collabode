@@ -1,6 +1,7 @@
 import("collab.collab_server");
 
 jimport("collabode.mobile.Application");
+//jimport("collabode.mobile.Stat");
 
 jimport("java.lang.System");
 
@@ -25,7 +26,10 @@ function _onAddToQueue(padId, userId, connectionId, msg) {
 
 function _onRequestStudentDetails(padId, userId, connectionId, msg) {
   // Collect student details and send a reply
-  var reply = msg;
-  reply.type = "STUDENT_DETAILS";
+  var reply = {      
+      type: "STUDENT_DETAILS",
+      cardId: msg.cardId,
+      user: Application.getUser(msg.username).getJSON()
+  }
   collab_server.sendConnectionExtendedMessage(connectionId, reply);
 }

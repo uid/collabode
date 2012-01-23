@@ -105,7 +105,7 @@ function includeMobileJs() {
   includeJs("mobile/utils.js");
   includeJs("mobile/card_tray.js");
   includeJs("mobile/queue_tray.js");
-  //includeJs("mobile/student_panel.js");
+  includeJs("mobile/student_panel.js");
 }
 
 function hideHeader() {

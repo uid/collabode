@@ -95,8 +95,12 @@ function initCards() {
   	assignCardId($(this), i);
   })
   // handle clicks
-  .dblclick( function() {
+  .click( function() {
     // TODO: open up an individual page
+    details.show({
+      cardId: $(this).attr('id'),
+      username: $(this).attr('data-username')
+    });
     //window.location.href = 'student.php?id=' + 
   	//encodeURIComponent($(this).attr('data-username'));
   });

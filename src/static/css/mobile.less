@@ -150,11 +150,26 @@ div#queue-tray {
 	left: 0px;
 	width: 100%;
 	overflow: auto;
+	> img {
+		max-height: 100px;
+	}
 	#placeholder {
 		width: 400px;
 		height: 400px;
 		margin: 0 auto;
 		text-align: center;
+	}
+	#stats-table-div {
+		#stats-table {
+			tr {
+				td {
+					padding: 5px;
+					&.stat-label {
+						font-weight: bold;
+					}
+				}
+			}
+		}
 	}
 }
 

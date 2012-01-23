@@ -10,10 +10,15 @@ function StudentPanel() {
   }
   
   this.display = function(data) {
-    console.log("reply", data);
+    var user = $.parseJSON(data.user);
+    console.log("user", user);
     // Set the user's information and photo
-    this.obj.find("#username").text(data.username);
-    this.obj.find("#photo").attr('src', data.photo);
+    this.obj.find("#username").text(user.username);
+    this.obj.find("#photo").attr('src', user.photo);
+    
+    this.obj.find("#stat-runcount").html(user.stats.runCount);
+    //this.obj.find("#latestRuns").append(user.stats.runLog[user.stats.runLog.length-1]);
+
     // Create any necessary figures
     //createPlot(this.data);
     // Show the panel
@@ -35,6 +40,7 @@ function StudentPanel() {
   
   this.obj.find('#student-details-button-remove')
     .click( function() {
+      console.log("selected card", queue.getSelectedCard());
       queue.remove(queue.getSelectedCard().attr('id'));
       details.hide();
     });

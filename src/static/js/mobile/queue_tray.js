@@ -59,6 +59,7 @@ function QueueTray() {
   }
   
   this.remove = function(cardId) {
+    console.log("removing", cardId);
     removeQuestionBadge(cardId);
     $('#'+cardId).fadeOut(200).remove();
   }
@@ -92,8 +93,7 @@ function qCardId(cardId) {
 function _showStudentInfo(e) {  
   details.show({
     cardId: $(this).attr('id'),
-    username: $(this).attr('data-username'),
-    photo: $(this).find('.photo').attr('src')
+    username: $(this).attr('data-username')
   });
 }
 

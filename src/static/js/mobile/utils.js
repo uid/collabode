@@ -56,7 +56,7 @@ function removeQuestionBadge(cardId) {
  */
 //Set some random events for testing the ui
 function startRandomEvents() {
-  var numCards = 8; // set to -1 to add infinitely
+  var numCards = -1; // set to -1 to add infinitely
   var queueAdder = setInterval(function() {
     // Randomly choose an ID to ask a question
     randomId = Math.floor(Math.random()*30);

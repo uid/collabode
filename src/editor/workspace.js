@@ -10,6 +10,7 @@ import("pad.model");
 jimport("collabode.PadDocumentOwner");
 jimport("collabode.Workspace");
 jimport("collabode.collab.Collab");
+jimport("collabode.mobile.Application");
 jimport("collabode.running.FileRunOwner");
 jimport("collabode.testing.ProjectTestsOwner");
 
@@ -391,6 +392,7 @@ function accessRunFilePad(userId, file) {
 }
 
 function _onRunRequest(padId, userId, connectionId, msg) {
+  Application.updateUserRunCount(userId); // TODO: update the correct user count!
   var filename = _runningFilenameFor(padId);
   var owner = FileRunOwner.of(Collab.of(userId).id);
   
