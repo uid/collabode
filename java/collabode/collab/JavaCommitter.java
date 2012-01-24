@@ -28,7 +28,12 @@ public class JavaCommitter extends WorkingCopyOwner implements CollabListener, R
         queue.add(doc.collab);
     }
     
-    public void committed(CollabDocument doc) { }
+    public void committed(CollabDocument doc) {
+        Collection<CollabDocument> others = doc.collaboration.get(doc.file.getProject());
+        for (CollabDocument other : others) {
+            if ( ! other.equals(doc)) { queue.add(other); }
+        }
+    }
     
     public void run() {
         while (true) {
@@ -65,6 +70,8 @@ public class JavaCommitter extends WorkingCopyOwner implements CollabListener, R
     }
     
     private void handleEdits(CollabDocument doc, List<ReplaceEdit> options) throws BadLocationException, JavaModelException, InterruptedException {
+        if (options.isEmpty()) { return; }
+        
         Collections.sort(options, new Comparator<ReplaceEdit>() {
             public int compare(ReplaceEdit e1, ReplaceEdit e2) {
                 int offset = e2.getOffset() - e1.getOffset();
