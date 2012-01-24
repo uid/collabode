@@ -1,10 +1,11 @@
 package collabode.collab;
 
 import java.io.IOException;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.*;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 
 import scala.Function1;
@@ -28,7 +29,8 @@ public class Collab implements CollabListener {
     
     public final String id;
     
-    private final ConcurrentMap<String, CollabDocument> docs = new ConcurrentHashMap<String, CollabDocument>();
+    private final ConcurrentMap<String, CollabDocument> docsByPath = new ConcurrentHashMap<String, CollabDocument>();
+    private final ConcurrentMap<String, List<CollabDocument>> docsByProj = new ConcurrentHashMap<String, List<CollabDocument>>();
     private final Set<CollabListener> listeners = new CopyOnWriteArraySet<CollabListener>();
     
     private Collab(String id) {
@@ -40,7 +42,7 @@ public class Collab implements CollabListener {
     }
     
     public boolean hasFile(IFile file) {
-        return docs.containsKey(file.getFullPath().toString());
+        return docsByPath.containsKey(file.getFullPath().toString());
     }
     
     /**
@@ -54,14 +56,21 @@ public class Collab implements CollabListener {
      */
     public synchronized void createDocument(String userId, IFile file, int rev, Function1<String,Double> setPadText) throws IOException, CoreException {
         final String path = file.getFullPath().toString();
-        if ( ! docs.containsKey(path)) {
-            docs.putIfAbsent(path, new CollabDocument(this, file, setPadText));
+        if ( ! docsByPath.containsKey(path)) {
+            docsByPath.putIfAbsent(path, new CollabDocument(this, file, setPadText));
+            String project = file.getProject().getFullPath().toString();
+            docsByProj.putIfAbsent(project, new CopyOnWriteArrayList<CollabDocument>());
+            docsByProj.get(project).add(docsByPath.get(path));
         }
-        docs.get(path).createPadDocument(userId);
+        docsByPath.get(path).createPadDocument(userId);
     }
     
     public CollabDocument get(IFile file) {
-        return docs.get(file.getFullPath().toString());
+        return docsByPath.get(file.getFullPath().toString());
+    }
+    
+    public Collection<CollabDocument> get(IProject project) {
+        return docsByProj.get(project.getFullPath().toString());
     }
     
     /**
@@ -83,6 +92,6 @@ public class Collab implements CollabListener {
     }
     
     @Override public String toString() {
-        return getClass().getSimpleName() + "<" + id + "," + docs + ">";
+        return getClass().getSimpleName() + "<" + id + "," + docsByPath + ">";
     }
 }
