@@ -1,6 +1,7 @@
 package collabode;
 
 import java.io.IOException;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -101,5 +102,19 @@ public class PadDocumentOwner extends WorkingCopyOwner {
      */
     public PadDocument[] documents() {
         return documents.values().toArray(new PadDocument[0]);
+    }
+    
+    /**
+     * Obtain all the documents of a known type owned by this owner.
+     */
+    @SuppressWarnings("unchecked")
+    public <T extends PadDocument> Collection<T> documents(Class<T> clazz) {
+        List<T> filtered = new ArrayList<T>();
+        for (PadDocument doc : documents.values()) {
+            if (clazz.isInstance(doc)) {
+                filtered.add((T)doc);
+            }
+        }
+        return filtered;
     }
 }
