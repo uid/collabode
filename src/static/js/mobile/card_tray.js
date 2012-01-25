@@ -22,6 +22,8 @@ function CardTray() {
       : $(window).width()
   );
   
+  initCards();
+  
   /* Object functions */
   this.isFilterSelected = function() {
     return (this.selectedFilter == null);
@@ -54,6 +56,38 @@ function CardTray() {
       height: $('.card').height()/scale
     });
   }
+}
+
+function initCards() {
+  // reassign ids to each card
+  $('.card').each( function(i) {
+    assignCardId($(this), i);
+  })
+  // handle clicks
+  .click( function() {
+    // TODO: open up an individual page
+    details.show({
+      cardId: $(this).attr('id'),
+      username: $(this).attr('data-username')
+    });
+    //window.location.href = 'student.php?id=' + 
+    //encodeURIComponent($(this).attr('data-username'));
+  });
+
+  // make each card draggable
+  $('.card').draggable({
+    containment: 'window',
+    stack: '.card'
+  });
+  /*.touch({
+    animate: false,
+    sticky: false,
+    dragx: true,
+    dragy: true,
+    rotate: false,
+    resort: true,
+    scale: false
+    });*/
 }
 
 function resetCards() {

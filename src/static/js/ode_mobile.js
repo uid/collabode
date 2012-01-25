@@ -89,38 +89,6 @@ function _showStudentDetails(msg) {
 /************************
  * Initialization methods
  */
-function initCards() {
-  // reassign ids to each card
-  $('.card').each( function(i) {
-  	assignCardId($(this), i);
-  })
-  // handle clicks
-  .click( function() {
-    // TODO: open up an individual page
-    details.show({
-      cardId: $(this).attr('id'),
-      username: $(this).attr('data-username')
-    });
-    //window.location.href = 'student.php?id=' + 
-  	//encodeURIComponent($(this).attr('data-username'));
-  });
-
-  // make each card draggable
-  $('.card').draggable({
-  	containment: 'window',
-  	stack: '.card'
-  });
-  /*.touch({
-    animate: false,
-    sticky: false,
-    dragx: true,
-    dragy: true,
-    rotate: false,
-    resort: true,
-    scale: false
-    });*/
-}
-
 var appliedFilter = false; // TODO: make this null or the applied filter, not a boolean
 function initFilters() {
   // Assign behavior to fade out cards that don't match the selected filter.
@@ -273,7 +241,6 @@ function init() {
   cardw = $('.card').width();
   cardh = $('.card').height();
   
-  initCards();
   initFilters();
   
   $('#queue-toggle').click( handleQueueToggle ); // 'Help Queue' button
