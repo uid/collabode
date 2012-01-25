@@ -10,15 +10,17 @@ function StudentPanel() {
   }
   
   this.display = function(data) {
-    var user = $.parseJSON(data.user);
-    console.log("user", user);
+    var user = data.user;
+    console.log("user", user, data.runLog);
     // Set the user's information and photo
     this.obj.find("#username").text(user.username);
     this.obj.find("#photo").attr('src', user.photo);
     
-    this.obj.find("#stat-runcount").html(user.stats.runCount);
-    //this.obj.find("#latestRuns").append(user.stats.runLog[user.stats.runLog.length-1]);
-
+    this.obj.find("#stat-runcount").html(user.runCount);
+    var latestRunsDiv = this.obj.find("#latestRuns").empty();
+    for (var i in data.runLog) {
+      latestRunsDiv.append("<p>"+data.runLog[i].runTime+"</p>");
+    }
     // Create any necessary figures
     //createPlot(this.data);
     // Show the panel

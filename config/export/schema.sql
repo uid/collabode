@@ -123,3 +123,20 @@ CREATE TABLE "pro_domains" (
   PRIMARY KEY  ("id"),
   UNIQUE ("subDomain")
 );
+
+CREATE TABLE MBL_USERS (
+  "userId" varchar(63) NOT NULL,
+  "username" varchar(63) NOT NULL,
+  "photo" varchar(100) NOT NULL,
+  "lastActiveDate" timestamp NOT NULL,
+  "runCount" int default 0 NOT NULL,
+  PRIMARY KEY ("userId"),
+  UNIQUE ("username"),
+);
+
+CREATE TABLE MBL_RUNLOG (
+  "id" int generated always as identity NOT NULL,
+  "userId" varchar(63) NOT NULL,
+  "runTime" varchar(100) NOT NULL,
+  PRIMARY KEY ("id")
+);

@@ -28,8 +28,8 @@
   	<div id="queue-tray"></div>
   	<div id="card-tray">
   	  <!-- Load the cards -->
-  	  <% for (var i = 0; i < users.size(); i++) { %>
-        <%= helpers.renderPartial("mobile/card", { user: users.get(i) }) %>
+  	  <% for (var i in users) { %>
+        <%= helpers.renderPartial("mobile/card", { user: users[i] }) %>
       <% } %>
       
       <!-- Student details overlay -->

@@ -4,13 +4,13 @@ import("collab.ace.easysync2.{AttribPool,Changeset}");
 import("collab.collab_server");
 
 import("editor.auth");
+import("editor.mobile");
 
 import("pad.model");
 
 jimport("collabode.PadDocumentOwner");
 jimport("collabode.Workspace");
 jimport("collabode.collab.Collab");
-jimport("collabode.mobile.Application");
 jimport("collabode.running.FileRunOwner");
 jimport("collabode.testing.ProjectTestsOwner");
 
@@ -392,7 +392,6 @@ function accessRunFilePad(userId, file) {
 }
 
 function _onRunRequest(padId, userId, connectionId, msg) {
-  Application.updateUserRunCount(userId); // TODO: update the correct user count!
   var filename = _runningFilenameFor(padId);
   var owner = FileRunOwner.of(Collab.of(userId).id);
   
@@ -404,6 +403,7 @@ function _onRunRequest(padId, userId, connectionId, msg) {
     });
     break;
   case 'launch':
+    mobile.updateRunStats(userId);
     owner.run(filename);
     break;
   case 'terminate':

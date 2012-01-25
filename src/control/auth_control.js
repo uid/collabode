@@ -5,6 +5,7 @@ import("utils.*");
 import("collab.collab_server");
 
 import("editor.workspace");
+import("editor.mobile");
 
 import("pad.model");
 import("pad.revisions");
@@ -38,6 +39,9 @@ function do_login(clazz, username, destination) {
   getSession().userName = username;
   getSession().restricted = workspace.restricted(getSession().userId);
   appjet.cache.recent_users[getSession().userId] = new Date();
+  
+  mobile.doMobileLogin(getSession().userId, getSession().userName);
+  
   response.redirect(destination);
 }
 
