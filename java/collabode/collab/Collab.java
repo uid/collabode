@@ -20,6 +20,7 @@ public class Collab implements CollabListener {
     
     static {
         CHOIR.addListener(new CollabFeedback(CHOIR));
+        CHOIR.addListener(new JavaReconciler(CHOIR)); // XXX should only operate on Java projects
         CHOIR.addListener(new JavaCommitter(CHOIR)); // XXX should only operate on Java projects
     }
     

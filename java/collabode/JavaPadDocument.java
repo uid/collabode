@@ -70,7 +70,7 @@ public class JavaPadDocument extends PadDocument implements IBuffer {
             public void documentAboutToBeChanged(DocumentEvent event) { }
             public void documentChanged(final DocumentEvent event) {
                 notifyListeners(event.fOffset, event.fLength, event.fText);
-                reconcileWorkingCopy(false);
+                reconcile(false);
             }
         });
     }
@@ -83,10 +83,10 @@ public class JavaPadDocument extends PadDocument implements IBuffer {
     
     public void addReconcileListener(JavaPadReconcileListener listener) {
         reconciles.add(listener);
-        reconcileWorkingCopy(true);
+        reconcile(true);
     }
     
-    private void reconcileWorkingCopy(boolean forceProblems) {
+    public void reconcile(boolean forceProblems) {
         try {
             CompilationUnit ast = workingCopy.reconcile(AST.JLS3, forceProblems, owner, null);
             notifyListeners(ast);
