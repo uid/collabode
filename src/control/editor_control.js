@@ -257,15 +257,15 @@ function modify_path(projectname, filename) {
     return true;
   }
   
-  var foldername = request.params["foldername"];
-  var filename = request.params["filename"];
+  var foldername = request.params["foldername"] || "";
+  var filename = request.params["filename"] || "";
   
   if ((request.params["folder"] || ! filename.length) && foldername.length) {
     _create_path_folder(project, folder, foldername);
   }
   
   if ((request.params["file"] || ! foldername.length) && filename.length) {
-    _create_path_file(project, folder, filename);
+    _create_path_file(project, folder, filename, request.params["content"] || "");
   }
   
   if (request.params["acl"]) {
@@ -285,13 +285,14 @@ function _create_path_folder(project, parent, foldername) {
   folder.create(false, true, null);
 }
 
-function _create_path_file(project, parent, filename) {
+function _create_path_file(project, parent, filename, content) {
   var file = parent.getFile(filename);
   if (file.exists()) {
     return true;
   }
   
-  file.create(new java.io.InputStream({ read: function() { return -1; }}), false, null);
+  content = new java.lang.String(content).getBytes();
+  file.create(new java.io.ByteArrayInputStream(content), false, null);
 }
 
 function delete_path(projectname, filename) {
