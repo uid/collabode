@@ -1,35 +1,43 @@
 function StudentPanel() {
   this.id = "#student-details-panel";
   this.obj = $(this.id);
+  this.cardInfo = null;
+  this.data = null;
   
+  this.updateTimer = null;
   this.show = function(cardInfo) {
     // This function only makes the request for the student data,
     // which is processed by the server and sent back via the
-    // this.display(data) function.
-    this.data = requestStudentDetails(cardInfo);
+    // this.display() function.
+    if (cardInfo != null) {
+      this.cardInfo = cardInfo;
+    }
+    this.data = requestStudentDetails(this.cardInfo);
   }
   
-  this.display = function(data) {
-    var user = data.user;
-    console.log("user", user, data.runLog);
+  this.display = function() {
+    var user = this.data.user;
     // Set the user's information and photo
     this.obj.find("#username").text(user.username);
     this.obj.find("#photo").attr('src', user.photo);
     
-    this.obj.find("#stat-runcount").html(user.runCount);
-    var latestRunsDiv = this.obj.find("#latestRuns").empty();
-    for (var i in data.runLog) {
-      latestRunsDiv.append("<p>"+data.runLog[i].runTime+"</p>");
-    }
-    // Create any necessary figures
-    //createPlot(this.data);
+    // Create figures
+    _updateRunCount(this.obj, user.runCount);
+    //_logRuns(this.obj, this.data);
+    _plotRuns(this.data.runLog);
+    this.updateTimer = setTimeout(this.show, 500, this.cardInfo);
     // Show the panel
     this.obj.fadeIn(200);
     return this;
   }
   
   this.hide = function() {
+    // Stop polling for updates
+    clearTimeout(this.updateTimer);
+    // Fade out the panel
     this.obj.fadeOut(200);
+    // Unhighlight the card in the queue
+    // TODO: also unhighlight the card in the card tray
     queue.unhighlightSelectedCard();
     return this;
   }
@@ -42,7 +50,6 @@ function StudentPanel() {
   
   this.obj.find('#student-details-button-remove')
     .click( function() {
-      console.log("selected card", queue.getSelectedCard());
       queue.remove(queue.getSelectedCard().attr('id'));
       details.hide();
     });
@@ -50,70 +57,39 @@ function StudentPanel() {
   return this;
 }
 
-function retrieveSampleData() {
-  var d1 = [];
-  for (var i = 0; i < 14; i += 0.5)
-      d1.push([i, Math.sin(i)]);
-
-  var d2 = [[0, 3], [4, 8], [8, 5], [9, 13]];
-
-  var d3 = [];
-  for (var i = 0; i < 14; i += 0.5)
-      d3.push([i, Math.cos(i)]);
-
-  var d4 = [];
-  for (var i = 0; i < 14; i += 0.1)
-      d4.push([i, Math.sqrt(i * 10)]);
-  
-  var d5 = [];
-  for (var i = 0; i < 14; i += 0.5)
-      d5.push([i, Math.sqrt(i)]);
-
-  var d6 = [];
-  for (var i = 0; i < 14; i += 0.5 + Math.random())
-      d6.push([i, Math.sqrt(2*i + Math.sin(i) + 5)]);
-  
-  return {d1: d1, d2: d2, d3: d3, d4: d4, d5: d5, d6: d6};
+function _updateRunCount(obj, count) {
+  obj.find("#stat-runcount").html(count);
 }
 
-function createSamplePlot(data) {
-  $.plot($("#placeholder"), [
-      {
-          data: data.d1,
-          lines: { show: true, fill: true }
-      },
-      {
-          data: data.d2,
-          bars: { show: true }
-      },
-      {
-          data: data.d3,
-          points: { show: true }
-      },
-      {
-          data: data.d4,
-          lines: { show: true }
-      },
-      {
-          data: data.d5,
-          lines: { show: true },
-          points: { show: true }
-      },
-      {
-          data: data.d6,
-          lines: { show: true, steps: true }
-      }
-  ]);
+function _logRuns(obj, data) {
+  var latestRunsDiv = obj.find("#latestRuns").empty();
+  for (var i in data.runLog) {
+    latestRunsDiv.append("<p>" + data.runLog[i].runTimeString + "</p>");
+  }
+}
+
+function _plotRuns(runLog) {
+  var data = [];
+  for (var i in runLog) {
+    data.push([Number(runLog[i].runTime), 1]);
+  }
+  $("#graph-runCount").width($("#card-tray").innerWidth() - 50);
+  $.plot($("#graph-runCount"), [{
+    data: data,
+    points: { show: true }
+  }], {
+    xaxis: {
+      mode: "time",
+      timeformat: "%h:%M%p",
+      twelveHourClock: "true"
+    },
+    yaxis: { show: false }
+  });
 }
 
 function requestStudentDetails(cardInfo) {
   var request = cardInfo;
   request.type = "REQUEST_STUDENT_DETAILS";
-  console.log("request", request);
   collab.sendExtendedMessage(request);
   return false;
-}
-
-function createPlot(data) {
-  // TODO
 }

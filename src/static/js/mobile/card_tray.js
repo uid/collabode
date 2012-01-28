@@ -65,13 +65,10 @@ function initCards() {
   })
   // handle clicks
   .click( function() {
-    // TODO: open up an individual page
     details.show({
       cardId: $(this).attr('id'),
       username: $(this).attr('data-username')
     });
-    //window.location.href = 'student.php?id=' + 
-    //encodeURIComponent($(this).attr('data-username'));
   });
 
   // make each card draggable
@@ -88,6 +85,26 @@ function initCards() {
     resort: true,
     scale: false
     });*/
+}
+
+function addNewCard(data) {
+  // TODO: Figure out a better way to do this!  This isn't right =(
+  $('<div class="card" data-username="'+ data.user.username + '">' +
+    '<div class="badge"></div>'+
+    '<img src="'+ data.user.photo +'" class="photo">' +
+    '<div class="nametag">' + data.user.username + '</div></div>')
+    .assignCardId($(this), $('.card').length)
+    .click( function() {
+      details.show({
+        cardId: $(this).attr('id'),
+        username: $(this).attr('data-username')
+      });
+    })
+    .draggable({
+      containment: 'window',
+      stack: '.card'
+    })
+    .appendTo('#card-tray');
 }
 
 function resetCards() {

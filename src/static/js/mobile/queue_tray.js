@@ -90,7 +90,7 @@ function qCardId(cardId) {
   return "#{0}q".format(cardId);
 }
 
-function _showStudentInfo(e) {  
+function _showStudentInfo(e) {
   details.show({
     cardId: $(this).attr('id'),
     username: $(this).attr('data-username')

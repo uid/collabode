@@ -30,7 +30,7 @@ function _onRequestStudentDetails(padId, userId, connectionId, msg) {
   var user = sqlobj.selectSingle("MBL_USERS", {
     username: msg.username
   });
-  var userRunLog = sqlobj.selectMulti("MBL_RUNLOG", {userId: userId});
+  var userRunLog = sqlobj.selectMulti("MBL_RUNLOG", {username: msg.username});
   var reply = {
       type: "STUDENT_DETAILS",
       cardId: msg.cardId,
@@ -59,15 +59,20 @@ function doMobileLogin(userId, username) {
       username: username
     }, { 
       photo: Application.getUserPhoto(username),
-      lastActiveDate: new Date()
+      lastActiveDate: new Date
     });
   if (numUpdated != 1) {
     sqlobj.insert("MBL_USERS", {
       userId: userId,
       username: username,
       photo: Application.getUserPhoto(username),
-      lastActiveDate: new Date()
+      lastActiveDate: new Date
     });
+    //connectionId: 285223463783
+    /*collab_server.sendConnectionExtendedMessage("does it really matter", {
+      type: "USER_JOINED",
+      user: sqlobj.selectSingle("MBL_USERS", {userId: userId, username: username})
+    });*/
   }
 }
 
@@ -76,14 +81,16 @@ function doMobileLogin(userId, username) {
  */
 function updateRunStats(userId) {
   var userObj = sqlobj.selectSingle("MBL_USERS", {userId: userId});
-  System.out.println("userObj runcount: " + userObj.runCount);
   // Increment the run count
   sqlobj.update("MBL_USERS", { userId: userId }, {
     runCount: userObj.runCount + 1
   });
   // Log the run timestamp
+  var date = new Date();
   sqlobj.insert("MBL_RUNLOG", { 
     userId: userId,
-    runTime: new Date().toString()
+    username: userObj.username,
+    runTime: '' + (Number(date.getTime())-18000),
+    runTimeString: date.toString()
   });
 }

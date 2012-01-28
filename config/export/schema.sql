@@ -127,7 +127,7 @@ CREATE TABLE "pro_domains" (
 CREATE TABLE MBL_USERS (
   "userId" varchar(63) NOT NULL,
   "username" varchar(63) NOT NULL,
-  "photo" varchar(100) NOT NULL,
+  "photo" varchar(128) NOT NULL,
   "lastActiveDate" timestamp NOT NULL,
   "runCount" int default 0 NOT NULL,
   PRIMARY KEY ("userId"),
@@ -137,6 +137,8 @@ CREATE TABLE MBL_USERS (
 CREATE TABLE MBL_RUNLOG (
   "id" int generated always as identity NOT NULL,
   "userId" varchar(63) NOT NULL,
-  "runTime" varchar(100) NOT NULL,
+  "username" varchar(63) NOT NULL,
+  "runTime" varchar(128) NOT NULL,
+  "runTimeString" varchar(100) NOT NULL,
   PRIMARY KEY ("id")
 );

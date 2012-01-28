@@ -75,6 +75,8 @@ function setExtendedMessages() {
   collab.setOnExtendedMessage("ADD_TO_QUEUE", _addToQueue);
   // Request for student information
   collab.setOnExtendedMessage("STUDENT_DETAILS", _showStudentDetails);
+  // Login of a new user
+  //collab.setOnExtendedMessage("USER_JOINED", _userJoined);
 }
 
 function _addToQueue(msg) {
@@ -83,7 +85,12 @@ function _addToQueue(msg) {
 
 function _showStudentDetails(msg) {
   queue.highlightCard(msg.cardId);
-  details.display(msg);
+  details.data = msg;
+  details.display();
+}
+
+function _userJoined(msg) {
+  cardTray.addNewCard(msg);
 }
 
 /************************
