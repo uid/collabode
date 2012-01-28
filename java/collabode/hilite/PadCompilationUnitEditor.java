@@ -33,6 +33,10 @@ class PadCompilationUnitEditor extends CompilationUnitEditor implements JavaPadR
         return config;
     }
     
+    @Override protected void selectionChanged() {
+        // XXX Override to avoid getPreferenceStore() and getSelectionProvider().getSelection()
+    }
+    
     public void reconciled(JavaPadDocument doc, final CompilationUnit ast) {
         // the SemanticHighlightingReconciler added itself as an IJavaReconcilingListener
         PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() {
