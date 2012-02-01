@@ -4,7 +4,7 @@
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry kind="src" path="java"/>
 	<classpathentry kind="src" output="inject-bin" path="inject"/>
-	<classpathentry kind="lib" path="lib/appjet-eth-dev.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/appjet-eth-dev.jar"/>
 	<classpathentry kind="lib" path="lib/hsqldb.jar"/>
 	<classpathentry kind="lib" path="lib/turkit.jar"/>
 	<classpathentry kind="output" path="bin"/>
