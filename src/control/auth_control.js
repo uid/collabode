@@ -89,7 +89,8 @@ function external_login(username, signature, destination) {
     sig.initVerify(key);
     sig.update(new java.lang.String(username + '@' + request.clientAddr).getBytes());
     if (sig.verify(Base64.decode(decodeURIComponent(signature)))) {
-      do_login('r', username, destination);
+      var priv = appjet.config.authPrivileged && (appjet.config.authPrivileged.split(',').indexOf(username) > -1);
+      do_login(priv ? 'u' : 'r', username, destination);
     } else {
       renderHtml("editor/login.ejs", { failure: "External authentication signature verification failed" });
     }
