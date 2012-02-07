@@ -200,6 +200,9 @@ body.nosidebar #padeditor { margin-left: 0; }
 #runtests.enabled {
     background: url(/static/img/eclipse/jdt.junit.obj.tsuiterun.gif) no-repeat center center;
 }
+#clone.enabled {
+    background: url(/static/img/eclipse/pde.ui.lcl.clone_el.gif) no-repeat center center;
+}
 
 #editorcontainerbox {
   border-left: 1px solid #c4c4c4; border-right: 1px solid #c4c4c4;

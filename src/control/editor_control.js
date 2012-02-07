@@ -218,7 +218,10 @@ function _render_file(project, file, lineno, projectfiles) {
     project: project,
     file: file,
     projectfiles: projectfiles,
-    extension: extension
+    extension: extension,
+    user_has_acl: function(permission) {
+      return auth.has_acl(project.getName(), file.getName(), getSession().userId, permission);
+    }
   };
   data.additions = function() {
     return renderFirstTemplateAsString([ "editor/add/" + extension + ".ejs" ], data);

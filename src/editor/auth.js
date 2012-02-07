@@ -52,7 +52,7 @@ function has_acl(projectname, filename, userId, permission, restrictionFunction)
   var permitting = null;
   var allowed = acl(Workspace.accessProject(projectname)).some(function(acl) {
     permitting = acl;
-    if ((acl.userId != ANYONE) && (acl.userId != userId)) { return false };
+    if ((acl.userId != ANYONE) && (acl.userId != userId)) { return false; }
     if (acl.path.length > filename.length) {
       return (acl.path.indexOf(filename) == 0) && (permission == READ);
     } else {
