@@ -30,6 +30,14 @@ public class ChangeSetOpIterator implements Iterator<ChangeSetOp> {
     private Queue<ChangeSetOp> rest = new LinkedList<ChangeSetOp>();
     
     /**
+     * Create an empty changeset.
+     */
+    public ChangeSetOpIterator(int revision, IDocument doc) {
+        this.revision = revision;
+        length = doc.getLength();
+    }
+    
+    /**
      * Create a changeset for presentation changes.
      */
     public ChangeSetOpIterator(int revision, IDocument doc, TextPresentation presentation, String namespace) {
