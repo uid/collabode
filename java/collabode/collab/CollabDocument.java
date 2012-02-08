@@ -258,6 +258,7 @@ public class CollabDocument implements Iterable<PadDocument> {
      * Convert local edits to a union changeset.
      */
     public ChangeSetOpIterator localTextEditToUnionChangeset(PadDocument doc, TextEdit edit) {
+        if (edit == null) { return new ChangeSetOpIterator(revision, union); }
         TextEditModifier mod = new TextEditModifier(localMaps.get(doc));
         edit.accept(mod);
         return new ChangeSetOpIterator(revision, union, mod.result());
