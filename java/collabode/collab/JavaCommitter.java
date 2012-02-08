@@ -47,6 +47,8 @@ public class JavaCommitter extends WorkingCopyOwner implements CollabListener, R
                 jme.printStackTrace(); // XXX
             } catch (InterruptedException ie) {
                 ie.printStackTrace(); // XXX
+            } catch (Exception e) {
+                e.printStackTrace(); // XXX ... and madly soldier on
             }
         }
     }
