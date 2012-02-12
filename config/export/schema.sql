@@ -135,10 +135,12 @@ CREATE TABLE MBL_USERS (
 );
 
 CREATE TABLE MBL_RUNLOG (
-  "id" int generated always as identity NOT NULL,
+  "id" int generated always as identity NOT NULL,  
+  "padId" varchar(128) NOT NULL,
   "userId" varchar(63) NOT NULL,
   "username" varchar(63) NOT NULL,
   "runTime" varchar(128) NOT NULL,
   "runTimeString" varchar(100) NOT NULL,
+  "runException" varchar(128) default NULL,
   PRIMARY KEY ("id")
 );

@@ -62,8 +62,11 @@ serverhandlers.tasks.updateAnnotations = function(username, file, type, annotati
 serverhandlers.tasks.runningStateChange = function(id, file, state) {
     workspace.taskRunningStateChange(id, file, state);
 };
-serverhandlers.tasks.runningOutput = function(id, file, text, attribs) {
-    workspace.taskRunningOutput(id, file, text, attribs);
+serverhandlers.tasks.runningOutput = function(id, file, text, streamType, attribs) {
+    workspace.taskRunningOutput(id, file, text, streamType, attribs);
+};
+serverhandlers.tasks.runningErrorOutput = function(id, file, text, attribs) {
+  workspace.taskRunningErrorOutput(id, file, text, attribs);
 };
 serverhandlers.tasks.testResult = function(project, test, result) {
     workspace.taskTestResult(project, test, result);

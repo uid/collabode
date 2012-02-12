@@ -4,6 +4,13 @@ function StudentPanel() {
   this.cardInfo = null;
   this.data = null;
   
+  this.stream = EventStream(this);
+  this.runPlot = PlotRenderer(this);
+  
+  this.getEventStream = function() {
+    return this.stream;
+  }
+    
   this.updateTimer = null;
   this.show = function(cardInfo) {
     // This function only makes the request for the student data,
@@ -17,15 +24,31 @@ function StudentPanel() {
   
   this.display = function() {
     var user = this.data.user;
+    
+    // Toggle off any buttons that may show as active
+    // TODO: make this better
+    $('a.filter').removeClass('ui-btn-active');
+    
     // Set the user's information and photo
     this.obj.find("#username").text(user.username);
     this.obj.find("#photo").attr('src', user.photo);
     
+    // Bind scroll events to the stream.
+    // XXX: This is hardcoded and hacked up.  Should be fixed =/
+    //$("#student-details-panel-left").width($("#photo").width());
+    $("#student-details-panel-left").width(300);
+
+    this.stream.updateStream(user.username);
+    
     // Create figures
     _updateRunCount(this.obj, user.runCount);
+    //_updateExceptionsList(this.obj, this.data.runLog);
     //_logRuns(this.obj, this.data);
-    _plotRuns(this.data.runLog);
-    this.updateTimer = setTimeout(this.show, 500, this.cardInfo);
+    this.runPlot.update(this.data.runLog);
+    
+    // TODO: Uncomment this when we want continuous polling!!!!
+    //this.updateTimer = setTimeout(this.show, 1500, this.cardInfo);
+    
     // Show the panel
     this.obj.fadeIn(200);
     return this;
@@ -39,7 +62,14 @@ function StudentPanel() {
     // Unhighlight the card in the queue
     // TODO: also unhighlight the card in the card tray
     queue.unhighlightSelectedCard();
+    
+    // TODO: don't hard-code this, figure out which layout was active last
+    $('#page-layout').addClass('ui-btn-active');
     return this;
+  }
+  
+  this.showSimilarExceptions = function(msg) {
+    this.stream.showUsersWithSimilarExceptions(msg);
   }
   
   this.obj.find('#student-details-button-close')
@@ -57,39 +87,55 @@ function StudentPanel() {
   return this;
 }
 
+/*=======================
+ * Functions to create various types of graphs and tables
+ * for the student details panel
+ */
 function _updateRunCount(obj, count) {
   obj.find("#stat-runcount").html(count);
+}
+
+function _updateExceptionsList(obj, runLog) {
+  var exceptionsDiv = obj.find("#console-errors");
+  _sizeToPanelWidth(exceptionsDiv);
+  exceptionsDiv.empty();
+  for (var i in runLog) {
+    if (runLog[i].runException != null) {
+      exceptionsDiv.append("<p class='exception'>" + runLog[i].runException + "</p>");
+    }
+  }
+  $('p.exception').click(function() {
+    //requestSimilarExceptions($(this).text());
+  });
 }
 
 function _logRuns(obj, data) {
   var latestRunsDiv = obj.find("#latestRuns").empty();
   for (var i in data.runLog) {
-    latestRunsDiv.append("<p>" + data.runLog[i].runTimeString + "</p>");
+    latestRunsDiv.append('<p>' + data.runLog[i].runTimeString + '</p>');
   }
 }
 
-function _plotRuns(runLog) {
-  var data = [];
-  for (var i in runLog) {
-    data.push([Number(runLog[i].runTime), 1]);
-  }
-  $("#graph-runCount").width($("#card-tray").innerWidth() - 50);
-  $.plot($("#graph-runCount"), [{
-    data: data,
-    points: { show: true }
-  }], {
-    xaxis: {
-      mode: "time",
-      timeformat: "%h:%M%p",
-      twelveHourClock: "true"
-    },
-    yaxis: { show: false }
-  });
+function _sizeToPanelWidth(obj) {
+  //obj.width(obj.parent().innerWidth());
+  obj.width(300);
 }
 
+/*=======================
+ * Functions to request other information
+ */
 function requestStudentDetails(cardInfo) {
   var request = cardInfo;
   request.type = "REQUEST_STUDENT_DETAILS";
   collab.sendExtendedMessage(request);
+  return false;
+}
+
+function requestSimilarExceptions(streamEventId, exception) {
+  collab.sendExtendedMessage({
+      type: "REQUEST_EXCEPTION_TYPE",
+      streamEventId: streamEventId,
+      exceptionType: exception
+  });
   return false;
 }

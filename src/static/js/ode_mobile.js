@@ -10,6 +10,10 @@ var details;
 /* Global communication channel */
 var collab;
 
+$(window).bind("orientationchange"), function(e) {
+  alert(jQuery.event.special.orientationchange.orientation());
+}
+
 $(document).ready(function() {
   var ace = {
     setProperty: function() {},
@@ -43,13 +47,6 @@ $(document).ready(function() {
   
   setExtendedMessages();
   
-  // XXX this is an example
-  /*$("#details").click(function() {
-    console.log("sending MOBILE_C2S");
-    collab.sendExtendedMessage({ type: "MOBILE_C2S", foo: 42 });
-    return false;
-  });*/
-  
   // Initialize the mobile application
   init();
   // XXX: This is for testing and prototype purposes only;
@@ -58,13 +55,15 @@ $(document).ready(function() {
 });
 
 /***************************************
- * Message boxes
+ * Messages
  */
 var NOT_IMPLEMENTED = "Not implemented";
 
 /***************************************
  * Definitions of what to do upon receipt of server-to-client 
- * messages
+ * messages.  Right now (?) this function sets all messages sent 
+ * to the mobile application and passes the information to each
+ * subsection of the app.
  */
 function setExtendedMessages() {
   // XXX: this one is an example
@@ -77,6 +76,7 @@ function setExtendedMessages() {
   collab.setOnExtendedMessage("STUDENT_DETAILS", _showStudentDetails);
   // Login of a new user
   //collab.setOnExtendedMessage("USER_JOINED", _userJoined);
+  collab.setOnExtendedMessage("FILTERBY_EXCEPTION_TYPE", _showFilterByExceptionType);
 }
 
 function _addToQueue(msg) {
@@ -91,6 +91,10 @@ function _showStudentDetails(msg) {
 
 function _userJoined(msg) {
   cardTray.addNewCard(msg);
+}
+
+function _showFilterByExceptionType(msg) {
+  details.showSimilarExceptions(msg);
 }
 
 /************************
@@ -231,7 +235,7 @@ var fixgeometry = function() {
 
 // MAIN INIT FUNCTION
 function init() {
-
+  
   $(document).bind("mobileinit", function(){
     $.mobile.touchOverflowEnabled = true;
   });
@@ -248,7 +252,13 @@ function init() {
   cardw = $('.card').width();
   cardh = $('.card').height();
   
-  initFilters();
+  // TODO: reenable? Recode?
+  //initFilters();
+  $('a.filter').click(function() {    
+    $(this).siblings().removeClass('ui-btn-active');
+    $(this).addClass('ui-btn-active');
+    details.hide();
+  })
   
   $('#queue-toggle').click( handleQueueToggle ); // 'Help Queue' button
   

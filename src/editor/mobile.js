@@ -12,6 +12,7 @@ jimport("java.lang.System");
 function onStartup() {
   collab_server.setExtendedHandler("REQUEST_ADD_TO_QUEUE", _onAddToQueue);
   collab_server.setExtendedHandler("REQUEST_STUDENT_DETAILS", _onRequestStudentDetails);
+  collab_server.setExtendedHandler("REQUEST_EXCEPTION_TYPE", _onRequestExceptions);
 }
 
 /**************************
@@ -40,6 +41,43 @@ function _onRequestStudentDetails(padId, userId, connectionId, msg) {
       runLog: userRunLog
   };
   //reply.user.runLog = userRunLog;
+  collab_server.sendConnectionExtendedMessage(connectionId, reply);
+}
+
+/**
+ * Respond to a client request for a list of distinct users who have
+ * encountered a particular exception type. 
+ * @param padId
+ * @param userId
+ * @param connectionId
+ * @param msg
+ */
+function _onRequestExceptions(padId, userId, connectionId, msg) {
+  var exceptionEntries = sqlobj.selectMulti("MBL_RUNLOG", {
+    runException: msg.exceptionType
+  });
+  
+  // Identify a unique list of users by searching through all logs that 
+  // match this exception and creating a list of distinct elements
+  // XXX: The Array object be sent over the collab channel (?)
+  var userSet = new Array();
+  var userList = [];
+  for (var i in exceptionEntries) {
+    //System.out.println(exceptionEntries[i].username + " " + exceptionEntries[i].runException);
+    var username = exceptionEntries[i].username;
+    if (userSet[username] == null) {
+      userSet[username] = 1;
+      userList.push(username);
+    }
+  }
+  
+  // Generate the server-to-client reply
+  var reply = {
+      type: "FILTERBY_EXCEPTION_TYPE",
+      streamEventId: msg.streamEventId,
+      exceptionType: msg.exceptionType,
+      users: userList
+  }
   collab_server.sendConnectionExtendedMessage(connectionId, reply);
 }
 
@@ -79,7 +117,7 @@ function doMobileLogin(userId, username) {
 /**
  * Update the runs-based statistics
  */
-function updateRunStats(userId) {
+function updateRunStats(padId, userId) {
   var userObj = sqlobj.selectSingle("MBL_USERS", {userId: userId});
   // Increment the run count
   sqlobj.update("MBL_USERS", { userId: userId }, {
@@ -87,10 +125,38 @@ function updateRunStats(userId) {
   });
   // Log the run timestamp
   var date = new Date();
-  sqlobj.insert("MBL_RUNLOG", { 
+  sqlobj.insert("MBL_RUNLOG", {
+    padId: padId,
     userId: userId,
     username: userObj.username,
-    runTime: '' + (Number(date.getTime())-18000),
+    runTime: '' + (Number(date.getTime())-18000000), // convert to EST
     runTimeString: date.toString()
   });
 }
+
+/**
+ * Identify whether an exception is being written to the console
+ */
+function interceptException(padId, text) {  
+  var javaLangIndex = text.indexOf("java.lang.");
+  var exceptionIndex = text.indexOf("Exception", javaLangIndex);
+  var exception = null;
+
+  if (javaLangIndex >= 0 && exceptionIndex > javaLangIndex) {
+    exception = text.substring(javaLangIndex, 
+        exceptionIndex + "Exception".length);
+  } 
+  
+  if (exception != null) {
+    // Find the latest run log entry and update it.
+    // TODO: Is there a better way to do this?
+    var runLog = sqlobj.selectMulti("MBL_RUNLOG", { padId: padId }, {
+      //orderBy: "-runException",
+      //limit: 1
+    });
+    sqlobj.update("MBL_RUNLOG", { id: runLog[runLog.length-1].id }, {
+      runException: exception
+    });
+  }
+}
+

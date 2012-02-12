@@ -146,37 +146,227 @@ div#queue-tray {
 #student-details-panel {
 	z-index: 20;
 	position: absolute;
-	top: 0px;
+	top: -15px;
 	left: 0px;
 	width: 100%;
 	overflow: auto;
 	> img {
 		max-height: 100px;
 	}
-	#placeholder {
-		width: 400px;
-		height: 400px;
-		margin: 0 auto;
-		text-align: center;
-	}
-	#graph-runCount {
-		width: 400px;
-		height: 40px;
-		margin: 0 auto;
-	}
-	#stats-table-div {
-		#stats-table {
-			tr {
-				td {
-					padding: 5px;
-					&.stat-label {
-						font-weight: bold;
+	#student-details-panel-content {
+ 		display: box;
+ 		-webkit-box-align: stretch;
+ 		-webkit-box-orient: horizontal;
+ 		
+ 		.container-left {
+ 			-webkit-box-flex: 1;
+ 		}
+ 		.container-right {
+ 			-webkit-box-flex: 1;
+ 		}
+	 	#graph-runCount {
+			width: 400px;
+			height: 40px;
+			margin: 0 auto;
+		}
+		#stats-table-div {
+			#stats-table {
+				tr {
+					td {
+						padding: 5px;
+						&.stat-label {
+							font-weight: bold;
+						}
 					}
 				}
 			}
 		}
+		#console-errors {
+			width: 400px;
+			height: 200px;
+			margin: 0 auto;
+			text-align: left;
+			color: red;
+			overflow: scroll;
+			p {
+				&.exception {
+				  cursor: pointer;
+				  text-decoration: underline;
+				}
+			}
+		}
+	}
+	#student-details-panel-left {
+		padding-right: 3px;
+	}
+	#student-details-panel-right {
+		position: relative;
+		border-left: 3px solid black;
+		height: 850px;
+		overflow: hidden;
+		.overlay {
+			position: absolute;
+			left: 0px;
+			height: 20px;
+	 		width: 100%;
+	 		z-index: 100;
+		}
+		#student-details-panel-right-overlay-top {
+			top: 0px;
+	 		background: -webkit-gradient(linear, left top, left bottom, 
+	 			color-stop(0%,rgba(0,0,0,0.5)), 
+	 			color-stop(100%, rgba(0,0,0,0.0)));
+	 	}
+	 	#student-details-panel-right-overlay-bottom {
+			bottom: 0px;
+			background: -webkit-gradient(linear, left bottom, left top, 
+	 			color-stop(0%,rgba(0,0,0,0.5)), 
+	 			color-stop(100%, rgba(0,0,0,0.0)));
+	 	}
+		#student-details-panel-right-content {
+			position: absolute;
+			top: 0px;
+			left: 0px;
+			height: inherit;
+			width: 96%;
+			overflow: visible;
+			.event {
+				width: inherit;
+				background: url("../img/mobile/smalldot.png") #C0C0C0 no-repeat center left;
+				border: 1px solid #666;
+				border-left: none;
+				padding: 4px 4px 4px 6px;
+				margin-bottom: 3px;
+				font-size: 12px;
+			}
+			.exception {
+				background-color: #EBCCCC;
+				.exceptionName {
+					color: red;
+					cursor: pointer;
+					text-decoration: underline;
+				}
+				img {
+					&.tiny {
+						height: 20px;
+						margin-right: 3px;
+						border: 1px solid @darkgray;
+					}
+				}
+			}
+			.notEvent {
+				background: none;
+				border: none;
+			}
+		}
 	}
 }
+
+
+/* hbox and vbox classes */
+ 
+.hbox {
+	display: -webkit-box;
+	-webkit-box-orient: horizontal;
+	-webkit-box-align: stretch;
+ 
+	display: -moz-box;
+	-moz-box-orient: horizontal;
+	-moz-box-align: stretch;
+ 
+	display: box;
+	box-orient: horizontal;
+	box-align: stretch;
+}
+ 
+.hbox > * {
+	-webkit-box-flex: 0;
+	-moz-box-flex: 0;
+	box-flex: 0;
+	display: block;
+}
+ 
+.vbox {
+	display: -webkit-box;
+	-webkit-box-orient: vertical;
+	-webkit-box-align: stretch;
+ 
+	display: -moz-box;
+	-moz-box-orient: vertical;
+	-moz-box-align: stretch;
+ 
+	display: box;
+	box-orient: vertical;
+	box-align: stretch;
+}
+ 
+.vbox > * {
+	-webkit-box-flex: 0;
+	-moz-box-flex: 0;
+	box-flex: 0;
+	display: block;
+}
+ 
+.spacer {
+	-webkit-box-flex: 1;
+	-moz-box-flex: 1;
+	box-flex: 1;
+}
+ 
+.reverse {
+	-webkit-box-direction: reverse;
+	-moz-box-direction: reverse;
+	box-direction: reverse;
+}
+ 
+.boxFlex0 {
+	-webkit-box-flex: 0;
+	-moz-box-flex: 0;
+	box-flex: 0;
+}
+ 
+.boxFlex1, .boxFlex {
+	-webkit-box-flex: 1;
+	-moz-box-flex: 1;
+	box-flex: 1;
+}
+ 
+.boxFlex2 {
+	-webkit-box-flex: 2;
+	-moz-box-flex: 2;
+	box-flex: 2;
+}
+ 
+.boxGroup1 {
+	-webkit-box-flex-group: 1;
+	-moz-box-flex-group: 1;
+	box-flex-group: 1;
+}
+ 
+.boxGroup2 {
+	-webkit-box-flex-group: 2;
+	-moz-box-flex-group: 2;
+	box-flex-group: 2;
+}
+ 
+.start {
+	-webkit-box-pack: start;
+	-moz-box-pack: start;
+	box-pack: start;
+}
+ 
+.end {
+	-webkit-box-pack: end;
+	-moz-box-pack: end;
+	box-pack: end;
+}
+ 
+.center {
+	-webkit-box-pack: center;
+	-moz-box-pack: center;
+	box-pack: center;
+}
+
 
 /******************
  * Other

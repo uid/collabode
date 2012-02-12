@@ -37,6 +37,13 @@ function CardTray() {
     this.isFilterApplied = true;
   }
   
+  this.filterCards = function(usernames) {
+    $('.card').fadeTo(200, 0.3);
+    for (var i in usernames) {
+      $('.card[data-username="' + usernames[i] + '"]').fadeTo(200, 1.0);
+    }
+  }
+  
   this.resize = function() {
     // Modify the card tray width and scale the card
     // sizes within it to preserve layout

@@ -105,8 +105,8 @@ public class FileRunOwner {
         state(file, "launched");
         
         for (IProcess proc : launch.getProcesses()) {
-            new StreamListener(proc.getStreamsProxy().getOutputStreamMonitor(), file, STDOUT);
-            new StreamListener(proc.getStreamsProxy().getErrorStreamMonitor(), file, STDERR);
+            new StreamListener(proc.getStreamsProxy().getOutputStreamMonitor(), file, "STDOUT", STDOUT);
+            new StreamListener(proc.getStreamsProxy().getErrorStreamMonitor(), file, "STDERR", STDERR);
         }
         
         launches.put(path, launch);
@@ -153,12 +153,14 @@ public class FileRunOwner {
     class StreamListener implements IStreamListener {
         
         private final IFile file;
+        private final String type;
         private final String[][] attribs;
         // some output may already have been generated before we are attached
         private boolean flushed = false;
         
-        StreamListener(IStreamMonitor monitor, IFile file, String[][] attribs) {
+        StreamListener(IStreamMonitor monitor, IFile file, String type, String[][] attribs) {
             this.file = file;
+            this.type = type;
             this.attribs = attribs;
             monitor.addListener(this);
             streamAppended(null, monitor);
@@ -175,7 +177,7 @@ public class FileRunOwner {
         
         private void write(String text) {
             if (text == null || text.length() == 0) { return; }
-            Workspace.scheduleTask("runningOutput", id, file, text, attribs);
+            Workspace.scheduleTask("runningOutput", id, file, text, this.type, attribs);
         }
     }
 }

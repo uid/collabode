@@ -403,7 +403,7 @@ function _onRunRequest(padId, userId, connectionId, msg) {
     });
     break;
   case 'launch':
-    mobile.updateRunStats(userId);
+    mobile.updateRunStats(padId, userId);
     owner.run(filename);
     break;
   case 'terminate':
@@ -477,7 +477,10 @@ function taskRunningStateChange(id, file, state) {
   });
 }
 
-function taskRunningOutput(id, file, text, attribs) {
+function taskRunningOutput(id, file, text, streamType, attribs) {
+  if (streamType.equals("STDERR")) {    
+    mobile.interceptException(_runningPadIdFor(id, file), text);
+  }
   model.accessPadGlobal(_runningPadIdFor(id, file), function(pad) {
     collab_server.appendPadText(pad, text, attribs.map(function(a) { return a.slice(); }));
   });
