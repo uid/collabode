@@ -22,8 +22,8 @@
 
   <div data-role="header" id="header">
     <div data-role="controlgroup" data-type="horizontal" id="filterBar">
-      <a data-role="button" class="filter" id="page-layout">Class layout</a>
-      <a data-role="button" class="filter ui-disabled" id="page-classstats">Class Statistics</a>
+      <a data-role="button" class="filter ui-btn-active" id="page-layout">Class layout</a>
+      <a data-role="button" class="filter" id="page-classsummary">Class Statistics</a>
     </div>
     <a data-role="button" data-inline="true" class="ui-btn-left" id="queue-toggle">Hide Queue</a>
     <!--<a data-role="button" data-inline="true" class="ui-btn-right" id="details">Apply selected filter</a>-->
@@ -38,42 +38,9 @@
         <%= helpers.renderPartial("mobile/card", { user: users[i] }) %>
       <% } %>
       
-      <!-- Student details overlay -->
-      <div id="student-details-panel">
-		<div data-role="content" data-theme="c" id="student-details-panel-content" class="hbox">
-          <div id="student-details-panel-left" class="boxFlex0">
-            <div data-role="controlgroup" data-type="horizontal" id="filterBar">
-              <a data-role="button" class="" id="student-details-button-close">Close</a>
-              <a data-role="button" class="" id="student-details-button-remove">Mark helped</a>
-            </div>
-           <!--      
-		    <a href="" data-role="button" data-inline="true" data-theme="a" id="student-details-button-remove">Remove from queue</a>
-		    <a href="" data-role="button" data-inline="true" data-theme="a" class="ui-btn-right" id="student-details-button-close">Close</a>
-           -->
-		    <h2 id="username">username</h2>
-		    <img src="static/img/mobile/placeholder-photo.png" id="photo">
-
-  	        <div id="stats-table-div">
-              <table id="stats-table">
-	            <tr>
-	              <td class="stat-label">Number of runs</td>
-	              <td id="stat-runcount"></td>
-                </tr>
-              </table>
-            </div>
-            <!--<div id="latestRuns"></div>-->
-		    <div id="graph-runCount"></div>
-		    <div id="console-errors"></div>
-		    <!--<div id="console-output"></div>-->
-		  </div>
-		  
-          <div id="student-details-panel-right" class="boxFlex">
-          	<!--<div id="student-details-panel-right-overlay-top" class="overlay"></div>
-          	<div id="student-details-panel-right-overlay-bottom" class="overlay"></div>-->
-          	<div id="student-details-panel-right-content" class="boxFlex"></div>
-          </div>
-		</div>
-	  </div>
+      <%= helpers.renderPartial("mobile/student_panel", {}) %>
+	  <%= helpers.renderPartial("mobile/class_summary", {}) %>
+	  
     </div>
   </div>
 </div>

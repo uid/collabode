@@ -112,6 +112,7 @@ function includeMobileJs() {
   includeJs("mobile/student_panel.js");
   includeJs("mobile/plotRenderer.js");
   includeJs("mobile/eventStream.js");
+  includeJs("mobile/class_summary.js");
 }
 
 function hideHeader() {

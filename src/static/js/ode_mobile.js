@@ -6,6 +6,7 @@ var cardh;
 var queue;
 var cardTray;
 var details;
+var classSummary;
 
 var myConnectionId;
 
@@ -278,6 +279,7 @@ function init() {
   queue = new QueueTray();
   cardTray = new CardTray();
   details = new StudentPanel().hide();
+  classSummary = new ClassSummary().hide();
   
   //TODO: Replace with stored card sizes; this is a temporary workaround
   cardw = $('.card').width();
@@ -293,6 +295,10 @@ function init() {
     $(this).addClass('ui-btn-active');
     details.hide();
   })
+  
+  $('#page-classsummary').click(function() {
+    classSummary.show();
+  });
   
   $('#queue-toggle').click( handleQueueToggle ); // 'Help Queue' button
   
