@@ -30,7 +30,7 @@ function EventStream(parent) {
   function _hideOverlay($overlay) {
     $overlay.hide();
   }
-  
+
   var contentScroller = new iScroll("student-details-panel-right", {
     hScroll: false,
     hScrollbar: false,
@@ -98,6 +98,10 @@ function EventStream(parent) {
       event.removeClass("event");
     }
     $content.prepend(event);
+    setTimeout(function () {
+      console.log(contentScroller);
+      contentScroller.refresh();
+    }, 0);
   }
   
   var lastEventTime = null;
@@ -140,6 +144,7 @@ function EventStream(parent) {
     default:
       html.append("Successful run");
     }
+    // TODO: don't hardcode this
     html.append(" [<a href='../console/HelloWorld/src/First.java' target='mobile_console'>View console</a>]");
     appendEventToStream(eventClass, eventId, html);
   }

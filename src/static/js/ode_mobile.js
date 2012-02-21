@@ -47,11 +47,23 @@ $(document).ready(function() {
   
   setExtendedMessages();
   
+  // TODO: 1. How to show the jQuery mobile graphic?
+  // TODO: 2. How to make this work more smoothly if the css styles are applied later?
+  //$.mobile.showPageLoadingMsg();
+  
   // Initialize the mobile application
   init();
   // XXX: This is for testing and prototype purposes only;
   // comment out otherwise
-  startRandomEvents();
+  //startRandomEvents();
+});
+
+$(window).load(function() {
+  // Remove the page cover when the page is fully done loading
+  $('#loading-page').fadeOut(200);
+  setTimeout(function() {
+    $('#loading-page').remove(); 
+  }, 210);
 });
 
 /***************************************

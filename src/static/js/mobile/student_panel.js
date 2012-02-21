@@ -7,6 +7,8 @@ function StudentPanel() {
   this.stream = EventStream(this);
   this.runPlot = PlotRenderer(this);
   
+  var pollContinuously = false;
+  
   this.getEventStream = function() {
     return this.stream;
   }
@@ -34,10 +36,11 @@ function StudentPanel() {
     this.obj.find("#photo").attr('src', user.photo);
     
     // Bind scroll events to the stream.
-    // XXX: This is hardcoded and hacked up.  Should be fixed =/
+    // XXX: This is hardcoded.  Should be fixed =/
     //$("#student-details-panel-left").width($("#photo").width());
     $("#student-details-panel-left").width(300);
 
+    // Update the event stream
     this.stream.updateStream(user.username);
     
     // Create figures
@@ -46,8 +49,11 @@ function StudentPanel() {
     //_logRuns(this.obj, this.data);
     this.runPlot.update(this.data.runLog);
     
-    // TODO: Uncomment this when we want continuous polling!!!!
-    //this.updateTimer = setTimeout(this.show, 1500, this.cardInfo);
+    // Poll continuously for updates (otherwise updates will be seen
+    // on refresh)
+    if (pollContinuously) {      
+      this.updateTimer = setTimeout(this.show, 500, this.cardInfo);
+    }
     
     // Show the panel
     this.obj.fadeIn(200);
@@ -55,12 +61,15 @@ function StudentPanel() {
   }
   
   this.hide = function() {
+    
     // Stop polling for updates
     clearTimeout(this.updateTimer);
+    
     // Fade out the panel
     this.obj.fadeOut(200);
+    
     // Unhighlight the card in the queue
-    // TODO: also unhighlight the card in the card tray
+    cardTray.unhighlightSelectedCard(); // XXX: is this necessary if we never actually see it?
     queue.unhighlightSelectedCard();
     
     // TODO: don't hard-code this, figure out which layout was active last

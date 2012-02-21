@@ -44,6 +44,14 @@ function CardTray() {
     }
   }
   
+  this.unhighlightSelectedCard = function() {
+    $('.card.selected')
+      .removeClass('selected')
+      .css('-mox-box-shadow', 'none')
+      .css('-webkit-box-shadow', 'none')
+      .css('box-shadow', 'none');
+  }
+  
   this.resize = function() {
     // Modify the card tray width and scale the card
     // sizes within it to preserve layout
@@ -72,6 +80,8 @@ function initCards() {
   })
   // handle clicks
   .click( function() {
+    $('.card').removeClass("selected");
+    $(this).addClass("selected");
     details.show({
       cardId: $(this).attr('id'),
       username: $(this).attr('data-username')

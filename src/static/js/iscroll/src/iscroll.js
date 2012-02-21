@@ -685,6 +685,12 @@ iScroll.prototype = {
 		var that = this;
 
 		if (e.target != that.scroller) return;
+		
+		// The following three lines were added to try to fix the 
+		// pixellation issue, but it doesn't seem to help
+		var roundedLeftOffset = Math.round($("#" + e.target.getAttribute("id")).position().left);
+		var roundedTopOffset = Math.round($("#" + e.target.getAttribute("id")).position().top);
+		this.scrollTo(roundedLeftOffset, roundedTopOffset, 0);
 
 		that._unbind('webkitTransitionEnd');
 		

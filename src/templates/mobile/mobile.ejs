@@ -12,6 +12,14 @@
 <% helpers.includeJs("ode_mobile.js") %>
 
 <div data-role="page" class="page" id="main">
+
+  <div id="loading-page">
+  	<p>Loading
+  	<br>
+  	<img src="static/img/mobile/ajax-loader.gif">
+  	</p>
+  </div>
+
   <div data-role="header" id="header">
     <div data-role="controlgroup" data-type="horizontal" id="filterBar">
       <a data-role="button" class="filter" id="page-layout">Class layout</a>
@@ -62,7 +70,7 @@
           <div id="student-details-panel-right" class="boxFlex">
           	<!--<div id="student-details-panel-right-overlay-top" class="overlay"></div>
           	<div id="student-details-panel-right-overlay-bottom" class="overlay"></div>-->
-          	<div id="student-details-panel-right-content" class="boxFlex"><!-- Stream --></div>
+          	<div id="student-details-panel-right-content" class="boxFlex"></div>
           </div>
 		</div>
 	  </div>
