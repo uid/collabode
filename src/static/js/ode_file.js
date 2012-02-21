@@ -118,4 +118,11 @@ $(document).ready(function() {
     collab.sendExtendedMessage({ type: "TESTS_RUN_REQUEST" });
     return false;
   });
+  $("#joinqueue").click(function() {
+    collab.sendExtendedMessage({ 
+      type: "JOIN_QUEUE_REQUEST", 
+      userName: clientVars.userName 
+    });
+    return false;
+  });
 });

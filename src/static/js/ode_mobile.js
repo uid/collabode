@@ -7,6 +7,8 @@ var queue;
 var cardTray;
 var details;
 
+var myConnectionId;
+
 /* Global communication channel */
 var collab;
 
@@ -47,9 +49,13 @@ $(document).ready(function() {
   
   setExtendedMessages();
   
-  // TODO: 1. How to show the jQuery mobile graphic?
-  // TODO: 2. How to make this work more smoothly if the css styles are applied later?
-  //$.mobile.showPageLoadingMsg();
+  // Request for this collab server's connection ID so that we have 
+  // it to communicate with the main connection
+  setTimeout(function() {    
+    collab.sendExtendedMessage({ 
+      type: "REQUEST_CONNECTION_ID"
+    });
+  }, 5000); // allow some time for the socket to finish connecting
   
   // Initialize the mobile application
   init();
@@ -78,12 +84,12 @@ var NOT_IMPLEMENTED = "Not implemented";
  * subsection of the app.
  */
 function setExtendedMessages() {
-  // XXX: this one is an example
-  collab.setOnExtendedMessage("MOBILE_S2C", function(msg) {
-    console.log("received MOBILE_S2C", msg);
-  });
+  // HACK: Respond to request for this collab's connectionId
+  collab.setOnExtendedMessage("COLLAB_CONNECTION_ID", _onConnectionId);
   // Request for a card to be added to the help queue
   collab.setOnExtendedMessage("ADD_TO_QUEUE", _addToQueue);
+  collab.setOnExtendedMessage("JOIN_QUEUE", _joinQueue);
+  collab.setOnExtendedMessage("LEAVE_QUEUE", _leaveQueue);
   // Request for student information
   collab.setOnExtendedMessage("STUDENT_DETAILS", _showStudentDetails);
   // Login of a new user
@@ -91,8 +97,21 @@ function setExtendedMessages() {
   collab.setOnExtendedMessage("FILTERBY_EXCEPTION_TYPE", _showFilterByExceptionType);
 }
 
+// XXX: myConnectionId is not currently used, but it's used in mobile.js
+// so I'm saving it here for now just in case.
+function _onConnectionId(msg) {
+  myConnectionId = msg.connectionId;
+}
+
+// Deprecated: used by the prototype
 function _addToQueue(msg) {
   queue.add(msg.cardId);
+}
+function _joinQueue(msg) {
+  queue.add($('.card[data-username="' + msg.username + '"]').attr("id"));
+}
+function _leaveQueue(msg) {
+  queue.remove(msg.cardId);
 }
 
 function _showStudentDetails(msg) {
@@ -267,7 +286,10 @@ function init() {
   // TODO: reenable? Recode?
   //initFilters();
   $('a.filter').click(function() {    
-    $(this).siblings().removeClass('ui-btn-active');
+    /*$(this).siblings().each(function() {
+      $(this).removeClass('ui-btn-active');
+    });*/
+    $('a.filter').removeClass('ui-btn-active');
     $(this).addClass('ui-btn-active');
     details.hide();
   })

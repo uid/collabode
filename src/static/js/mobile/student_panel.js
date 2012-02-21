@@ -73,7 +73,7 @@ function StudentPanel() {
     queue.unhighlightSelectedCard();
     
     // TODO: don't hard-code this, figure out which layout was active last
-    $('#page-layout').addClass('ui-btn-active');
+    //$('#page-layout').addClass('ui-btn-active');
     return this;
   }
   
@@ -89,7 +89,7 @@ function StudentPanel() {
   
   this.obj.find('#student-details-button-remove')
     .click( function() {
-      queue.remove(queue.getSelectedCard().attr('id'));
+      queue.sendRemoveRequest(queue.getSelectedCard().attr('id'));
       details.hide();
     });
   

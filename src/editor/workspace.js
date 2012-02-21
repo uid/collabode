@@ -40,6 +40,7 @@ function onStartup() {
   collab_server.setExtendedHandler("FORMAT_REQUEST", _onFormatRequest);
   collab_server.setExtendedHandler("ORGIMPORTS_REQUEST", _onOrganizeImportsRequest);
   collab_server.setExtendedHandler("ORGIMPORTS_RESOLVED", _onOrganizeImportsResolved);
+  collab_server.setExtendedHandler("JOIN_QUEUE_REQUEST", _onJoinQueueRequest);
 }
 
 function accessDummyPad(userId) {
@@ -475,6 +476,10 @@ function taskRunningStateChange(id, file, state) {
     }
     collab_server.sendPadExtendedMessage(pad, { type: "RUN_STATE_CHANGE", state: state });
   });
+}
+
+function _onJoinQueueRequest(padId, userId, connectionId, msg) {
+  mobile.addToHelpQueue(msg.userName);
 }
 
 function taskRunningOutput(id, file, text, streamType, attribs) {

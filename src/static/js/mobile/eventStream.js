@@ -5,8 +5,8 @@ function EventStream(parent) {
   var botOverlayId = containerId + "-overlay-bottom";
   var $container = $(containerId);
   var $content = $(contentId);
-  var $topOverlay = $(topOverlayId);
-  var $botOverlay = $(botOverlayId);
+  var $topOverlay = $(topOverlayId); // XXX unused
+  var $botOverlay = $(botOverlayId); // XXX unused
   var $parent = parent;
   
   this.username = null;
@@ -14,8 +14,8 @@ function EventStream(parent) {
   /*=====================
    * Initialization code
    */
-  $topOverlay.hide();
-  $botOverlay.hide();  
+  $topOverlay.hide(); // XXX unused
+  $botOverlay.hide(); // XXX unused
   
   /*=====================
    * Helper functions
@@ -24,9 +24,11 @@ function EventStream(parent) {
     return $content;
   }
   
+  // Deprecated
   function _applyOverlay($overlay) {
     $overlay.show();
   }
+  // Deprecated
   function _hideOverlay($overlay) {
     $overlay.hide();
   }
@@ -36,44 +38,6 @@ function EventStream(parent) {
     hScrollbar: false,
     vScrollbar: true
   });
-  
-  /*
-  $container.bind("swipeup", function(e) {
-    var top = parseInt($content.css('top'));
-    
-    // Perform the scroll
-    $content.animate({
-      top: top <= -($content.height()-$container.height())
-          ? -$content.height()
-          : top-500 + "px"
-    });
-    
-    // Add a shadow as an affordance for scrolling to view hidden items 
-    if (parseInt($content.css('top'))-500 < 0) {
-      _applyOverlay($topOverlay);
-    } else {
-      _hideOverlay($topOverlay);
-    }
-  });
-  
-  $container.bind("swipedown", function(e) {
-    var top = parseInt($content.css('top'));
-
-    // Perform the scroll
-    $content.animate({
-      top: top == 0
-          ? "0px" 
-          : Math.min(0,top+500) + "px"
-    });
-    
-    // Add a shadow as an affordance for scrolling to view hidden items 
-    if (Math.min(0,parseInt($content.css('top')))+500 < 0) {
-      _applyOverlay($topOverlay);
-    } else {
-      _hideOverlay($topOverlay);
-    }
-  });
-  */
   
   /*===================
    * Public functions
@@ -99,7 +63,6 @@ function EventStream(parent) {
     }
     $content.prepend(event);
     setTimeout(function () {
-      console.log(contentScroller);
       contentScroller.refresh();
     }, 0);
   }

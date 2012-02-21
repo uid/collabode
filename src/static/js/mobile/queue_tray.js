@@ -58,10 +58,23 @@ function QueueTray() {
     }
   }
   
+  /*
+   * Send a remove request to the server, so that this card 
+   * can be removed from all clients (via the 'remove' function)
+   * and not just from this one.
+   */
+  this.sendRemoveRequest = function(cardId) {
+    collab.sendExtendedMessage({
+      type: "REQUEST_LEAVE_QUEUE",
+      cardId: cardId
+    });
+  }
   this.remove = function(cardId) {
-    console.log("removing", cardId);
     removeQuestionBadge(cardId);
-    $('#'+cardId).fadeOut(200).remove();
+    $('#'+cardId).fadeOut(200);
+    setTimeout(function() {
+      $('#'+cardId).remove();
+    },210);
   }
   
   this.unhighlightSelectedCard = function() {

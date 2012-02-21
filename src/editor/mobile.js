@@ -9,8 +9,12 @@ jimport("collabode.mobile.Application");
 
 jimport("java.lang.System");
 
+var connectionIds = {};
+
 function onStartup() {
-  collab_server.setExtendedHandler("REQUEST_ADD_TO_QUEUE", _onAddToQueue);
+  collab_server.setExtendedHandler("REQUEST_CONNECTION_ID", _onRequestConnectionId);
+  collab_server.setExtendedHandler("REQUEST_ADD_TO_QUEUE", _onAddToQueue); // Deprecated
+  collab_server.setExtendedHandler("REQUEST_LEAVE_QUEUE", _onLeaveQueue);
   collab_server.setExtendedHandler("REQUEST_STUDENT_DETAILS", _onRequestStudentDetails);
   collab_server.setExtendedHandler("REQUEST_EXCEPTION_TYPE", _onRequestExceptions);
 }
@@ -18,12 +22,30 @@ function onStartup() {
 /**************************
  * Message handlers
  */
+function _onRequestConnectionId(padId, userId, connectionId, msg) {
+  connectionIds[connectionId] = true;
+  collab_server.sendConnectionExtendedMessage(connectionId, {
+    type: "COLLAB_CONNECTION_ID",
+    connectionId: connectionId
+  });
+}
+
+// Deprecated
 function _onAddToQueue(padId, userId, connectionId, msg) {
   collab_server.sendConnectionExtendedMessage(connectionId, {
     type: "ADD_TO_QUEUE",
     cardId: msg.cardId,
     username: msg.username
   });
+}
+
+function _onLeaveQueue(padId, userId, connectionId, msg) {
+  for (var connectionId in connectionIds) {
+    collab_server.sendConnectionExtendedMessage(connectionId, {
+      type: "LEAVE_QUEUE",
+      cardId: msg.cardId
+    });
+  }
 }
 
 function _onRequestStudentDetails(padId, userId, connectionId, msg) {
@@ -160,3 +182,14 @@ function interceptException(padId, text) {
   }
 }
 
+/**
+ * Add a user to the help queue
+ */
+function addToHelpQueue(username) {
+  for (var connectionId in connectionIds) {
+    collab_server.sendConnectionExtendedMessage(connectionId, {
+      type: "JOIN_QUEUE",
+      username: username
+    });
+  }
+}
