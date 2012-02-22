@@ -1,0 +1,28 @@
+<% helpers.setHtmlTitle("History") %>
+<% helpers.addBodyClass("fullwidth") %>
+<% helpers.addBodyClass("nosidebar") %>
+<% helpers.includeCss("editor_ejs.css") %>
+
+<div id="editorpage">
+
+<%= helpers.renderPartial("docbar", { project: project.getName(), file: "History" }) %>
+
+<div id="padmain">
+  <div id="padeditor">
+    <div id="wizardcontainerbox" style="overflow:visible">
+      <% pads.forEach(function(pad) { %>
+     	<h2><%= pad.resource.getFullPath().toString() %></h2>
+     	<% pad.revisions.forEach(function(rev) { %>
+     	  <p><a href="/version:<%= whoId %><%= pad.resource.getFullPath().toString() %>:<%= rev.revision %>" target="_blank">
+     	  	<%= rev.revision %>
+     	  	<%= rev.date.getHours() %>:<%= rev.date.getMinutes() %>:<%= rev.date.getSeconds() %>+<%= rev.date.getMilliseconds() %>
+     	  	<%= rev.author %>
+     	  </p></a>
+     	  <span style="font-family: Consolas, Menlo, monospace; font-size: 14px;"><%= toHTML(rev.changeset).replace(/ /g, '&#x02fd;') %></span>
+     	<% }); %>
+      <% }); %>
+    </div>
+  </div>
+</div>
+
+</div>

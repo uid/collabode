@@ -9,6 +9,7 @@ import("control.auth_control");
 import("control.clone_control");
 import("control.console_control");
 import("control.editor_control");
+import("control.history_control");
 import("control.mobile_control");
 import("control.stats_control");
 import("control.turk_control");
@@ -124,7 +125,8 @@ function handlePath() {
     [/^\/login()(\/.*)$/, auth_control.render_login],
     ['/logout', auth_control.logout],
     [_file('turk:([\\w]+)'), turk_control.render_task],
-    [/^\/frame%22([\s\S]*?)%22(\/.*)$/, turk_control.render_framed] // XXX anyone can frame us?
+    [/^\/frame%22([\s\S]*?)%22(\/.*)$/, turk_control.render_framed], // XXX anyone can frame us?
+    [_file('replay:([\\w.]+):([\\w.]+)'), history_control.render_replay] // XXX completely unsafe!
   ]);
   noauth.POST.addLocations([
     [/^\/login(\/.*)$/, auth_control.login]
@@ -188,6 +190,9 @@ function handlePath() {
     [_file('delacl:([\\w\\.]+)'), r(editor_control.delete_acl, auth.OWNER, 1)],
     [_file('knockout:([\\w,.\\[;]+)"([\\s\\S]*)"'), r(turk_control.create_knockout, auth.READ, 2, 'clones')],
     ['/', u(editor_control.create_project)],
+    [_proj('history:([\\w.]+)'), u(history_control.render_history)],
+    [_file('version:([\\w.]+)'), u(history_control.render_version)],
+    [/^\/padhistory:(.*)$/, u(history_control.render_pad_history)],
     [_proj(), r(editor_control.modify_path, auth.OWNER)],
     [_file(), r(editor_control.modify_path, auth.OWNER)]
   ]);
