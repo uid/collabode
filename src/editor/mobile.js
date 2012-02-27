@@ -202,7 +202,7 @@ function updateRunStats(padId, userId) {
 /**
  * Identify whether an exception is being written to the console
  */
-function interceptException(padId, text) {  
+function interceptException(padId, text) {
   var javaLangIndex = text.indexOf("java.lang.");
   var exceptionIndex = text.indexOf("Exception", javaLangIndex);
   var exception = null;

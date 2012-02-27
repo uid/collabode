@@ -41,6 +41,9 @@ function onStartup() {
   collab_server.setExtendedHandler("ORGIMPORTS_REQUEST", _onOrganizeImportsRequest);
   collab_server.setExtendedHandler("ORGIMPORTS_RESOLVED", _onOrganizeImportsResolved);
   collab_server.setExtendedHandler("JOIN_QUEUE_REQUEST", _onJoinQueueRequest);
+  
+  // for replays
+  collab_server.setExtendedHandler("REPLAY", _onReplay);
 }
 
 function accessDummyPad(userId) {
@@ -489,4 +492,22 @@ function taskRunningOutput(id, file, text, streamType, attribs) {
   model.accessPadGlobal(_runningPadIdFor(id, file), function(pad) {
     collab_server.appendPadText(pad, text, attribs.map(function(a) { return a.slice(); }));
   });
+}
+
+/*======================
+ * Replay functions
+ */
+function replayPadIdFor(id, filename) {
+  return id + "*replay*" + filename;//file.getFullPath();
+}
+
+function _onReplay(padId, userId, connectionId, msg) {
+  System.out.println("  padId: " + padId);
+  System.out.println("  userId: " + userId);
+  System.out.println("  connectionId: " + connectionId);
+  System.out.println("  msg: " + msg);
+  
+  // TODO: access the pad
+  //collab_server.sendPadExtendedMessage(pad, { type: "REPLAY" });
+  //collab_server.sendConnectionExtendedMessage(connectionId, { type: "REPLAY" });
 }

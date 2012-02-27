@@ -1,0 +1,25 @@
+<% helpers.setHtmlTitle("History") %>
+<% helpers.addBodyClass("fullwidth") %>
+<% helpers.addBodyClass("nosidebar") %>
+<% helpers.includeCss("editor_ejs.css") %>
+
+<% helpers.includeCometJs() %>
+<% helpers.includeJs("json2.js") %>
+<% helpers.includeJs("ace/ace2_common.js") %>
+<% helpers.includeJs("ace/ace2_outer.js") %>
+<% helpers.includeJs("collab_client.js") %>
+<% helpers.includeJs("ode_replay.js") %>
+
+<div id="editorpage">
+
+<%= helpers.renderPartial("docbar", { project: project.getName(), file: "Mobile replay" }) %>
+
+<div id="padmain">
+  <div id="padeditor">
+    <div id="wizardcontainerbox" style="overflow:visible">
+      Hi there.
+    </div>
+  </div>
+</div>
+
+</div>
