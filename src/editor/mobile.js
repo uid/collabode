@@ -11,9 +11,14 @@ jimport("java.lang.System");
 
 var connectionIds = {};
 
+var NOT_QUEUED = 0;
+var QUEUED = 1;
+var HELPED = 2;
+
 function onStartup() {
   collab_server.setExtendedHandler("REQUEST_CONNECTION_ID", _onRequestConnectionId);
   collab_server.setExtendedHandler("REQUEST_ADD_TO_QUEUE", _onAddToQueue); // Deprecated
+  collab_server.setExtendedHandler("REQUEST_QUEUE_HELPING", _onQueueHelping);
   collab_server.setExtendedHandler("REQUEST_LEAVE_QUEUE", _onLeaveQueue);
   collab_server.setExtendedHandler("REQUEST_STUDENT_DETAILS", _onRequestStudentDetails);
   collab_server.setExtendedHandler("REQUEST_EXCEPTION_TYPE", _onRequestExceptions);
@@ -39,7 +44,20 @@ function _onAddToQueue(padId, userId, connectionId, msg) {
   });
 }
 
+function _onQueueHelping(padId, userId, connectionId, msg) {
+  // Mark queue status in the db
+  sqlobj.update("MBL_USERS", { userId: userId }, {
+    queueStatus: HELPED
+  });
+}
+
 function _onLeaveQueue(padId, userId, connectionId, msg) {
+  // Mark queue status in the db
+  sqlobj.update("MBL_USERS", { userId: userId }, {
+    queueStatus: NOT_QUEUED
+  });
+  
+  // Alert all clients
   for (var connectionId in connectionIds) {
     collab_server.sendConnectionExtendedMessage(connectionId, {
       type: "LEAVE_QUEUE",
@@ -186,6 +204,12 @@ function interceptException(padId, text) {
  * Add a user to the help queue
  */
 function addToHelpQueue(username) {
+  // Mark queue status in the db
+  sqlobj.update("MBL_USERS", { username: username }, {
+    queueStatus: QUEUED
+  });
+  
+  // Alert all clients
   for (var connectionId in connectionIds) {
     collab_server.sendConnectionExtendedMessage(connectionId, {
       type: "JOIN_QUEUE",

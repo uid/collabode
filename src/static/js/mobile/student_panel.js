@@ -4,10 +4,11 @@ function StudentPanel() {
   this.cardInfo = null;
   this.data = null;
   
+  this.queueStatus = QueueStatusWidget(this);
   this.stream = EventStream(this);
   this.runPlot = PlotRenderer(this);
   
-  var pollContinuously = false;
+  var pollContinuously = true;
   
   this.getEventStream = function() {
     return this.stream;
@@ -44,10 +45,13 @@ function StudentPanel() {
     this.stream.updateStream(user.username);
     
     // Create figures
-    _updateRunCount(this.obj, user.runCount);
+    //_updateRunCount(this.obj, user.runCount);
     //_updateExceptionsList(this.obj, this.data.runLog);
     //_logRuns(this.obj, this.data);
     this.runPlot.update(this.data.runLog);
+    
+    // Get the student's queue status
+    this.queueStatus.updateQStatus(user.queueStatus);
     
     // Poll continuously for updates (otherwise updates will be seen
     // on refresh)
@@ -87,11 +91,15 @@ function StudentPanel() {
       details.hide();
     });
   
+  function removeFromQueue() {
+    // TODO: make this work from the tray; when selected, corresponding
+    // queue card should be found and erased
+    queue.sendRemoveRequest(queue.getSelectedCard().attr('id'));
+    details.hide();
+  }
   this.obj.find('#student-details-button-remove')
-    .click( function() {
-      queue.sendRemoveRequest(queue.getSelectedCard().attr('id'));
-      details.hide();
-    });
+    .bind("tap", removeFromQueue)
+    .click(removeFromQueue);
   
   return this;
 }

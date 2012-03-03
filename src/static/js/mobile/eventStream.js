@@ -53,10 +53,13 @@ function EventStream(parent) {
     }
   }
   
-  function appendEventToStream(eventClass, eventId, html) {
+  function appendEventToStream(eventClass, eventId, filepath, html) {
     var event = $("<div class='event'/>")
       .attr('id', eventId)
       .addClass(eventClass)
+      .bind("tap", function() {
+        window.open("../console"+filepath, target="mobile_console");
+      })
       .append(html);
     if (eventClass == "notEvent") {
       event.removeClass("event");
@@ -81,35 +84,34 @@ function EventStream(parent) {
     // Create the HTML contents of of the event item based on its
     // event class
     if (lastEventTime != null && (Number(data.runTime)-600000 > lastEventTime)) {
-      appendEventToStream("notEvent", "notEvent", "<p style='text-align:center;'>//</p>");
+      //appendEventToStream("notEvent", "notEvent", /*"<p style='text-align:center;'>//</p>"*/"");
     }
     var html = $('<p/>')
-      .append('<span style="color: #888;">'+new Date(Number(data.runTime)+18000000).format("shortTime")+' - </span>');
-      //.append(" - ");
+      .append('<span style="color: #888;">'+new Date(Number(data.runTime)+18000000).format("shortTime")+' - </span>')
+      .append('<b>' + data.padId.substring(data.padId.indexOf("src/")+"src/".length,//"choir*run*/".length, 
+          data.padId.length)  + '</b>');
     lastEventTime = Number(data.runTime);
     
     switch(eventClass) {
     // Runs that resulted in an exception being thrown
     case "exception":
+      requestSimilarExceptions(eventId, data.runException);
       var exceptionSpan = $('<span class="exceptionName"/>')
         .append(data.runException)
         .click(function() {
-          requestSimilarExceptions(eventId, data.runException);
+          // requestSimilarExceptions used to be here
         });
       html
-        .append(exceptionSpan)
         .append("<br>")
-        .append(data.padId.substring("choir*run*/".length, 
-            data.padId.length));
+        .append(exceptionSpan);
       break;
       
     // Regular runs
     default:
-      html.append("Successful run");
+      html.append(" ran successfully.");
     }
-    // TODO: don't hardcode this
-    html.append(" [<a href='../console/HelloWorld/src/First.java' target='mobile_console'>View console</a>]");
-    appendEventToStream(eventClass, eventId, html);
+    var filepath = data.padId.substring(data.padId.lastIndexOf("*")+1, data.padId.length);
+    appendEventToStream(eventClass, eventId, filepath, html);
   }
   
   /** 
@@ -146,7 +148,7 @@ function EventStream(parent) {
           cardTray.filterCards(data.users);
         })
       } else {
-        seeAll.append("No other users have gotten this exception.");
+        seeAll.append("<span style='color:#666'>No other users have gotten this exception.</span>");
       }
       similarExceptionsUsers.append(seeAll);
       

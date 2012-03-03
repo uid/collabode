@@ -130,6 +130,7 @@ CREATE TABLE MBL_USERS (
   "photo" varchar(128) NOT NULL,
   "lastActiveDate" timestamp NOT NULL,
   "runCount" int default 0 NOT NULL,
+  "queueStatus" int default 0 NOT NULL,
   PRIMARY KEY ("userId"),
   UNIQUE ("username"),
 );

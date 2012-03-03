@@ -1,36 +1,67 @@
 <!-- Student details overlay -->
 <div id="student-details-panel">
   <div data-role="content" data-theme="c" id="student-details-panel-content" class="hbox">
+  
+    <span id="student-details-button-close"></span>
+    <div id="stream-instructions">Tap any event to view the current console for that file</div>
+  
     <div id="student-details-panel-left" class="boxFlex0">
-      <div data-role="controlgroup" data-type="horizontal" id="filterBar">
+    
+      <table id="student-info-table">
+        <tr colspan=2>
+          <td><h2 id="username">username</h2></td>
+        </tr>
+        <tr>
+          <td><img src="static/img/mobile/placeholder-photo.png" id="photo"></td>
+          <td>
+            <ul id="queue-status">
+              <li id="queue-status-msg"></li>
+              <li class="button" id="student-details-button-help">Mark helping</li>
+              <li class="button" id="student-details-button-remove">Mark resolved</li>
+            </ul>
+          </td>
+        </tr>
+      </table>
+    
+      <!--<div data-role="controlgroup" data-type="horizontal" id="filterBar">
         <a data-role="button" class="" id="student-details-button-close">Close</a>
         <a data-role="button" class="" id="student-details-button-remove">Mark helped</a>
-      </div>
+      </div>-->
       <!--      
       <a href="" data-role="button" data-inline="true" data-theme="a" id="student-details-button-remove">Remove from queue</a>
       <a href="" data-role="button" data-inline="true" data-theme="a" class="ui-btn-right" id="student-details-button-close">Close</a>
        -->
-      <h2 id="username">username</h2>
-      <img src="static/img/mobile/placeholder-photo.png" id="photo">
 
-      <div id="stats-table-div">
+      <!--<div id="stats-table-div">
         <table id="stats-table">
           <tr>
             <td class="stat-label">Number of runs</td>
             <td id="stat-runcount"></td>
           </tr>
         </table>
-      </div>
+      </div>-->
       <!--<div id="latestRuns"></div>-->
       <div id="graph-runCount"></div>
       <!--<div id="console-errors"></div>
       <div id="console-output"></div>-->
+      
+      <!-- Mocked up -->
+      <div class="junitTestDiv">
+        <div class="junitTest" style="background: #99FF33">TestName</div>
+        <div class="junitTest">TestName</div>
+        <div class="junitTest">TestName</div>
+        <div class="junitTest">TestName</div>
+        <div class="junitTest">TestName</div>
+        <div class="junitTest">TestName</div>
+        <div id="testPassed">1/6 tests passed</div>
+      </div>
     </div>
 	  
     <div id="student-details-panel-right" class="boxFlex">
    	  <!--<div id="student-details-panel-right-overlay-top" class="overlay"></div>
    	  <div id="student-details-panel-right-overlay-bottom" class="overlay"></div>-->
-   	  <div id="student-details-panel-right-content" class="boxFlex"></div>
+   	  <div id="student-details-panel-right-content" class="boxFlex">
+   	  </div>
     </div>
   </div>
 </div>
