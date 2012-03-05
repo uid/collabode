@@ -95,8 +95,7 @@ public class Workspace {
         project.copy(desc, false, null);
         
         ResourcesPlugin.getWorkspace().run(new IWorkspaceRunnable() {
-            @Override
-            public void run(IProgressMonitor monitor) throws CoreException {
+            public void run(IProgressMonitor monitor) {
                 Preferences prefs = getProjectPrefs(dest, "clone");
                 prefs.put("origin", projectname);
                 try {
