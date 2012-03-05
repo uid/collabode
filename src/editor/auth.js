@@ -1,6 +1,7 @@
 import("jsutils");
 
 jimport("collabode.Workspace");
+jimport("org.eclipse.core.resources.IWorkspaceRunnable");
 
 jimport("java.lang.System");
 
@@ -38,14 +39,22 @@ function acl(project) {
 function add_acl(project, filename, userId, permission) {
   permission = PERMISSIONS[permission];
   var prefs = Workspace.getProjectPrefs(project, "acl");
-  prefs.put(userId + '/' + filename, permission);
-  prefs.flush();
+  Workspace.getWorkspace().run(new IWorkspaceRunnable({
+    run : function() {
+      prefs.put(userId + '/' + filename, permission);
+      prefs.flush();
+    }
+  }), null);
 }
 
 function del_acl(project, filename, userId) {
   var prefs = Workspace.getProjectPrefs(project, "acl");
-  prefs.remove(userId + '/' + filename);
-  prefs.flush();
+  Workspace.getWorkspace().run(new IWorkspaceRunnable({
+    run : function() {
+      prefs.remove(userId + '/' + filename);
+      prefs.flush();
+    }
+  }), null);
 }
 
 function has_acl(projectname, filename, userId, permission, restrictionFunction) {

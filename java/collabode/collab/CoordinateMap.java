@@ -44,7 +44,7 @@ class IdentityMap implements CoordinateTranslation {
  */
 class CoordinateMap implements CoordinateTranslation {
     
-    private static class UL {
+    static class UL {
         final int union;
         final int local;
         UL(int union, int local) {

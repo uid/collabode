@@ -83,8 +83,8 @@ public class Workspace {
      * Clone a project using on-disk files and in-memory {@link PadDocument}s
      * belonging to <code>username</code>.
      */
-    public static IProject cloneProject(String username, String projectname, String destinationname) throws CoreException {
-        IProject dest = getWorkspace().getRoot().getProject(destinationname);
+    public static IProject cloneProject(String username, final String projectname, String destinationname) throws CoreException {
+        final IProject dest = getWorkspace().getRoot().getProject(destinationname);
         if (dest.exists()) { return dest; }
         
         IProject project = getWorkspace().getRoot().getProject(projectname);
@@ -94,13 +94,17 @@ public class Workspace {
         desc.setName(destinationname);
         project.copy(desc, false, null);
         
-        Preferences prefs = getProjectPrefs(dest, "clone");
-        prefs.put("origin", projectname);
-        try {
-            prefs.flush();
-        } catch (BackingStoreException bse) {
-            bse.printStackTrace(); // XXX
-        }
+        ResourcesPlugin.getWorkspace().run(new IWorkspaceRunnable() {
+            public void run(IProgressMonitor monitor) {
+                Preferences prefs = getProjectPrefs(dest, "clone");
+                prefs.put("origin", projectname);
+                try {
+                    prefs.flush();
+                } catch (BackingStoreException bse) {
+                    bse.printStackTrace(); // XXX
+                }
+            }
+        }, null);
         
         for (PadDocument doc : PadDocumentOwner.of(username).documents()) {
             if (doc.collab.file.getProject().equals(project)) {

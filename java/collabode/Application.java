@@ -59,19 +59,7 @@ public class Application implements IApplication {
         
         setupShutdown();
         
-        final Display display = PlatformUI.createDisplay();
-        PlatformUI.createAndRunWorkbench(display, new WorkbenchAdvisor() {
-            @Override public boolean openWindows() { return true; } // XXX no window
-            public String getInitialWindowPerspectiveId() { return null; }
-            @Override public void postStartup() {
-                SHELL = new Shell(display); // XXX maybe one window
-                try {
-                    Platform.getBundle("org.eclipse.jdt.ui").start();
-                } catch (BundleException be) {
-                    be.printStackTrace(); // XXX
-                }
-            }
-        });
+        startWorkbench();
         
         return IApplication.EXIT_OK;
     }
@@ -172,5 +160,24 @@ public class Application implements IApplication {
                 }
             }
         }, "console input").start();
+    }
+    
+    /**
+     * Start the workbench. Blocks until the workbench is terminated.
+     */
+    public static void startWorkbench() {
+        final Display display = PlatformUI.createDisplay();
+        PlatformUI.createAndRunWorkbench(display, new WorkbenchAdvisor() {
+            @Override public boolean openWindows() { return true; } // XXX no window
+            public String getInitialWindowPerspectiveId() { return null; }
+            @Override public void postStartup() {
+                SHELL = new Shell(display); // XXX maybe one window
+                try {
+                    Platform.getBundle("org.eclipse.jdt.ui").start();
+                } catch (BundleException be) {
+                    be.printStackTrace(); // XXX
+                }
+            }
+        });
     }
 }
