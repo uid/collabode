@@ -499,6 +499,7 @@ function taskRunningOutput(id, file, text, streamType, attribs) {
  */
 function replayPadIdFor(id, filename) {
   return id + "*replay*" + filename;//file.getFullPath();
+  //return id + filename;
 }
 
 function _onReplay(padId, userId, connectionId, msg) {
@@ -511,3 +512,30 @@ function _onReplay(padId, userId, connectionId, msg) {
   //collab_server.sendPadExtendedMessage(pad, { type: "REPLAY" });
   //collab_server.sendConnectionExtendedMessage(connectionId, { type: "REPLAY" });
 }
+
+function replayTaskRunningOutput(padId, text) {
+  mobile.interceptException(padId, text);
+}
+
+function replayOnRunRequest(padId, userId) {
+  mobile.updateRunStats(padId, userId);
+  
+  /*var filename = _runningFilenameFor(padId);
+  var owner = FileRunOwner.of(Collab.of(userId).id);
+  
+  switch (msg.action) {
+  case 'state':
+    collab_server.sendConnectionExtendedMessage(connectionId, {
+      type: "RUN_STATE_CHANGE",
+      state: owner.state(filename)
+    });
+    break;
+  case 'launch':
+    owner.run(filename);
+    break;
+  case 'terminate':
+    owner.stop(filename);
+    break;
+  }*/
+}
+

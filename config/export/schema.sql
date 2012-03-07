@@ -136,7 +136,7 @@ CREATE TABLE MBL_USERS (
 );
 
 CREATE TABLE MBL_RUNLOG (
-  "id" int generated always as identity NOT NULL,  
+  "id" int generated always as identity NOT NULL, 
   "padId" varchar(128) NOT NULL,
   "userId" varchar(63) NOT NULL,
   "username" varchar(63) NOT NULL,
@@ -145,3 +145,23 @@ CREATE TABLE MBL_RUNLOG (
   "runException" varchar(128) default NULL,
   PRIMARY KEY ("id")
 );
+
+CREATE TABLE REPLAYS (
+  "replayId" int generated always as identity NOT NULL, 
+  "session" varchar(128) NOT NULL,
+  "padId" varchar(128) NOT NULL,
+  "headRevision" int default 0 NOT NULL,
+  PRIMARY KEY ("replayId")
+)
+
+CREATE TABLE REPLAY_DATA (
+  "id" int generated always as identity NOT NULL, 
+  "replayId" int NOT NULL,
+  "padId" varchar(128) NOT NULL,
+  "revisionNum" int NOT NULL,
+  "author" varchar(128) NOT NULL,
+  "timestamp" varchar(128) NOT NULL,
+  "changeset" longvarchar NOT NULL,
+  "action" varchar(128) NOT NULL,
+  PRIMARY KEY ("id")
+)

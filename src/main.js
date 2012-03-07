@@ -127,7 +127,9 @@ function handlePath() {
     [_file('turk:([\\w]+)'), turk_control.render_task],
     [/^\/frame%22([\s\S]*?)%22(\/.*)$/, turk_control.render_framed], // XXX anyone can frame us?
     [_file('replay:([\\w.]+):([\\w.]+)'), history_control.render_replay], // XXX completely unsafe!
-    [_file('replaym:([\\w.]+)'), history_control.render_replay_mobile]
+    [_file('replaymx:([\\w.]+)'), history_control.render_replay_mobile],
+    //[_file('replaym:([\\w.]+)'), history_control.handleReplay],
+    ['/replayall', history_control.replayAll]
   ]);
   noauth.POST.addLocations([
     [/^\/login(\/.*)$/, auth_control.login]
