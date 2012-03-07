@@ -9,6 +9,7 @@ import("control.auth_control");
 import("control.clone_control");
 import("control.console_control");
 import("control.editor_control");
+import("control.git_control");
 import("control.import_control");
 import("control.stats_control");
 import("control.turk_control");
@@ -165,6 +166,7 @@ function handlePath() {
     ['/settings', u(auth_control.render_settings)],
     ['/new', u(editor_control.render_new_project)],
     ['/import', u(import_control.render_import_projects)],
+    [/^\/git:(\w+)$/, u(git_control.render_command)],
     [_file('console'), r(console_control.render_console)],
     [_proj('delete'), u(editor_control.render_confirm_delete)],
     [_file('delete'), u(editor_control.render_confirm_delete)],
@@ -178,6 +180,7 @@ function handlePath() {
   ]);
   authed.POST.addLocations([
     ['/import', u(import_control.import_projects)],
+    [/^\/git:(\w+)$/, u(git_control.run_command)],
     [_proj('delete'), u(editor_control.delete_path)],
     [_file('delete'), u(editor_control.delete_path)],
     [_proj('delacl:([\\w\\.]+)'), r(editor_control.delete_acl, auth.OWNER, 1)],

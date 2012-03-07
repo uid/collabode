@@ -1,0 +1,23 @@
+<% helpers.setHtmlTitle("Git Error") %>
+<% helpers.includeCss("editor_ejs.css") %>
+
+<div id="editorpage">
+
+<%= helpers.renderPartial("docbar", { project: "Git", file: "Error" }) %>
+
+<div id="sidebarbox">
+  <div class="sidebarsection">
+    <%= helpers.renderList("explorer", projects) %>
+  </div>
+</div>
+
+<div id="padmain">
+  <div id="padeditor">
+    <form id="wizardcontainerbox" method="post">
+      <h1>Git Error</h1>
+      <p><%= error.getMessage() %></p>
+    </form>
+  </div>
+</div>
+
+</div>
