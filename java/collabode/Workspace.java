@@ -52,8 +52,10 @@ public class Workspace {
         return getWorkspace().getRoot().getProjects();
     }
     
-    public static IProject accessProject(String projectname) {
-        return getWorkspace().getRoot().getProject(projectname);
+    public static IProject accessProject(String projectname) throws CoreException {
+        IProject project = getWorkspace().getRoot().getProject(projectname);
+        if (project.exists()) { project.open(null); }
+        return project;
     }
     
     public static Preferences getProjectPrefs(IProject project, String node) {
