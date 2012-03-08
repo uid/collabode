@@ -19,7 +19,7 @@ jimport("java.lang.System");
 
 function render_root() {
   renderHtml("editor/root.ejs", {
-    projects: Workspace.listProjects()
+    projects: _list_accessible_projects()
   });
   return true;
 }
@@ -30,7 +30,7 @@ function render_new_project(projectname) {
   if ( ! project.exists()) {
     renderHtml("editor/project_create.ejs", {
       project: project,
-      projects: Workspace.listProjects()
+      projects: _list_accessible_projects()
     });
     return true;
   }
@@ -49,9 +49,12 @@ function render_new_project(projectname) {
 function _list_accessible_projects(revealed) {
   var projects = Workspace.listProjects().slice();
   var userId = getSession().userId;
+  if ( ! userId) {
+    return [];
+  }
   if (workspace.restricted(userId)) {
     projects = projects.filter(function(project) {
-      return (project == revealed) || ( ! workspace.restricted(userId)) || auth.has_acl(project.getName(), '', userId, auth.READ);
+      return (project == revealed) || ( ! workspace.restricted(userId)) || auth.has_acl(project.getName(), '', userId, auth.WRITE);
     });
   }
   return projects;
