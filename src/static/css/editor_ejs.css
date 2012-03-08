@@ -308,6 +308,10 @@ body.nosidebar #padeditor { margin-left: 0; }
 .test .testclass {
 	font-size: smaller;
 }
+.test .testclass, .test .testmethod {
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
 .test.ok, .test.ok table {
 	border-color:#360;
 	background:#efe;
