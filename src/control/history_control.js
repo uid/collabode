@@ -279,15 +279,16 @@ function cycle(whoId, defaultId, projectname, filename) {
 // Real replay stuff
 function replayAll() {
   
+  System.out.println("Replaying...");
+  
   var pq = new PriorityQueue();
   
-  //var projects = Replay.getAllProjectSourceFiles();
   var projects = Workspace.listProjects();
   for (var p in projects) {
     var project = projects[p];
     if (project.hasNature("org.eclipse.jdt.core.javanature")) {
       var jproject = JavaCore.create(project);
-      //System.out.println(jproject.getElementName());
+      System.out.println(jproject.getElementName());
       
       var projectName = jproject.getElementName();
       var session = projectName.split("-")[0];
@@ -307,7 +308,7 @@ function replayAll() {
           var units = ppackage.getCompilationUnits();
           for (var u in units) {
             var unit = units[u];
-            //System.out.println("    -> " + unit.getElementName());
+            System.out.println("    -> " + unit.getElementName());
             
             // Generate replays if they don't already exist
             handleReplay("choir", username, session, projectName, 
@@ -323,7 +324,7 @@ function replayAll() {
   // Now go through the priority queue and apply these changes!
   
   //System.out.println();
-  System.out.println("=============== PLAYBACK ==============");
+  System.out.println("Playback -- " + pq.size() + " revisions");
   while (pq.peek() != null) {
     playback(pq.poll());
   }
