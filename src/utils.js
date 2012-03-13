@@ -17,16 +17,46 @@
 import("fileutils.{readFile,fileLastModified}");
 import("ejs.EJS");
 import("sessions");
+import("stringutils.md5");
 import("jsutils.eachProperty");
 
 import("helpers");
 
 jimport("net.appjet.oui.JarVirtualFile");
+jimport("java.util.Random");
+
+const COOKIE_NAME = "ode";
+const COOKIE_DOMAIN = undefined; // XXX only legal value when accessed by IP addr; problematic?
+
+var _jrand = new Random(); // replaces stringutils._jrand
+
+function _randomHash(len) {
+  var x = md5(""+_jrand.nextDouble()*1e12+_jrand.nextDouble()*1e12);
+  if (len) {
+    return String(x).substr(0,len);
+  } else {
+    return x;
+  }
+}
 
 function getSession() {
+  // avoid sessionId collisions by using randomer Random
+  if ( ! (request.cookies[COOKIE_NAME] || appjet.requestCache.sessionId)) {
+    var sessionId = _randomHash(16);
+    
+    response.setCookie({
+      name: COOKIE_NAME,
+      value: sessionId,
+      path: "/",
+      domain: COOKIE_DOMAIN
+    });
+    
+    appjet.requestCache.sessionId = sessionId;
+  }
+  
   return sessions.getSession({
-    cookieName: "ode",
-    domain: undefined // XXX only legal value when accessed by IP addr; problematic?
+    cookieName: COOKIE_NAME,
+    domain: COOKIE_DOMAIN
   });
 }
 
