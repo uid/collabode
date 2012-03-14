@@ -182,6 +182,7 @@ var _controllers = {
   java: function(project, file) {
     return {
       continuousTesting: appjet.config.continuousTesting == 'true',
+      testDriven: workspace.accessTestsOwner(project).isTestDriven(),
       isTest: file.getName().match(/Test\.java$/)
     }
   }

@@ -42,6 +42,19 @@ public class ProjectTestsOwner {
     }
     
     /**
+     * Is the project using test-driven development annotations?
+     */
+    public boolean isTestDriven() throws JavaModelException {
+        for (IClasspathEntry entry : project.getRawClasspath()) {
+            if (entry.getEntryKind() == IClasspathEntry.CPE_CONTAINER
+                    && entry.getPath().equals(AnnotationsInitializer.PATH)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    /**
      * Schedule test execution.
      */
     public void scheduleRun() {
