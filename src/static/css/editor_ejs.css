@@ -302,7 +302,7 @@ body.nosidebar #padeditor { margin-left: 0; }
 	border-width:1px;
 	border-style:solid;
 	margin-top:4px;
-	padding:10px 15px;
+	padding:6px 8px;
 	position:relative;
 }
 .test .testclass {
@@ -324,65 +324,100 @@ body.nosidebar #padeditor { margin-left: 0; }
 	border-color:#009;
 	background:#eef;
 }
-.test.new {
-	border-width: 9px 14px 9px 14px;
-	padding:1px;
+.test .extra {
+	position: absolute;
+	display: none;
 }
-.test.new.ok {
-	-webkit-border-image: url(/static/img/cloud-pass.png) 9 20 9 20 stretch stretch;
-	-moz-border-image: url(/static/img/cloud-pass.png) 9 20 9 20 stretch stretch;
+.test .extra.top {
+	width: 100%;
+	left: 0;
+	bottom: 100%;
 }
-.test.new.failure {
-	-webkit-border-image: url(/static/img/cloud-fail.png) 9 20 9 20 stretch stretch;
-	-moz-border-image: url(/static/img/cloud-fail.png) 9 20 9 20 stretch stretch;
+.test .extra.left, .test .extra.right {
+	height: 100%;
+	top: 0;
 }
-.test.new.error {
-	-webkit-border-image: url(/static/img/cloud-error.png) 9 20 9 20 stretch stretch;
-	-moz-border-image: url(/static/img/cloud-error.png) 9 20 9 20 stretch stretch;
+.testDriven .test.new .extra.top {
+	display: block;
+	height: 22px;
 }
-.test.needsimpl {
-	-webkit-border-radius:18px; -moz-border-radius:18px;
+.testDriven .test.new.ok .extra.top {
+	background: url(/static/img/cloud-pass.png) no-repeat center top;
 }
-.test.needsreview {
+.testDriven .test.new.failure .extra.top {
+	background: url(/static/img/cloud-fail.png) no-repeat center top;
+}
+.testDriven .test.new.error .extra.top {
+	background: url(/static/img/cloud-error.png) no-repeat center top;
+}
+.testDriven .test.new.failure .extra.left,
+.testDriven .test.new.failure .extra.right,
+.testDriven .test.new.error .extra.left,
+.testDriven .test.new.error .extra.right {
+	display: none;
+}
+.testDriven .test.new {
+	padding-top: 2px;
+	margin-top: 24px;
+	-webkit-border-radius:12px; -moz-border-radius:12px;
+}
+.testDriven .test.needsimpl.ok {
+	-webkit-border-radius:12px; -moz-border-radius:12px;
+}
+.testDriven .test.needsreview.ok {
 	-webkit-border-radius:6px; -moz-border-radius:6px;
 }
-.test.accepted.failure, .test.accepted.error {
-	border-width: 9px 14px 9px 14px;
-	padding:1px;
+.test.failure .extra.left {
+	display: block;
+	width: 7px;
+	left: -2px;
+	background: url(/static/img/bang-fail.png) repeat-y;
+	background-position: 0 6px;
 }
-.test.accepted.failure {
-	-webkit-border-image: url(/static/img/bang-fail.png) 9 20 9 20 stretch stretch;
-	-moz-border-image: url(/static/img/bang-fail.png) 9 20 9 20 stretch stretch;	
+.test.failure .extra.right {
+	display: block;
+	width: 7px;
+	right: 0;
+	margin-right: -2px;
+	background: url(/static/img/bang-fail.png) repeat-y;
+	background-position: -6px 6px;
 }
-.test.accepted.error {
-	-webkit-border-image: url(/static/img/bang-error.png) 9 20 9 20 stretch stretch;
-	-moz-border-image: url(/static/img/bang-error.png) 9 20 9 20 stretch stretch;	
+.test.error .extra.left {
+	display: block;
+	width: 7px;
+	left: -2px;
+	background: url(/static/img/bang-error.png) repeat-y;
+	background-position: 0 6px;
+}
+.test.error .extra.right {
+	display: block;
+	width: 7px;
+	right: 0;
+	margin-right: -2px;
+	background: url(/static/img/bang-error.png) repeat-y;
+	background-position: -6px 6px;
 }
 .test button {
 	padding:.2em;
 	position:absolute;
-	top:0;
-	right:0;
+	top: 6px;
+	right: 6px;
 	visibility: hidden;
 	-webkit-appearance: square-button;
 }
-.test.needsimpl button, .test.needsreview button {
-	top:10px;
-	right:13px;
-}
-.editingTest .test.new button {
+.testDriven.editingTest .test.new button {
 	visibility: visible;
 }
 .test.new button div:after {
 	content: "Needs impl";
 }
-.editingImpl .test.needsimpl button {
+.testDriven.editingImpl .test.needsimpl button {
 	visibility: visible;
 }
 .test.needsimpl button div:after {
 	content: "Needs review";
 }
-.editingTest .test.needsreview button {
+.testDriven.editingTest .test.needsreview button {
 	visibility: visible;
 }
 .test.needsreview button div:after {
@@ -394,6 +429,7 @@ body.nosidebar #padeditor { margin-left: 0; }
 	position: absolute;
 	left: 0;
 	right: 0;
+	margin-top: -0.5em;
 	display: none;
 	cursor: pointer;
 }
@@ -409,6 +445,7 @@ body.nosidebar #padeditor { margin-left: 0; }
 .test .testtrace {
 	display: none;
 	margin-top: 0.5em;
+	position: relative;
 	font-size: 11px;
 	white-space: pre;
 	font-family: Consolas, Menlo, monospace;

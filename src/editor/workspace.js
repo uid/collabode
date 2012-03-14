@@ -259,6 +259,10 @@ function taskUpdateAnnotations(userId, file, type, annotations) {
   });
 }
 
+function accessTestsOwner(project) {
+  return ProjectTestsOwner.of(project);
+}
+
 function _onTestsRequest(padId, userId, connectionId, msg) {
   var doc = PadDocumentOwner.of(userId).get(_filenameFor(padId));
   var owner = ProjectTestsOwner.of(doc.collab.file.getProject());
