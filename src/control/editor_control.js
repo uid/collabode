@@ -178,6 +178,15 @@ function _find_markers(resource) {
   return markers;
 }
 
+var _controllers = {
+  java: function(project, file) {
+    return {
+      continuousTesting: appjet.config.continuousTesting == 'true',
+      isTest: file.getName().match(/Test\.java$/)
+    }
+  }
+};
+
 var _renderers = {
   launch: function(project, file) {
     return {
@@ -220,6 +229,9 @@ function _render_file(project, file, lineno, projectfiles) {
     projectfiles: projectfiles,
     extension: extension
   };
+  if (extension && _controllers[extension]) {
+    data.add = _controllers[extension](project, file);
+  }
   data.additions = function() {
     return renderFirstTemplateAsString([ "editor/add/" + extension + ".ejs" ], data);
   };
