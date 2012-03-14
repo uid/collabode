@@ -2,10 +2,15 @@
 <a href="<%= item.getFullPath() %>"><img src="/static/img/eclipse/ui.ide.obj.project.gif"><br/>
 <%= item.getName() %></a><br/>
 <%
-var natures = item.getDescription().getNatureIds().map(function (natureId) {
-  return item.getWorkspace().getNatureDescriptor(natureId).getLabel();
-});
-%>
-<%= natures.join(', ') %> project<br/>
+if (item.isOpen()) {
+  var natures = item.getDescription().getNatureIds().map(function (natureId) {
+    var desc = item.getWorkspace().getNatureDescriptor(natureId);
+    return desc ? desc.getLabel() : "<i>" + natureId + "</i>";
+  });
+  %><%= natures.join(', ') %> project<%
+} else {
+  %><i>closed</i><%
+}
+%><br/>
 <a class="delete" href="/delete<%= item.getFullPath() %>">Delete</a>
 </td>

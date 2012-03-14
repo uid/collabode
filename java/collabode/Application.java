@@ -80,8 +80,9 @@ public class Application implements IApplication {
         config.load(new FileInputStream(configFile));
         
         List<String> appjetArgs = new ArrayList<String>();
-        appjetArgs.add("--modulePath=" + bundleResourcePath("src"));
-        appjetArgs.add("--useVirtualFileRoot=" + bundleResourcePath("src"));
+        for (String key : new String[] { "modulePath", "useVirtualFileRoot" }) {
+            appjetArgs.add("--" + key + "=" + config.getProperty(key, bundleResourcePath("src")));
+        }
         
         for (String key : new String[] { "appjetHome", "logDir", "dbURL" }) {
             if ( ! config.containsKey(key + "Template")) { continue; }

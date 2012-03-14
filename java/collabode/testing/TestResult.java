@@ -37,7 +37,9 @@ public class TestResult {
             IType type = project.findType(elt.getTestClassName());
             IMethod method = type.getMethod(elt.getTestMethodName(), new String[0]);
             for (IAnnotation ann : method.getAnnotations()) {
-                for (String[] name : type.resolveType(ann.getElementName())) {
+                String[][] names = type.resolveType(ann.getElementName());
+                if (names == null) { continue; }
+                for (String[] name : names) {
                     if (name[0].equals(PACKAGE)) {
                         return name[1];
                     }

@@ -1,9 +1,9 @@
-<% helpers.setHtmlTitle("Confirm Delete") %>
+<% helpers.setHtmlTitle("Git clone") %>
 <% helpers.includeCss("editor_ejs.css") %>
 
 <div id="editorpage">
 
-<%= helpers.renderPartial("docbar", { project: project.getName() }) %>
+<%= helpers.renderPartial("docbar", { project: "Git", file: "clone" }) %>
 
 <div id="sidebarbox">
   <div class="sidebarsection">
@@ -14,11 +14,12 @@
 <div id="padmain">
   <div id="padeditor">
     <form id="wizardcontainerbox" method="post">
-      <h1>Delete <%= resource.getFullPath() %></h1>
-      <p>Are you sure you want to delete this resource from the file system?</p>
+      <h1>Git clone</h1>
+      <p><img src="/static/img/eclipse/egit.ui.obj.import.gif"/> Clone a Git repository and import all projects</p>
+      <p>URL: <input name="uri" size="60"/></p>
       
       <div id="wizardbottom">
-        <button type="submit">Delete resource</button>
+        <button type="submit">Clone &amp; import</button>
       </div>
     </form>
   </div>

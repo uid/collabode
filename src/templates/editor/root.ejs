@@ -19,6 +19,8 @@
         <% if ( ! session.restricted) { %>
           <p><a href="/settings">Edit settings</a></p>
           <p><a href="/new">Create a new project</a></p>
+          <p><a href="/import">Import server projects</a></p>
+          <p><a href="/git:clone">Import projects from Git</a></p>
         <% } %>
       <% } else { %>
         <p><a href="/login/">Log in</a></p>

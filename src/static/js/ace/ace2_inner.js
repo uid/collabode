@@ -941,7 +941,7 @@ function OUTER(gscope) {
         });
         d.toggleClass('tipified', true);
       }
-      $('p', d).append('<div class="' + type + '-annotation-msg">' + annotation.message + '</div>');
+      $('p', d).append($('<div>').addClass(type + '-annotation-msg').text(annotation.message));
     });
     
     $('p:empty', sidedivinner).fadeOut(1);
