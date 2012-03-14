@@ -35,6 +35,7 @@ function Testor(collab) {
       node = $('<div>');
       testNodes[test.name] = node;
       
+      node.append($('<div class="extra top"></div><div class="extra left"></div><div class="extra right"></div>'));
       node.append($('<div>').addClass('testclass').html(test.className));
       node.append($('<div>').addClass('testmethod').html(test.methodName));
       
