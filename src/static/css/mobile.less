@@ -6,6 +6,7 @@
  * Color definitions 
  */
 @white: #FFF;
+@background: #EEE;
 @darkgray: #333;
 
 body {
@@ -18,7 +19,7 @@ body {
 	left: 0px;
 	height: 1024px; // This is hardcoded to iPad2 specs
 	width: 768px;
-	background: #EEE;
+	background: @background;
 	z-index: 1000;
 	align: center;
 	text-align: center;
@@ -153,6 +154,21 @@ div#queue-tray {
 }
 
 /******************
+ * Mixins
+ */
+.fullPageOverlay {
+	z-index: 20;
+	position: absolute;
+	top: -15px;
+	left: 0px;
+	width: 100%;
+	overflow: auto;
+}
+.noblur {
+	-webkit-transform:translate3d(0,0,0); /* Counter blurriness on iOS */
+}
+
+/******************
  * Student details
  */
  #stream-instructions {
@@ -160,15 +176,10 @@ div#queue-tray {
 	top: 5px;
 	left: 330px;
 	font-size: 9px;
-	-webkit-transform:translate3d(0,0,0); /* Counter blurriness on iOS */
+	.noblur;
 }
 #student-details-panel {
-	z-index: 20;
-	position: absolute;
-	top: -15px;
-	left: 0px;
-	width: 100%;
-	overflow: auto;
+	.fullPageOverlay;
 	> img {
 		max-height: 100px;
 	}
@@ -184,7 +195,7 @@ div#queue-tray {
 			background: url("../img/mobile/close.png");
 			height: 30px;
 			width: 30px;
-			-webkit-transform:translate3d(0,0,0); /* Counter blurriness on iOS */
+			.noblur;
 		}
  		.container-left {
  			-webkit-box-flex: 1;
@@ -226,7 +237,7 @@ div#queue-tray {
 	}
 	#student-details-panel-left {
 		padding-right: 3px;
-		-webkit-transform:translate3d(0,0,0); /* Counter blurriness on iOS */
+		.noblur;
 		#photo {
 			max-width: 120px;
 		}
@@ -314,7 +325,7 @@ div#queue-tray {
 				border-left: none;
 				padding: 2px 2px 2px 6px;
 				font-size: 12px;
-				-webkit-transform:translate3d(0,0,0); /* Counter blurriness on iOS */
+				.noblur;
 			}
 			.exception {
 				background-color: #EBCCCC;
@@ -334,7 +345,7 @@ div#queue-tray {
 			.notEvent {
 				background: none;
 				border: none;
-				-webkit-transform:translate3d(0,0,0); /* Counter blurriness on iOS */
+				.noblur;
 			}
 		}
 	}
@@ -344,14 +355,22 @@ div#queue-tray {
  * Class summary
  */
 #class-summary-page {
-	z-index: 20;
-	position: absolute;
-	top: -15px;
-	left: 0px;
-	width: 100%;
-	overflow: auto;
+	.fullPageOverlay;
+	padding: 15px;
+	height: 1000px;
+	background-color: @background;
+	table#class-summary-page-stats {
+		width: 50%;
+		tr {
+			th {
+				text-align: right;
+			}
+			td {
+				text-align: right;
+			}
+		}
+	}
 }
-
 
 /* hbox and vbox classes */
  

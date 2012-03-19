@@ -93,6 +93,8 @@ function setExtendedMessages() {
   collab.setOnExtendedMessage("LEAVE_QUEUE", _leaveQueue);
   // Request for student information
   collab.setOnExtendedMessage("STUDENT_DETAILS", _showStudentDetails);
+  //Request for class summary information
+  collab.setOnExtendedMessage("CLASS_SUMMARY", _updateClassSummary);
   // Login of a new user
   //collab.setOnExtendedMessage("USER_JOINED", _userJoined);
   collab.setOnExtendedMessage("FILTERBY_EXCEPTION_TYPE", _showFilterByExceptionType);
@@ -119,6 +121,11 @@ function _showStudentDetails(msg) {
   queue.highlightCard(msg.cardId);
   details.data = msg;
   details.display();
+}
+
+function _updateClassSummary(msg) {
+  classSummary.data = msg;
+  classSummary.display();
 }
 
 function _userJoined(msg) {
@@ -293,6 +300,7 @@ function init() {
     });*/
     $('a.filter').removeClass('ui-btn-active');
     $(this).addClass('ui-btn-active');
+    classSummary.hide();
     details.hide();
   })
   

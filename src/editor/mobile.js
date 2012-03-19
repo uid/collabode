@@ -20,6 +20,7 @@ function onStartup() {
   collab_server.setExtendedHandler("REQUEST_ADD_TO_QUEUE", _onAddToQueue); // Deprecated
   collab_server.setExtendedHandler("REQUEST_QUEUE_HELPING", _onQueueHelping);
   collab_server.setExtendedHandler("REQUEST_LEAVE_QUEUE", _onLeaveQueue);
+  collab_server.setExtendedHandler("REQUEST_CLASS_SUMMARY", _onRequestClassSummary);
   collab_server.setExtendedHandler("REQUEST_STUDENT_DETAILS", _onRequestStudentDetails);
   collab_server.setExtendedHandler("REQUEST_EXCEPTION_TYPE", _onRequestExceptions);
 }
@@ -64,6 +65,30 @@ function _onLeaveQueue(padId, userId, connectionId, msg) {
       cardId: msg.cardId
     });
   }
+}
+
+function _onRequestClassSummary(padId, userId, connectionId, msg) {
+  connectionIds[connectionId] = true;
+  var users = sqlobj.selectMulti("MBL_USERS", { });
+  
+  var maxRunCount = 0;
+  var minRunCount = 0;
+  var meanRunCount = 0;
+  
+  for (u in users) {
+    maxRunCount = Math.max(maxRunCount, users[u].runCount);
+    minRunCount = Math.min(minRunCount, users[u].runCount);
+    meanRunCount += users[u].runCount;
+  }
+  meanRunCount /= users.length;
+  meanRunCount = Math.round(meanRunCount);
+  
+  collab_server.sendConnectionExtendedMessage(connectionId, {
+    type: "CLASS_SUMMARY",
+    maxRunCount: maxRunCount,
+    minRunCount: minRunCount,
+    meanRunCount: meanRunCount
+  });
 }
 
 function _onRequestStudentDetails(padId, userId, connectionId, msg) {
