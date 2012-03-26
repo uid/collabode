@@ -12,8 +12,6 @@ import("editor.workspace");
 import("pad.model");
 import("pad.revisions");
 
-//jimport("collabode.history.PQueue");
-//jimport("collabode.history.Replay");
 jimport("collabode.history.Revision");
 jimport("collabode.Workspace");
 
@@ -22,6 +20,7 @@ jimport("org.eclipse.jdt.core.IPackageFragmentRoot");
 jimport("org.eclipse.jdt.core.JavaCore");
 
 jimport("java.io.ByteArrayInputStream");
+jimport("java.util.HashMap");
 jimport("java.util.PriorityQueue");
 
 jimport("java.lang.System");
@@ -309,10 +308,14 @@ function replayAll() {
           for (var u in units) {
             var unit = units[u];
             System.out.println("    -> " + unit.getElementName());
+            System.out.println(unit.getPath().toString());
             
-            // Generate replays if they don't already exist
-            handleReplay("choir", username, session, projectName, 
-                "src/"+unit.getElementName(), pq);            
+            var filename = unit.getPath().toString();
+            filename = filename.substring(1, filename.length); // remove first /
+            filename = filename.substring(filename.indexOf("/"), filename.length); // trim off project name
+              // Generate replays if they don't already exist
+              handleReplay("choir", username, session, projectName, 
+                  filename, pq);            
           }
         }
       }
@@ -328,6 +331,83 @@ function replayAll() {
   while (pq.peek() != null) {
     playback(pq.poll());
   }
+  
+  // after the revision is done playing, check the consoles
+  // TODO: if this ends up being useful, move the code to do stuff in the 
+  // mobile interface in real time
+  postprocess();
+  return true;
+}
+
+function postprocess() {
+  //get all users, each source file, and same -- assume there's a console pad
+  System.out.println("Post-processing...");
+  
+  var outputGlobs = new HashMap(); //HashMap<String File, HashMap<String glob, int count>>
+
+  // Go through PROJECTS -- one per student
+  var projects = Workspace.listProjects();
+  for (var p in projects) {
+    var project = projects[p];
+    if (project.hasNature("org.eclipse.jdt.core.javanature")) {
+      var jproject = JavaCore.create(project);
+      System.out.println(jproject.getElementName());
+      
+      var projectName = jproject.getElementName();
+      //var session = projectName.split("-")[0];
+      var username = projectName.split("-")[1];
+      
+      // Go through PACKAGES to find source folder
+      packages = jproject.getPackageFragments();
+      for (var pp in packages) {
+        var ppackage = packages[pp]; 
+        if (ppackage.getKind() == IPackageFragmentRoot.K_SOURCE) {
+          //System.out.println("  src/");
+
+          // Get all SOURCE FILES 
+          var units = ppackage.getCompilationUnits();
+          for (var u in units) {
+            var unit = units[u];
+            var sourceFileName = unit.getElementName();
+            System.out.println("    -> " + sourceFileName);
+            
+            if (!outputGlobs.containsKey(sourceFileName)) {
+              outputGlobs.put(sourceFileName, new HashMap());
+            }
+            
+            // get the console pads for each source file (assume they exist)
+            var consolePadId = "choir*run*" + unit.getPath().toString();
+            
+            System.out.println("console pad: " + consolePadId);
+            try {              
+              model.accessPadGlobal(consolePadId, function(pad) {
+                var fileGlob = outputGlobs.get(sourceFileName);
+                var text = pad.text();
+                // trim out the start and end, which will always be different!
+                var firstEndBracket = text.indexOf("]");
+                var lastStartBracket = text.lastIndexOf("[");
+                text = text.substring(firstEndBracket+1, lastStartBracket);
+                text = text.replace("\n", "<br>");
+                
+                if (fileGlob.containsKey(text)) {
+                  fileGlob.put(text, fileGlob.get(text)+1);
+                } else {
+                  fileGlob.put(text, 1);
+                } 
+              });
+            } catch(e) {
+              //System.out.println("no console pad");
+            }
+          }
+        }
+      }
+    }
+  }
+  
+  // Render the outputGlobs map to a page
+  renderHtml("mobile/outputGlobs.ejs", {
+    outputGlobs: outputGlobs
+  });
 }
 
 function handleReplay(whoId, defaultId, session, projectname, filename, pq) {
