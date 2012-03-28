@@ -1011,6 +1011,18 @@ function OUTER(gscope) {
       width: '' + iframe.width() + 'px'
     }).delay(1000).fadeOut(2000);
   };
+  editorInfo.ace_getSelection = function() {
+    var selection = {};
+    inCallStackIfNecessary("getsel", function() {
+      var start = selection.start = rep.selStart;
+      var end = selection.end = rep.selEnd;
+      var text = rep.lines.slice(start[0], end[0]+1).map(function (node) { return node.text; });
+      text[text.length-1] = text[text.length-1].substring(0, end[1]);
+      text[0] = text[0].substring(start[1]);
+      selection.text = text.join("\n");
+    });
+    return selection;
+  };
   
   var externalKeyHandlers = [];
   var externalClickHandlers = [];

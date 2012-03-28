@@ -140,6 +140,9 @@ function Ace2Editor() {
   editor.scrollToLineNo = pendingInit(function(lineno) {
     info.ace_scrollToLineNo($, lineno);
   });
+  editor.getSelection = function() {
+    return info.ace_getSelection();
+  };
   editor.addKeyHandler = pendingInit(function(handler) {
     info.ace_addKeyHandler(handler);
   });
