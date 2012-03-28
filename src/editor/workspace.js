@@ -79,7 +79,7 @@ function isChangesetAllowed(padId, changeset, author) {
   
   var doc = PadDocumentOwner.of(author).get(_filenameFor(padId));
   var file = doc.collab.file;
-  return auth.has_acl(file.getProject().getName(), file.getProjectRelativePath().toString(), author, auth.WRITE, function(restrictions) {
+  return auth.has_acl(file.getProject(), file, author, auth.WRITE, function(restrictions) {
     return doc.isAllowed(_makeReplaceEdits(changeset), restrictions);
   });
 }

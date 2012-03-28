@@ -51,7 +51,7 @@ function _list_accessible_projects(revealed) {
   var userId = getSession().userId;
   if (workspace.restricted(userId)) {
     projects = projects.filter(function(project) {
-      return (project == revealed) || ( ! workspace.restricted(userId)) || auth.has_acl(project.getName(), '', userId, auth.READ);
+      return (project == revealed) || ( ! workspace.restricted(userId)) || auth.has_acl(project, '', userId, auth.READ);
     });
   }
   return projects;
