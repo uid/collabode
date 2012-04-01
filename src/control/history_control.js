@@ -20,7 +20,6 @@ jimport("org.eclipse.jdt.core.IPackageFragmentRoot");
 jimport("org.eclipse.jdt.core.JavaCore");
 
 jimport("java.io.ByteArrayInputStream");
-jimport("java.util.HashMap");
 jimport("java.util.PriorityQueue");
 
 jimport("java.lang.System");
@@ -343,7 +342,6 @@ function postprocess() {
   //get all users, each source file, and same -- assume there's a console pad
   System.out.println("Post-processing...");
   
-  //var outputGlobs = new HashMap(); //HashMap<String File, HashMap<String glob, int count>>
   var outputGlobs = {};
   
   // Go through PROJECTS -- one per student
@@ -371,10 +369,7 @@ function postprocess() {
             var unit = units[u];
             var sourceFileName = unit.getElementName();
             //System.out.println("    -> " + sourceFileName);
-            
-            /*if (!outputGlobs.containsKey(sourceFileName)) {
-              outputGlobs.put(sourceFileName, new HashMap());
-            }*/
+
             if (outputGlobs[sourceFileName] == null) {
               outputGlobs[sourceFileName] = {};
             }
@@ -394,11 +389,6 @@ function postprocess() {
                 text = text.replace(/^\s+|\s+$/g,''); // trim whitespace from front and back
                 //text = text.replace(/^\s\s*/, '').replace(/\s\s*$/, '');
                 
-                /*if (fileGlob.containsKey(text)) {
-                  fileGlob.put(text, fileGlob.get(text)+1);
-                } else {
-                  fileGlob.put(text, 1);
-                }*/
                 if (fileGlob[text] != null) {
                   fileGlob[text] = fileGlob[text] + 1;
                 } else {
@@ -414,42 +404,13 @@ function postprocess() {
     }
   }
   
-  /*
   // Sort the results by number of occurrences and prepare a friendlier
   // JSONifiable object
-  // TODO: Change the above to just use a sane sorted data structure so
-  // that this is unnecessary -__-
+  // TODO: Javascript doesn't have a sorted hash map structure... does it?
   var sortedOutputGlobs = {};
-  var keys = outputGlobs.keySet().toArray();
-  for (var f in keys) {
-    var file = keys[f];
-    var fileGlobs = outputGlobs.get(file).keySet().toArray();
-    sortedOutputGlobs[file] = new Array();
-    
-    while (sortedOutputGlobs[file].length < fileGlobs.length) {
-      // repeatedly find the glob with the most occurrences and append it
-      // in sorted order to the list
-      var maxOccurrences = 0;
-      var maxOccurrencesGlob = "";
-      for (var g in fileGlobs) {
-        var glob = fileGlobs[g];
-        var count = outputGlobs.get(file).get(glob);
-        if (count > maxOccurrences) {
-          maxOccurrences = count;
-          maxOccurrencesGlob = glob;
-        }
-      }
-      outputGlobs.get(file).put(maxOccurrencesGlob, -1);
-      sortedOutputGlobs[file].push({text: maxOccurrencesGlob, count: maxOccurrences});
-    }
-  }*/
-  
-  var sortedOutputGlobs = {};
-  //var keys = outputGlobs.keySet().toArray();
   for (var file in outputGlobs) {
     System.out.println("file: " + file);
-    //var file = outputGlobs[f];
-    var fileGlobs = outputGlobs[file];//.keySet().toArray();
+    var fileGlobs = outputGlobs[file];
     sortedOutputGlobs[file] = new Array();
     
     var numFileGlobs = 0;
@@ -465,7 +426,6 @@ function postprocess() {
       var maxOccurrences = 0;
       var maxOccurrencesGlob = "";
       for (var glob in fileGlobs) {
-        //var glob = fileGlobs[g];
         var count = outputGlobs[file][glob];
         if (count > maxOccurrences) {
           maxOccurrences = count;
@@ -483,7 +443,7 @@ function postprocess() {
   
   // Render the outputGlobs map to a page
   renderHtml("mobile/outputGlobs.ejs", {
-    outputGlobs: sortedOutputGlobs//outputGlobs
+    outputGlobs: sortedOutputGlobs
   });
 }
 
