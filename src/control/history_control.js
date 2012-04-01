@@ -278,7 +278,7 @@ function cycle(whoId, defaultId, projectname, filename) {
 // Real replay stuff
 function replayAll() {
   
-  System.out.println("Replaying...");
+  //System.out.println("Replaying...");
   
   var pq = new PriorityQueue();
   
@@ -287,7 +287,7 @@ function replayAll() {
     var project = projects[p];
     if (project.hasNature("org.eclipse.jdt.core.javanature")) {
       var jproject = JavaCore.create(project);
-      System.out.println(jproject.getElementName());
+      //System.out.println(jproject.getElementName());
       
       var projectName = jproject.getElementName();
       var session = projectName.split("-")[0];
@@ -307,15 +307,15 @@ function replayAll() {
           var units = ppackage.getCompilationUnits();
           for (var u in units) {
             var unit = units[u];
-            System.out.println("    -> " + unit.getElementName());
-            System.out.println(unit.getPath().toString());
+            //System.out.println("    -> " + unit.getElementName());
+            //System.out.println(unit.getPath().toString());
             
             var filename = unit.getPath().toString();
             filename = filename.substring(1, filename.length); // remove first /
             filename = filename.substring(filename.indexOf("/"), filename.length); // trim off project name
               // Generate replays if they don't already exist
               handleReplay("choir", username, session, projectName, 
-                  filename, pq);            
+                  filename, pq);
           }
         }
       }
@@ -343,15 +343,16 @@ function postprocess() {
   //get all users, each source file, and same -- assume there's a console pad
   System.out.println("Post-processing...");
   
-  var outputGlobs = new HashMap(); //HashMap<String File, HashMap<String glob, int count>>
-
+  //var outputGlobs = new HashMap(); //HashMap<String File, HashMap<String glob, int count>>
+  var outputGlobs = {};
+  
   // Go through PROJECTS -- one per student
   var projects = Workspace.listProjects();
   for (var p in projects) {
     var project = projects[p];
     if (project.hasNature("org.eclipse.jdt.core.javanature")) {
       var jproject = JavaCore.create(project);
-      System.out.println(jproject.getElementName());
+      //System.out.println(jproject.getElementName());
       
       var projectName = jproject.getElementName();
       //var session = projectName.split("-")[0];
@@ -369,31 +370,40 @@ function postprocess() {
           for (var u in units) {
             var unit = units[u];
             var sourceFileName = unit.getElementName();
-            System.out.println("    -> " + sourceFileName);
+            //System.out.println("    -> " + sourceFileName);
             
-            if (!outputGlobs.containsKey(sourceFileName)) {
+            /*if (!outputGlobs.containsKey(sourceFileName)) {
               outputGlobs.put(sourceFileName, new HashMap());
+            }*/
+            if (outputGlobs[sourceFileName] == null) {
+              outputGlobs[sourceFileName] = {};
             }
             
             // get the console pads for each source file (assume they exist)
             var consolePadId = "choir*run*" + unit.getPath().toString();
-            
-            System.out.println("console pad: " + consolePadId);
+
             try {              
               model.accessPadGlobal(consolePadId, function(pad) {
-                var fileGlob = outputGlobs.get(sourceFileName);
+                //var fileGlob = outputGlobs.get(sourceFileName);
+                var fileGlob = outputGlobs[sourceFileName];
                 var text = pad.text();
                 // trim out the start and end, which will always be different!
                 var firstEndBracket = text.indexOf("]");
                 var lastStartBracket = text.lastIndexOf("[");
                 text = text.substring(firstEndBracket+1, lastStartBracket);
-                text = text.replace("\n", "<br>");
+                text = text.replace(/^\s+|\s+$/g,''); // trim whitespace from front and back
+                //text = text.replace(/^\s\s*/, '').replace(/\s\s*$/, '');
                 
-                if (fileGlob.containsKey(text)) {
+                /*if (fileGlob.containsKey(text)) {
                   fileGlob.put(text, fileGlob.get(text)+1);
                 } else {
                   fileGlob.put(text, 1);
-                } 
+                }*/
+                if (fileGlob[text] != null) {
+                  fileGlob[text] = fileGlob[text] + 1;
+                } else {
+                  fileGlob[text] = 1;
+                }
               });
             } catch(e) {
               //System.out.println("no console pad");
@@ -404,9 +414,76 @@ function postprocess() {
     }
   }
   
+  /*
+  // Sort the results by number of occurrences and prepare a friendlier
+  // JSONifiable object
+  // TODO: Change the above to just use a sane sorted data structure so
+  // that this is unnecessary -__-
+  var sortedOutputGlobs = {};
+  var keys = outputGlobs.keySet().toArray();
+  for (var f in keys) {
+    var file = keys[f];
+    var fileGlobs = outputGlobs.get(file).keySet().toArray();
+    sortedOutputGlobs[file] = new Array();
+    
+    while (sortedOutputGlobs[file].length < fileGlobs.length) {
+      // repeatedly find the glob with the most occurrences and append it
+      // in sorted order to the list
+      var maxOccurrences = 0;
+      var maxOccurrencesGlob = "";
+      for (var g in fileGlobs) {
+        var glob = fileGlobs[g];
+        var count = outputGlobs.get(file).get(glob);
+        if (count > maxOccurrences) {
+          maxOccurrences = count;
+          maxOccurrencesGlob = glob;
+        }
+      }
+      outputGlobs.get(file).put(maxOccurrencesGlob, -1);
+      sortedOutputGlobs[file].push({text: maxOccurrencesGlob, count: maxOccurrences});
+    }
+  }*/
+  
+  var sortedOutputGlobs = {};
+  //var keys = outputGlobs.keySet().toArray();
+  for (var file in outputGlobs) {
+    System.out.println("file: " + file);
+    //var file = outputGlobs[f];
+    var fileGlobs = outputGlobs[file];//.keySet().toArray();
+    sortedOutputGlobs[file] = new Array();
+    
+    var numFileGlobs = 0;
+    for (var i in fileGlobs) {
+      numFileGlobs++;
+    }
+    
+    System.out.println("fileGlobs length: " + numFileGlobs);
+    
+    while (sortedOutputGlobs[file].length < numFileGlobs) {
+      // repeatedly find the glob with the most occurrences and append it
+      // in sorted order to the list
+      var maxOccurrences = 0;
+      var maxOccurrencesGlob = "";
+      for (var glob in fileGlobs) {
+        //var glob = fileGlobs[g];
+        var count = outputGlobs[file][glob];
+        if (count > maxOccurrences) {
+          maxOccurrences = count;
+          maxOccurrencesGlob = glob;
+        }
+      }
+      outputGlobs[file][maxOccurrencesGlob] = -1;
+      sortedOutputGlobs[file].push({
+        text: maxOccurrencesGlob,
+        count: maxOccurrences
+        }
+      );
+    }
+  }
+  
   // Render the outputGlobs map to a page
   renderHtml("mobile/outputGlobs.ejs", {
-    outputGlobs: outputGlobs
+    outputGlobs: sortedOutputGlobs//outputGlobs
   });
 }
 
@@ -591,7 +668,7 @@ function generateReplay(session, padId, whoId, defaultId) {
   // Save replayId with head revision number to db
 }
 
-function playback(rev) { // rev is a single revision
+function playback(rev) { // rev is a single Java Revision object
   if (rev.action == "WRITE") {
     workspace.replayTaskRunningOutput(rev.author, rev.padId, rev.cs);
 

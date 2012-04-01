@@ -97,8 +97,12 @@ function includeCometJs() {
     _hd().includeCometJs = true;
 }
 
-function includeMobileJs() {
+function includeJQueryMobile() {  
   includeJs("jquery.mobile-1.0.min.js");
+}
+
+function includeMobileJs() {
+  includeJQueryMobile();
   includeJs("jquery-ui-1.8.16.custom.min.js");
   includeJs("jquery.ui.touch.js");
   includeJs("iscroll/src/iscroll.js");

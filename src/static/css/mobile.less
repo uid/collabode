@@ -372,7 +372,69 @@ div#queue-tray {
 	}
 }
 
-/* hbox and vbox classes */
+/******************
+ * Output globs
+ */
+#variant-toggle {
+	width: 25px;
+	height: 25px;
+	float: right;
+	margin: 5px;
+	background-color: #FEFEFE;
+	border: 1px solid @darkgray;
+	font-size: 8px;
+}
+
+#globs-filechooser {
+	ul {
+		li {
+			display: inline-block;
+			cursor: pointer;
+			border: 1px solid @darkgray;
+			padding: 5px;
+			font-size: 12px;
+		}
+	}
+}
+
+#globs-box-diffs {
+	position: relative;
+	white-space: pre;
+	font-size: 12px;
+	.globs-diff {
+		margin: 10px;
+		padding: 10px;
+		border: 1px solid @darkgray;
+		background-color: #FEFEFE;
+		max-height: 250px;
+		overflow-y: scroll;
+		.globs-diff-count {
+			float: right;
+			z-index: 100;
+			padding: 2px;
+			background-color: #EEE;
+			border: 1px solid @darkgray;
+		}
+	}
+}
+
+#globs-box {
+	position: relative;
+	.globs-card {
+		position: absolute;
+		top: 50px;
+		left: 0px;
+		width: 100%;
+		overflow: auto;
+		border: 1px solid #C0C0C0;
+		opacity: 0.2;
+		white-space: pre;
+	}
+}
+
+/******************
+ * hbox and vbox classes 
+ */
  
 .hbox {
 	display: -webkit-box;
