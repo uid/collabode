@@ -379,8 +379,7 @@ function postprocess() {
 
             try {              
               model.accessPadGlobal(consolePadId, function(pad) {
-                //var fileGlob = outputGlobs.get(sourceFileName);
-                var fileGlob = outputGlobs[sourceFileName];
+                var fileGlobs = outputGlobs[sourceFileName];
                 var text = pad.text();
                 // trim out the start and end, which will always be different!
                 var firstEndBracket = text.indexOf("]");
@@ -388,12 +387,17 @@ function postprocess() {
                 text = text.substring(firstEndBracket+1, lastStartBracket);
                 text = text.replace(/^\s+|\s+$/g,''); // trim whitespace from front and back
                 //text = text.replace(/^\s\s*/, '').replace(/\s\s*$/, '');
-                
-                if (fileGlob[text] != null) {
-                  fileGlob[text] = fileGlob[text] + 1;
+
+                if (fileGlobs[text] != null) {
+                  fileGlobs[text].count++;
                 } else {
-                  fileGlob[text] = 1;
+                  fileGlobs[text] = {
+                      text: text,
+                      count: 1,
+                      authors: new Array()
+                  };
                 }
+                (fileGlobs[text].authors).push(username);
               });
             } catch(e) {
               //System.out.println("no console pad");
@@ -407,37 +411,32 @@ function postprocess() {
   // Sort the results by number of occurrences and prepare a friendlier
   // JSONifiable object
   // TODO: Javascript doesn't have a sorted hash map structure... does it?
+  // If it does, this whole chunk can be avoided.
   var sortedOutputGlobs = {};
   for (var file in outputGlobs) {
-    System.out.println("file: " + file);
-    var fileGlobs = outputGlobs[file];
     sortedOutputGlobs[file] = new Array();
     
     var numFileGlobs = 0;
-    for (var i in fileGlobs) {
+    for (var i in outputGlobs[file]) {
       numFileGlobs++;
     }
-    
-    System.out.println("fileGlobs length: " + numFileGlobs);
     
     while (sortedOutputGlobs[file].length < numFileGlobs) {
       // repeatedly find the glob with the most occurrences and append it
       // in sorted order to the list
-      var maxOccurrences = 0;
-      var maxOccurrencesGlob = "";
-      for (var glob in fileGlobs) {
-        var count = outputGlobs[file][glob];
-        if (count > maxOccurrences) {
-          maxOccurrences = count;
-          maxOccurrencesGlob = glob;
+      var maxOccurrencesGlob = { count: 0 };
+      for (var glob in outputGlobs[file]) {
+        var globInfo = outputGlobs[file][glob];
+        if (globInfo.count > maxOccurrencesGlob.count) {
+          maxOccurrencesGlob = { // make a copy
+              text: globInfo.text,
+              count: globInfo.count,
+              authors: globInfo.authors
+          };
         }
       }
-      outputGlobs[file][maxOccurrencesGlob] = -1;
-      sortedOutputGlobs[file].push({
-        text: maxOccurrencesGlob,
-        count: maxOccurrences
-        }
-      );
+      outputGlobs[file][maxOccurrencesGlob.text].count = -1;
+      sortedOutputGlobs[file].push(maxOccurrencesGlob);
     }
   }
   

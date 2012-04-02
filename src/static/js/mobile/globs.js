@@ -70,7 +70,7 @@ function generateDiffs() {
   var $proto = $selectedGlobsCards().first();
   $('#globs-box-diffs').append(
       $('<div id="proto" class="globs-diff"/>')
-        .append(occurrences($proto.attr("count")))
+        .append(occurrences($proto.attr("count"), $proto.attr("authors")))
         .append($.trim($proto.text()))
   );
   
@@ -89,14 +89,28 @@ function generateDiffs() {
     }
     $('#globs-box-diffs').append(
         $('<div class="globs-diff"/>')
-          .append(occurrences($(this).attr("count")))
+          .append(occurrences($(this).attr("count"), $(this).attr("authors")))
           .append(html)
     );
   });
 }
 
-function occurrences(count) {
-  return '<p class="globs-diff-count">Occurrences: <b>' + count + '</b></p>';
+function occurrences(count, authors) {
+  var o = $('<div/>')
+    .append('<p class="globs-diff-count">Occurrences: <b>' + count + '</b></p>')
+    .css('position', 'relative');
+  var authorsbox = $('<div class="authors-container"/>')
+    .append( $('<div class="authors-list"/>').append(authors.split(',').join(', ')) );
+  authorsbox
+    .css('position', 'absolute')
+    .css('top', 35/*o.outerHeight()*/)
+    .css('right', 0)
+    .hide();
+  o.append(authorsbox);
+  o.click(function() {
+    $(this).find('.authors-container').slideToggle(200);
+  });
+  return o;
 }
 
 diff_match_patch.prototype.diff_myPrettyHtml = function(diffs) {

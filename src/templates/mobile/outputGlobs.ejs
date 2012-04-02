@@ -38,7 +38,7 @@
     <% globsList = outputGlobs[file] %>
     <% for (g in globsList) { %>
    	  <% glob = globsList[g] %>
-   	  <div class="globs-card globs-<%= fileid %>" count=<%= glob.count %>>
+   	  <div class="globs-card globs-<%= fileid %>" count=<%= glob.count %> authors='<%= glob.authors %>'>
    	    <%= glob.text %>
       </div>
     <% }; %>
