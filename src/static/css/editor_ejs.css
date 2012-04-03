@@ -23,14 +23,14 @@ body.fullwidth #editorpage { width: auto; margin-left: 6px; margin-right: 6px; }
 
 #docbarproject {
 	position: absolute; height: auto; left: 9px;
-	width: 280px; font-size: 1.6em; color: #444; font-weight: normal;
+	width: 244px; font-size: 1.6em; color: #444; font-weight: normal;
 	line-height: 22px; margin-left: 2px; height: 22px; top: 4px;
 	overflow: hidden; text-overflow: ellipsis /*not supported in FF*/;
 	white-space:nowrap;
 }
 #docbarfile {
 	position: absolute; height: auto; left: 265px;
-	width: 40%; font-size: 1.6em; color: #444; font-weight: normal;
+	width: 35%; font-size: 1.6em; color: #444; font-weight: normal;
 	line-height: 22px; margin-left: 2px; height: 22px; top: 4px;
 	overflow: hidden; text-overflow: ellipsis /*not supported in FF*/;
 	white-space:nowrap;
@@ -40,6 +40,10 @@ body.fullwidth #editorpage { width: auto; margin-left: 6px; margin-right: 6px; }
 	font-size: 1.6em; color: #888; font-weight: normal;
 	line-height: 22px; margin-right: 2px; height: 22px; top: 4px;
 	white-space:nowrap;
+}
+#docbaruser span {
+	display: block; max-width: 166px; 
+	overflow: hidden; text-overflow: ellipsis /*not supported in FF*/;
 }
 
 #docbarproject a {
@@ -57,12 +61,12 @@ body.fullwidth #editorpage { width: auto; margin-left: 6px; margin-right: 6px; }
 }
 
 #docbaroverlay {
-	position: absolute; top: 1px; height: 30px; right: 200px; width:1in;
+	position: absolute; top: 1px; height: 30px; right: 210px;
 }
 
 #docbartools {
 	position:absolute; height:auto; right:0;
-	width:160px; font-size: 1.6em; color:#444; font-weight:normal;
+	width:172px; font-size: 1.6em; color:#444; font-weight:normal;
 	line-height: 22px; margin-right: 2px; height:22px; top:4px;
 	white-space:nowrap;
 }
