@@ -1,0 +1,23 @@
+<% helpers.setHtmlTitle("History") %>
+<% helpers.addBodyClass("fullwidth") %>
+<% helpers.addBodyClass("nosidebar") %>
+<% helpers.includeCss("editor_ejs.css") %>
+
+<div id="editorpage">
+
+<%= helpers.renderPartial("docbar", { project: "History" }) %>
+
+<div id="padmain">
+  <div id="padeditor">
+    <div id="wizardcontainerbox">
+      <% padIds.forEach(function(padId) { %>
+        <p>
+        <a href="/history/<%= padId %>"><%= padId %></a><br/>
+        <%= editors[padId].join(",") %>
+        </p>
+      <% }); %>
+    </div>
+  </div>
+</div>
+
+</div>

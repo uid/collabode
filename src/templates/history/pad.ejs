@@ -1,0 +1,74 @@
+<% helpers.setHtmlTitle("History") %>
+<% helpers.addBodyClass("fullwidth") %>
+<% helpers.addBodyClass("nosidebar") %>
+<% helpers.includeCss("editor_ejs.css") %>
+<% helpers.includeJQuery() %>
+<% helpers.includeJs("history.js") %>
+
+<style>
+#docbarfile { position: fixed; top: 11px; width: 60%; }
+#containerbox { position: relative; }
+#contents {
+  position: fixed;
+  width: 95%;
+  border: 1px solid #c4c4c4;
+  background:#fff;
+  padding:11px;
+  margin-top:78px;
+  -webkit-border-radius:6px; -moz-border-radius:6px;
+  font-family: Consolas, Menlo, monospace;
+  white-space: pre;
+  -webkit-columns: auto 3;
+  -webkit-column-gap: 2em;
+  -webkit-column-rule: 1px solid #c4c4c4;
+}
+#timeline {
+  position: absolute;
+  top: 0;
+  width: 100%;
+}
+#timeline .rev {
+  position: absolute;
+  top: 0;
+  width: 100%;
+  height: 20px;
+  padding-right: 25px;
+  border-left: 1px solid #c4c4c4;
+}
+#timeline .ts {
+  position: absolute;
+  z-index: 50;
+  width: 70px;
+}
+#timeline .del, #timeline .ins {
+  position: absolute;
+  bottom: 0;
+  width: 2px;
+  -webkit-transform: rotate(135deg);
+  -webkit-transform-origin: left bottom;
+}
+#timeline .del { background: #c52323; left: 0; }
+#timeline .ins { background: #61c423; left: 2px; }
+</style>
+
+<script type="text/javascript">
+var history = <%= fastJSON.stringify({
+  padId: padId,
+  revisions: revisions
+}) %>;
+</script>
+
+<div id="editorpage">
+
+<%= helpers.renderPartial("docbar", { project: "History", file: padId + ' revision <span id="revision">r</span> at <span id="timestamp">t</span>' }) %>
+
+<div id="padmain">
+  <div id="padeditor">
+    <div id="containerbox" class="autoresize">
+      <div id="contents" class="autoresized"></div>
+      <div id="timeline"></div>
+    </div>
+  </div>
+</div>
+
+</div>
