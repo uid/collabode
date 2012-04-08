@@ -85,6 +85,14 @@ function getTreeClient(comet, hilite) {
       // Send message
       comet.sendExtendedMessage({ type : "TREE_FOLDER_CLOSED", path : $("#treecontainer").jstree("get_path", data.rslt.obj) });
     });
+    $("#treecontainer").bind("before.jstree", function(e, data) {
+      if(data.func=="delete_node"){
+        var parent = $.jstree._reference("#treecontainer")._get_parent(data.args[0]);
+        if($.jstree._reference("#treecontainer")._get_children(parent).length==1){
+          $.jstree._reference("#treecontainer").close_node(parent);
+        }
+      }
+    });
   });
 
   //
@@ -187,6 +195,7 @@ function getTreeClient(comet, hilite) {
     myid = myid.replace(/(\/)/g,'\\$1');
     myid = myid.replace(/(\.)/g,'\\$1');
     myid = myid.replace(/(\:)/g,'\\$1');
+    myid = myid.replace(/(\$)/g,'\\$1');
     return myid;
   }
 }
