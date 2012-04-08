@@ -163,6 +163,7 @@ function initOverlay() {
     })
     .each(function() {
       $(this).css('z-index', z++);
+      $(this).text($.trim($(this).text()));
     });
   adjustGlobCardOpacities();
 }
