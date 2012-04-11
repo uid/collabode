@@ -36,6 +36,8 @@ jimport("java.util.concurrent.ConcurrentHashMap");
 jimport("java.lang.System");
 
 var PADPAGE_ROOMTYPE = "padpage";
+var NOPAD_ROOMTYPE = "nopad";
+
 var EXTENDED = "collab_server_extended_handlers";
 
 function onStartup() {
@@ -689,6 +691,23 @@ function getRoomCallbacks(roomName) {
   return callbacks;
 }
 
+function getNoPadRoomCallbacks(roomName, callbacks) {
+  callbacks.handleConnect = function(data) {
+    // XXX validation!
+    return data.userInfo;
+  };
+  callbacks.handleMessage = function(connection, msg) {
+    // XXX validation!
+    if (msg.type == "EXTENDED_MESSAGE") { // XXX duplicated from _handleCometMessage...
+      appjet.cache[EXTENDED][msg.payload.type](null, // XXX ... except we have no pad
+                                               connection.data.userInfo.userId,
+                                               connection.connectionId,
+                                               msg.payload);
+    }
+  };
+  return callbacks;
+}
+
 var _specialKeys = [['x375b', 'invisible']];
 
 function translateSpecialKey(specialKey) {
@@ -861,5 +880,15 @@ function sendConnectionExtendedMessage(connectionId, msg) {
 function sendPadExtendedMessage(pad, msg) {
   _getPadConnections(pad).forEach(function(connection) {
     sendConnectionExtendedMessage(connection.connectionId, msg);
+  });
+}
+
+function sendUserExtendedMessage(userId, msg) {
+  getAllRooms().forEach(function(roomName) {
+    getRoomConnections(roomName).forEach(function(connection) {
+      if (connection.data.userInfo.userId == userId) {
+        sendConnectionExtendedMessage(connection.connectionId, msg);
+      }
+    });
   });
 }

@@ -210,6 +210,9 @@ function getCallbacksForRoom(roomName, roomType) {
   //else if (roomType == readonly_server.PADVIEW_ROOMTYPE) {
   //  return readonly_server.getRoomCallbacks(roomName, emptyCallbacks);
   //}
+  else if (roomType == collab_server.NOPAD_ROOMTYPE) {
+    return collab_server.getNoPadRoomCallbacks(roomName, emptyCallbacks);
+  }
   else {
     //java.lang.System.out.println("UNKNOWN ROOMTYPE: "+roomType);
     return emptyCallbacks;
@@ -279,6 +282,10 @@ function updateRoomConnectionData(connectionId, data) {
 
 function getRoomConnections(roomName) {
   return _getConnections(roomName);
+}
+
+function getAllRooms() {
+  return _getCache().rooms.keySet().toArray();
 }
 
 function getAllRoomsOfType(roomType) {
