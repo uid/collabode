@@ -80,6 +80,10 @@ function getCometClient(initialUserInfo) {
   
   return {
     setOnChannelStateChange: function(cb) { callbacks.onChannelStateChange = cb; },
+    addOnChannelStateChange: function(cb) {
+      var old = callbacks.onChannelStateChange;
+      callbacks.onChannelStateChange = function(state, info) { old(state, info); cb(state, info); }
+    },
     setOnExtendedMessage: function(type, cb) { callbacks.onExtendedMessage[type] = cb; },
     sendExtendedMessage: sendExtendedMessage
   };

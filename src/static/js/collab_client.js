@@ -633,6 +633,10 @@ function getCollabClient(ace2editor, serverVars, initialUserInfo, options) {
     setOnUserLeave: function(cb) { callbacks.onUserLeave = cb; },
     setOnUpdateUserInfo: function(cb) { callbacks.onUpdateUserInfo = cb; },
     setOnChannelStateChange: function(cb) { callbacks.onChannelStateChange = cb; },
+    addOnChannelStateChange: function(cb) {
+      var old = callbacks.onChannelStateChange;
+      callbacks.onChannelStateChange = function(state, info) { old(state, info); cb(state, info); }
+    },
     setOnClientMessage: function(cb) { callbacks.onClientMessage = cb; },
     setOnInternalAction: function(cb) { callbacks.onInternalAction = cb; },
     setOnConnectionTrouble: function(cb) { callbacks.onConnectionTrouble = cb; },
