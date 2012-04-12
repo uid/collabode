@@ -3,6 +3,8 @@
 <% helpers.includeCss("editor_ejs.css") %>
 <% helpers.includeJQuery() %>
 <% helpers.includeJs("layout.js") %>
+<% helpers.includeCometClient() %>
+<% helpers.includeTreeScripts() %>
 
 <div id="editorpage">
 
@@ -15,7 +17,8 @@
 
 <div id="sidebarbox" class="autoresized">
   <div class="sidebarsection">
-    <%= helpers.renderList("explorer", projectfiles, file) %>
+    <div id="treecontainer">
+    </div>
   </div>
 </div>
 

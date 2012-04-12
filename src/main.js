@@ -21,6 +21,7 @@ import("pad.dbwriter");
 
 import("editor.auth");
 import("editor.workspace");
+import("editor.tree");
 
 jimport("java.lang.System");
 
@@ -34,6 +35,7 @@ serverhandlers.startupHandler = function() {
     collabroom_server.onStartup();
     auth.onStartup();
     workspace.onStartup();
+    tree.onStartup();
 };
 
 serverhandlers.requestHandler = function() {
@@ -73,6 +75,13 @@ serverhandlers.tasks.orgImportsPrompt = function(connectionId, openChoices, rang
 serverhandlers.tasks.orgImportsApply = function(username, file, connectionId, iterator) {
     workspace.taskOrgImportsApply(username, file, connectionId, iterator);
 };
+serverhandlers.tasks.reportNewResource = function(resource, resourceParent, resourceType) {
+	tree.newResource(resource, resourceParent);
+};
+serverhandlers.tasks.reportRemoveResource = function(resource, resourceParent) {
+	tree.removeResource(resource, resourceParent);
+};
+
 
 serverhandlers.cometHandler = function(op, id, data) {
     if ( ! data) {

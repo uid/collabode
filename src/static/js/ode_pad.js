@@ -17,6 +17,7 @@ $(document).ready(function() {
                                clientVars.collab_client_vars,
                                user,
                                { });
+  window.ode_comet = collab;
   
   collab.setOnInternalAction(function(action) {
     if (action == "commitPerformed") {

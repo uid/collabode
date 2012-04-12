@@ -20,6 +20,7 @@ $(document).ready(function() {
                                clientVars.collab_client_vars,
                                user,
                                { });
+  window.ode_comet = collab;
   
   function onChannelStateChange(state, info) {
     if (state == "CONNECTED") {

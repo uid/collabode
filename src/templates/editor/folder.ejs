@@ -1,5 +1,7 @@
 <% helpers.setHtmlTitle([ project.getName(), folder.getProjectRelativePath() ]) %>
 <% helpers.includeCss("editor_ejs.css") %>
+<% helpers.includeCometClient() %>
+<% helpers.includeTreeScripts() %>
 
 <div id="editorpage">
 
@@ -7,7 +9,8 @@
 
 <div id="sidebarbox">
   <div class="sidebarsection">
-    <%= helpers.renderList("explorer", projectfiles, folder) %>
+    <div id="treecontainer">
+    </div>
   </div>
 </div>
 

@@ -101,6 +101,26 @@ function includeCometJs() {
     });
 }
 
+function includeCollabClient() {
+  includeCometJs();
+  includeJQuery();
+  includeJs("json2.js");
+  includeJs("collab_client.js");
+}
+
+function includeCometClient() {
+  includeCometJs();
+  includeJQuery();
+  includeJs("json2.js");
+  includeJs("comet_client.js");
+}
+
+function includeTreeScripts() {
+  includeCss("jstree/style.css");
+  includeJs("tree_client.js");
+  includeJs("jstree/jquery.jstree.js");
+}
+
 function hideHeader() {
     _hd().showHeader = false;
 }
