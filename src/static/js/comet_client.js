@@ -1,3 +1,11 @@
+
+$(document).ready(function() {
+  window.ode_comet = getCometClient({
+    userId: clientVars.userId,
+    name: clientVars.userName
+  });
+});
+
 /*
  * See collab_client.js.
  */
