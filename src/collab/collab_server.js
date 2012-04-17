@@ -883,10 +883,11 @@ function sendPadExtendedMessage(pad, msg) {
   });
 }
 
-function sendUserExtendedMessage(userId, msg) {
+function sendUserExtendedMessage(userId, msg, exceptConnectionId) {
   getAllRooms().forEach(function(roomName) {
     getRoomConnections(roomName).forEach(function(connection) {
-      if (connection.data.userInfo.userId == userId) {
+      if (connection.data.userInfo.userId == userId 
+          && connection.connectionId != exceptConnectionId) {
         sendConnectionExtendedMessage(connection.connectionId, msg);
       }
     });

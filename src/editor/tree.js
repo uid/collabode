@@ -46,7 +46,7 @@ function initRequest(nullPadId, user, connectionId, msg) {
   // Store tree nodes to send back to client
   var data = [];
 
-  addPathToOpenFolders(msg.current, user);
+  addPathToOpenFolders(msg.current, user, connectionId);
 
   // Make each resource into a tree node
   projects.forEach(function(item) {
@@ -65,19 +65,23 @@ function initRequest(nullPadId, user, connectionId, msg) {
 
 // When a user loads a page that is in the tree, the user should be able
 // to see that node in the tree also
-function addPathToOpenFolders(file, user) {
+function addPathToOpenFolders(file, user, connectionId) {
 
   // Split the path into its components
   var components = file.split("/");
 
   // Path that will be added to set of open folders for this user
   var path = "";
+  var msgPath = "";
 
-  for (i=1;i<components.length-1;i++) {
+  for (var i=1;i<components.length-1;i++) {
     path += ("/"+components[i]);
+    msgPath += ((i==1?"":",")+components[i]);
 
     // Save path as open
-    treeManager().folderOpened(user, path);
+    if (!treeManager().isFolderOpen(user, path)) {
+      folderOpened(null, user, connectionId, {path: msgPath}, true);
+    }
   }
 }
 
@@ -93,11 +97,11 @@ function folderClosed(nullPadId, user, connectionId, msg) {
   collab_server.sendUserExtendedMessage(user, {
     type : "TREE_CLOSE_FOLDER",
     node : ""+resource_path
-  });
+  }, connectionId);
 }
 
 // Response to when a client opens a folder
-function folderOpened(nullPadId, user, connectionId, msg) {
+function folderOpened(nullPadId, user, connectionId, msg, noOriginal) {
   var resource;
 
   // Path is comma separated, so replace commas with '/'
@@ -122,22 +126,24 @@ function folderOpened(nullPadId, user, connectionId, msg) {
   // Children come in reverse order
   children.reverse();
 
-  // Send the child nodes to the connection that opened the folder
-  collab_server.sendConnectionExtendedMessage(connectionId, {
-    type : "TREE_ADD",
-    parent : ""+resource_path,
-    data : children,
-
-    // Message may contain more than one new node. Nodes will
-    // already be in correct sorted order
-    many : true
-  });
+  if(!noOriginal) {
+    // Send the child nodes to the connection that opened the folder
+    collab_server.sendConnectionExtendedMessage(connectionId, {
+      type : "TREE_ADD",
+      parent : ""+resource_path,
+      data : children,
+  
+      // Message may contain more than one new node. Nodes will
+      // already be in correct sorted order
+      many : true
+    });
+  }
 
   // Notify user's other connections to open the folder
   collab_server.sendUserExtendedMessage(user, {
     type : "TREE_OPEN_FOLDER",
     node : ""+resource_path
-  });
+  }, connectionId);
 }
 
 // Response to client creating a new resource
