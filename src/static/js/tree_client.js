@@ -1,7 +1,4 @@
-// hilite is boolean indicating whether to highlight a node
-// in the tree. If page being viewed is not a node in the tree,
-// hilite should be false.
-function getTreeClient(comet, hilite) {
+function getTreeClient(comet) {
   $(document).ready(function() {
 
     // Gets the path of the currently viewed page
@@ -41,7 +38,7 @@ function getTreeClient(comet, hilite) {
       $("#treecontainer").jstree(init);
 
       // Mark a node as highlighted if necessary
-      if (hilite) highlightNode();
+      highlightNode();
     });
 
     // Handler for adding new files to the tree. Happens either when
@@ -52,7 +49,7 @@ function getTreeClient(comet, hilite) {
       });
 
       // Highlight if necessary
-      if (hilite) highlightNode();
+      highlightNode();
     });
 
     // Handler for request to remove a node
@@ -206,5 +203,5 @@ function getTreeClient(comet, hilite) {
 }
 
 $(document).ready(function(){
-  getTreeClient(window.ode_comet, true);
+  getTreeClient(window.ode_comet);
 });
