@@ -9,15 +9,15 @@ jimport("collabode.Workspace");
 
 jimport("java.lang.System");
 
-function render_task(requester, projectname, filename) {
+function render_mturk_task(requester, projectname, filename) {
   var assignmentId = request.params.assignmentId;
   if (assignmentId == 'ASSIGNMENT_ID_NOT_AVAILABLE') { assignmentId = null; }
   
   var assigned = assignmentId && request.params.workerId;
   
-  var hit = turk.getHIT('u.'+requester, request.params.hitId); // XXX f'n that prepends u.
+  var hit = turk.getMTurkHIT('u.'+requester, request.params.hitId); // XXX f'n that prepends u.
   
-  renderHtml("turk/task.ejs", {
+  renderHtml("turk/mturk_task.ejs", {
     workerId: request.params.workerId,
     hitId: request.params.hitId,
     assignmentId: assignmentId,

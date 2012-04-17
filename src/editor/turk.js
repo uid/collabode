@@ -4,7 +4,7 @@ jimport("edu.mit.csail.uid.turkit.MTurk");
 
 jimport("java.lang.System");
 
-function getHIT(userId, hitId) {
+function getMTurkHIT(userId, hitId) {
   var settings = workspace.getSettings(userId);
   return new XML(MTurk.restRequest(settings.get('turkID'),
                                    settings.get('turkSecret'),

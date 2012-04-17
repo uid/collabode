@@ -119,7 +119,7 @@ function handlePath() {
     [/^\/login:([\w]+):([^\/]+)(\/.*)$/, auth_control.external_login],
     [/^\/login()(\/.*)$/, auth_control.render_login],
     ['/logout', auth_control.logout],
-    [_file('turk:([\\w]+)'), turk_control.render_task],
+    [_file('mturk:([\\w]+)'), turk_control.render_mturk_task],
     [/^\/frame%22([\s\S]*?)%22(\/.*)$/, turk_control.render_framed] // XXX anyone can frame us?
   ]);
   noauth.POST.addLocations([
