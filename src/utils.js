@@ -110,3 +110,43 @@ function renderHtml(bodyFileName, data) {
 function camelToUnderscore(camel) {
   return camel.replace(/[A-Z]/, function(m) { return '_'+m.toLowerCase(); });
 }
+
+function urlGet(url0, params) { // logic and return structure from netutils.urlPost(...)
+  var partialUrl = new java.net.URL(url0);
+  
+  var components = [];
+  eachProperty(params, function(k, v) {
+    components.push(encodeURIComponent(k)+"="+encodeURIComponent(v));
+  });
+  var query = components.join('&');
+  
+  var url = new java.net.URL(url0 + (partialUrl.getQuery() ? '&' : '?') + query);
+  
+  var conn = url.openConnection();
+  var content = conn.getContent();
+  var responseCode = conn.getResponseCode();
+  var contentType = conn.getContentType();
+  var contentEncoding = conn.getContentEncoding();
+  
+  if ((content instanceof java.io.InputStream) && (new java.lang.String(contentType)).startsWith("text/")) {
+    if (! contentEncoding) {
+      var encoding = contentType.split(/;\s*/);
+      if (encoding.length > 1) {
+        encoding = encoding[1].split("=");
+        if (encoding[0] == "charset")
+          contentEncoding = encoding[1];
+      }
+    }
+    content = net.appjet.common.util.BetterFile.getStreamBytes(content);
+    if (contentEncoding) {
+      content = (new java.lang.String(content, contentEncoding));
+    }
+  }
+  
+  return {
+    content: content,
+    status: responseCode,
+    contentType: contentType,
+    contentEncoding: contentEncoding
+  };
+}
