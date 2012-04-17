@@ -54,9 +54,6 @@ function initRequest(nullPadId, user, connectionId, msg) {
     data.push(node);
   });
 
-  // Projects come in reverse order
-  data.reverse();
-
   collab_server.sendConnectionExtendedMessage(connectionId, {
     type: "TREE_INIT",
     data: data
