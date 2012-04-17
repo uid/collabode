@@ -5,6 +5,10 @@ import("collab.collab_server");
 
 import("pad.model");
 
+import("utils.getSession");
+import("editor.auth");
+import("editor.workspace");
+
 jimport("collabode.PadFunctions");
 jimport("collabode.PadDocumentOwner");
 jimport("collabode.Workspace");
@@ -36,12 +40,23 @@ function treeManager() {
   return TreeManager.getTreeManager();
 }
 
+function list_accessible_projects() {
+  var projects = Workspace.listProjects().slice();
+  var userId = getSession().userId;
+  if (workspace.restricted(userId)) {
+    projects = projects.filter(function(project) {
+      return (! workspace.restricted(userId)) || auth.has_acl(project, '', userId, auth.READ);
+    });
+  }
+  return projects;
+}
+
 // Response to request for entire current state of tree. This
 // happens when the user loads a new page with a file tree on it
 function initRequest(nullPadId, user, connectionId, msg) {
   // Currently get all projects, not taking in to account
   // user permissions
-  var projects = Workspace.listProjects();
+  var projects = list_accessible_projects();
 
   // Store tree nodes to send back to client
   var data = [];
