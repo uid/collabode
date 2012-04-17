@@ -138,6 +138,11 @@ function getTreeClient(comet, hilite) {
 
   // Build node structure expected by jsTree
   function makeJSTreeNode(item) {
+    var icons = {
+      "file" : "/static/img/eclipse/ui.obj.file.gif",
+      "folder" : "/static/img/eclipse/ui.obj.folder.gif",
+      "project" : "/static/img/eclipse/ui.ide.obj.project.gif"
+    };
     var node;
     if (item.type == "folder") {
       node = {
@@ -146,7 +151,7 @@ function getTreeClient(comet, hilite) {
           "attr" : {
             "href" : item.path
           },
-          "icon" : "/static/img/eclipse/ui.obj.folder.gif"
+          "icon" : icons[item.icon]
         },
         "attr" : {id : item.path},
         "state" : item.state,
@@ -159,7 +164,7 @@ function getTreeClient(comet, hilite) {
             "attr" : {
               "href" : item.path
             },
-            "icon" : "/static/img/eclipse/ui.obj.file.gif"
+            "icon" : icons[item.icon]
           },
           "attr" : {id : item.path}
       }

@@ -202,6 +202,12 @@ function makeNode(user, resource, position) {
   // If node is a folder, indicate whether it is open
   var isOpen = ((type == "folder") ? treeManager().isFolderOpen(user, resource.getFullPath()) : "");
 
+  var icons = {
+      1: "file",
+      2: "folder",
+      4: "project"
+  };
+
   var node = {
     // Node in which this node should be placed inside
     parent : ""+resource.getParent().getFullPath(),
@@ -214,6 +220,9 @@ function makeNode(user, resource, position) {
 
     // Folder of file
     type : ""+type,
+
+    // Icon type of the node
+    icon : ""+icons[resource.getType()],
 
     // Either a file or a folder that is open or closed
     state : ((type == "file") ? "" : ((isOpen) ? "open" : "closed")),
