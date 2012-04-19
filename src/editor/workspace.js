@@ -63,9 +63,13 @@ function accessDocumentPad(userId, file) {
   return padId;
 }
 
-function _filenameFor(padId) {
+function filenameFor(padId) {
   var cf = padId.split("@", 2);
   return cf[1];
+}
+
+function documentFor(userId, padId) {
+  return PadDocumentOwner.of(userId).get(filenameFor(padId));
 }
 
 function restricted(userId) {
@@ -77,7 +81,7 @@ function isChangesetAllowed(padId, changeset, author) {
   if (author[0] == '#') { return true; } // XXX always internal?
   if ( ! restricted(author)) { return true; }
   
-  var doc = PadDocumentOwner.of(author).get(_filenameFor(padId));
+  var doc = documentFor(author, padId);
   var file = doc.collab.file;
   return auth.has_acl(file.getProject(), file, author, auth.WRITE, function(restrictions) {
     return doc.isAllowed(_makeReplaceEdits(changeset), restrictions);
@@ -105,7 +109,7 @@ function getSettings(userId, key) {
 }
 
 function taskPdsyncDocumentText(padId, newRev, cs, author) {
-  var doc = PadDocumentOwner.of(author).get(_filenameFor(padId));
+  var doc = documentFor(author, padId);
   doc.collab.syncUnionCoordinateEdits(doc, newRev, _makeReplaceEdits(cs));
 }
 
@@ -264,7 +268,7 @@ function accessTestsOwner(project) {
 }
 
 function _onTestsRequest(padId, userId, connectionId, msg) {
-  var doc = PadDocumentOwner.of(userId).get(_filenameFor(padId));
+  var doc = documentFor(userId, padId);
   var owner = ProjectTestsOwner.of(doc.collab.file.getProject());
   switch (msg.action) {
   case 'state':
@@ -276,7 +280,7 @@ function _onTestsRequest(padId, userId, connectionId, msg) {
     var testsPadId;
     var iterator = owner.advanceStatus(msg.test.className, msg.test.methodName, msg.from, scalaFn(1, function(testsFile) {
       testsPadId = accessDocumentPad(userId, testsFile); // ensure existence
-      return PadDocumentOwner.of(userId).get(_filenameFor(testsPadId));
+      return documentFor(userId, testsPadId)
     }));
     model.accessPadGlobal(testsPadId, function(pad) {
       collab_server.applyChangesetToPad(pad, _makeChangeSetStr(pad, iterator), userId);
@@ -286,12 +290,12 @@ function _onTestsRequest(padId, userId, connectionId, msg) {
 }
 
 function _onTestsRunRequest(padId, userId, connectionId, msg) {
-  var doc = PadDocumentOwner.of(userId).get(_filenameFor(padId));
+  var doc = documentFor(userId, padId)
   ProjectTestsOwner.of(doc.collab.file.getProject()).scheduleRun();
 }
 
 function _onCodeCompleteRequest(padId, userId, connectionId, msg) {
-  var doc = PadDocumentOwner.of(userId).get(_filenameFor(padId));
+  var doc = documentFor(userId, padId)
   doc.codeComplete(doc.collab.unionToLocalOffset(doc, msg.offset), scalaFn(1, function(proposals) {
     collab_server.sendConnectionExtendedMessage(connectionId, {
       type: "CODECOMPLETE_PROPOSALS",
@@ -310,13 +314,13 @@ function _onCodeCompleteRequest(padId, userId, connectionId, msg) {
 }
 
 function getContentTypeName(author, padId) {
-  return PadDocumentOwner.of(author).get(_filenameFor(padId)).getContentTypeName();
+  return documentFor(author, padId).getContentTypeName();
 }
 
 function knockout(padId, userId, method, params, replacement) {
   var changeset;
   model.accessPadGlobal(padId, function(pad) {
-    var iterator = PadDocumentOwner.of(userId).get(_filenameFor(padId)).knockout(method, params, replacement);
+    var iterator = documentFor(userId, padId).knockout(method, params, replacement);
     changeset = _makeChangeSetStr(pad, iterator);
     collab_server.applyChangesetToPad(pad, changeset, userId);
   });
@@ -355,7 +359,7 @@ function _testResultMessage(test, result) {
 function taskTestResult(project, test, result) {
   var projectName = "" + project.getName();
   var padIds = collab_server.getAllPadsWithConnections().filter(function(padId) {
-    return _filenameFor(padId) && (projectName == _filenameFor(padId).split("/", 3)[1]);
+    return filenameFor(padId) && (projectName == filenameFor(padId).split("/", 3)[1]);
   });
   var msg = _testResultMessage(test, result);
   padIds.forEach(function(padId) {
@@ -407,7 +411,7 @@ function _onRunRequest(padId, userId, connectionId, msg) {
 }
 
 function _onFormatRequest(padId, userId, connectionId, msg) {
-  var iterator = PadDocumentOwner.of(userId).get(_filenameFor(padId)).formatDocument();
+  var iterator = documentFor(userId, padId).formatDocument();
   model.accessPadGlobal(padId, function(pad) {
     var cs = _makeChangeSetStr(pad, iterator);
     collab_server.sendConnectionExtendedMessage(connectionId, {
@@ -419,7 +423,7 @@ function _onFormatRequest(padId, userId, connectionId, msg) {
 }
 
 function _onOrganizeImportsRequest(padId, userId, connectionId, msg) {
-  PadDocumentOwner.of(userId).get(_filenameFor(padId)).organizeImports(connectionId);
+  documentFor(userId, padId).organizeImports(connectionId);
 }
 
 function taskOrgImportsPrompt(connectionId, openChoices, ranges) {
@@ -450,7 +454,7 @@ function taskOrgImportsApply(username, file, connectionId, iterator) {
 }
 
 function _onOrganizeImportsResolved(padId, userId, connectionId, msg) {
-  PadDocumentOwner.of(userId).get(_filenameFor(padId)).organizeImportsResolved(connectionId, msg.choices);
+  documentFor(userId, padId).organizeImportsResolved(connectionId, msg.choices);
 }
 
 function taskRunningStateChange(id, file, state) {
