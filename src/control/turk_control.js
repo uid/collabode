@@ -30,6 +30,26 @@ function render_mturk_task(requester, projectname, filename) {
   return true;
 }
 
+function render_instawork_task(taskId, destination) {
+  if (taskId) {
+    try {
+      var task = turk.getInstaworkTask(taskId);
+    } catch (e) {
+      renderError(404);
+    }
+    
+    // XXX claim task, fail if assigned or completed
+    
+    renderHtml("turk/instawork_task.ejs", {
+      task: task,
+      frameURL: request.path.substring(request.path.indexOf('/', 1))
+    });
+  } else {
+    response.redirect('/instawork:' + request.params.taskId + destination);
+  }
+  return true;
+}
+
 function render_framed(description, destination) {
   renderHtml("turk/framed.ejs", {
     description: decodeURIComponent(description),
