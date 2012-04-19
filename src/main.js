@@ -20,6 +20,7 @@ import("pad.model");
 import("pad.dbwriter");
 
 import("editor.auth");
+import("editor.turk");
 import("editor.workspace");
 
 jimport("java.lang.System");
@@ -33,6 +34,7 @@ serverhandlers.startupHandler = function() {
     dbwriter.onStartup();
     collabroom_server.onStartup();
     auth.onStartup();
+    turk.onStartup();
     workspace.onStartup();
 };
 

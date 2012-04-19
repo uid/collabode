@@ -26,7 +26,11 @@ $(document).ready(function() {
   var testor = new Testor(collab);
   
   var orgImportsWidget = makeOrgImportsWidget($, ace, function(selection) {
-    collab.sendExtendedMessage({ type: "ORGIMPORTS_RESOLVED" , choices: selection});
+    collab.sendExtendedMessage({ type: "ORGIMPORTS_RESOLVED" , choices: selection });
+  });
+  
+  var outsourceWidget = makeOutsourceWidget(function(request) {
+    collab.sendExtendedMessage({ type: "OUTSOURCE_REQUEST", request: request });
   });
   
   collab.setOnInternalAction(function(action) {
@@ -116,6 +120,10 @@ $(document).ready(function() {
   });
   $("#runtests").click(function() {
     collab.sendExtendedMessage({ type: "TESTS_RUN_REQUEST" });
+    return false;
+  });
+  $("#outsource").click(function() {
+    outsourceWidget.createRequest(ace.getSelection());
     return false;
   });
 });

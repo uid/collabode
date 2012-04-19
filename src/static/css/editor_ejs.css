@@ -10,7 +10,7 @@ a img { border: none; }
 html { font-size: 62.5%; }
 
 body { background: #ebebeb url(/static/img/pad/backgradient.gif) repeat-x left top; }
-body, textarea { font-family: Arial, sans-serif; }
+body { font-family: Arial, sans-serif; }
 
 #editorpage { position: relative; margin-left: auto; margin-right: auto; width: 1010px; }
 
@@ -204,6 +204,9 @@ body.nosidebar #padeditor { margin-left: 0; }
 #runtests.enabled {
     background: url(/static/img/eclipse/jdt.junit.obj.tsuiterun.gif) no-repeat center center;
 }
+#outsource.enabled {
+    background: url(/static/img/eclipse/help.ui.view.help.gif) no-repeat center center;
+}
 
 #editorcontainerbox {
   border-left: 1px solid #c4c4c4; border-right: 1px solid #c4c4c4;
@@ -241,6 +244,18 @@ body.nosidebar #padeditor { margin-left: 0; }
 #orgimports-input { position:absolute; top:8px; left:9px; width:325px; height:17px; }
 #orgimports-cancel { position:absolute; top:198px; height:25px; width:65px; left:77px; }
 #orgimports-next { position:absolute; top:198px; height:25px; width:65px; left:9px; }
+#outsource-container {
+	position:absolute; width:328px; height:161px; top:11px; left:368px; background-color:#dedede; box-shadow:5px 5px 5px #888; -o-box-shadow:5px 5px 5px #888;
+	-icab-box-shadow:5px 5px 5px #888; -khtml-box-shadow:5px 5px 5px #888; -moz-box-shadow:3px 3px 6px #888; -webkit-box-shadow:5px 5px 5px #888; border:1px;
+	padding:8px 9px;
+}
+#outsource-container label { padding:0 0.75em; height:17px; }
+#outsource-file { width:200px; height:17px; }
+#outsource-line { width:35px; height:17px; }
+#outsource-request { position:absolute; top:36px; height:79px; width:325px; left:9px; }
+#outsource-details { position:absolute; top:126px; height:17px; width:325px; left:9px; }
+#outsource-cancel { position:absolute; top:143px; height:25px; width:65px; left:77px; }
+#outsource-next { position:absolute; top:143px; height:25px; width:65px; left:9px; }
 
 #wizardcontainerbox {
 	border: 1px solid #c4c4c4;

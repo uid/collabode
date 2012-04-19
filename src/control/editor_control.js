@@ -248,6 +248,10 @@ function _render_file(project, file, lineno, projectfiles) {
   }
   
   data.__proto__ = _renderers._file(project, file);
+  helpers.addClientVars({
+    editorProject: "" + project.getName(),
+    editorFile: "" + file.getProjectRelativePath()
+  });
   if (lineno) { helpers.addClientVars({ scrollToLineNo: lineno }); }
   renderHtml("editor/file.ejs", data);
   return true;
