@@ -40,9 +40,10 @@ body.fullwidth #editorpage { width: auto; margin-left: 6px; margin-right: 6px; }
 	font-size: 1.6em; color: #888; font-weight: normal;
 	line-height: 22px; margin-right: 2px; height: 22px; top: 4px;
 	white-space:nowrap;
+	text-align: right;
 }
 #docbaruser span {
-	display: block; max-width: 166px; 
+	display: inline-block; max-width: 166px; 
 	overflow: hidden; text-overflow: ellipsis /*not supported in FF*/;
 }
 
