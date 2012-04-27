@@ -17,7 +17,7 @@
 import("fastJSON");
 import("comet");
 import("jsutils.eachProperty");
-import("utils.renderTemplateAsString");
+import("utils.{getSession,renderTemplateAsString}");
 
 import("globals.*");
 
@@ -95,6 +95,11 @@ function includeCss(relpath) {
 
 function includeCometJs() {
     _hd().includeCometJs = true;
+    var session = getSession();
+    addClientVars({
+      userId: session.userId,
+      userName: session.userName
+    });
 }
 
 function hideHeader() {

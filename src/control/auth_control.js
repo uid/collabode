@@ -31,8 +31,6 @@ function render_settings() {
       initialRevisionList: revisions.getRevisionList(pad),
       serverTimestamp: +(new Date),
       initialOptions: pad.getPadOptionsObj(),
-      userId: getSession().userId,
-      userName: getSession().userName,
       opts: {}
     });
   });
