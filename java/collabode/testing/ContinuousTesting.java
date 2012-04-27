@@ -1,7 +1,7 @@
 package collabode.testing;
 
 import java.io.IOException;
-import java.util.Collections;
+import java.util.*;
 import java.util.concurrent.*;
 
 import org.eclipse.core.resources.*;
@@ -31,6 +31,7 @@ public class ContinuousTesting implements Runnable {
     
     private final BlockingQueue<IProject> toRun = new LinkedBlockingQueue<IProject>();
     private final ConcurrentMap<ILaunch, CountDownLatch> latches = new ConcurrentHashMap<ILaunch, CountDownLatch>();
+    private final Set<ITestRunSession> launched = Collections.synchronizedSet(new HashSet<ITestRunSession>());
     
     public final IResourceChangeListener listener = new IResourceChangeListener() {
         public void resourceChanged(IResourceChangeEvent event) {
@@ -65,8 +66,12 @@ public class ContinuousTesting implements Runnable {
             @Override public void testCaseFinished(ITestCaseElement elt) {
                 ProjectTestsOwner.of(elt.getTestRunSession().getLaunchedProject()).update(elt);
             }
+            @Override public void sessionLaunched(ITestRunSession session) {
+                launched.add(session);
+            }
             @Override public void sessionStarted(ITestRunSession session) {
                 ProjectTestsOwner.of(session.getLaunchedProject()).update(session);
+                launched.remove(session);
             }
         });
     }
@@ -100,6 +105,12 @@ public class ContinuousTesting implements Runnable {
                 } catch (CoreException ce) {
                     ce.printStackTrace(); // XXX
                 }
+                
+                for (ITestRunSession session : launched) {
+                    System.err.println("Retry " + session.getProgressState() + " " + session.getTestRunName()); // XXX
+                    runTests(session.getLaunchedProject().getProject());
+                }
+                launched.clear();
             } catch (Exception e) {
                 e.printStackTrace(); // XXX ... and madly soldier on
             }
