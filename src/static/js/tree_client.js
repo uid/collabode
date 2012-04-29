@@ -66,9 +66,6 @@ function getTreeClient(comet) {
 
       // jsTree function to build tree with supplied nodes
       $("#treecontainer").jstree(init);
-
-      // Mark a node as highlighted if necessary
-      highlightNode();
     });
 
     // Handler for adding new files to the tree. Happens either when
@@ -97,6 +94,10 @@ function getTreeClient(comet) {
       $.jstree._reference("#treecontainer").close_node("#"+escapeURL(msg.node));
     });
 
+    $("#treecontainer").bind("loaded.jstree", function(e, data) {
+      highlightNode();
+    });
+    
     // When a folder is opened, make a request for the child nodes and tell server so
     // that server can save state
     $("#treecontainer").bind("open_node.jstree", function(e, data) {
