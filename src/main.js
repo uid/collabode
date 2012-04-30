@@ -181,6 +181,8 @@ function handlePath() {
     [_file('delete'), u(editor_control.render_confirm_delete)],
     [_proj('delacl:([\\w\\.]+)'), r(editor_control.render_confirm_delacl, auth.OWNER, 1)],
     [_file('delacl:([\\w\\.]+)'), r(editor_control.render_confirm_delacl, auth.OWNER, 1)],
+    [_proj('dialog'), u(editor_control.render_dialog)],
+    [_file('dialog'), u(editor_control.render_dialog)],
     [_file('clone'), r(clone_control.clone_path)],
     [_file('knockout:([\\w,.\\[;]+)"([\\s\\S]*)"'), r(turk_control.render_knockout, auth.READ, 2, 'clones')],
     [/^\/statistics(?:\/(?:([^\/]+)(?:\/([^\/]+)?)?)?)?$/, u(stats_control.render_stats)],

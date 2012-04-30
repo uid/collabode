@@ -454,3 +454,11 @@ body.nosidebar #padeditor { margin-left: 0; }
 	white-space: pre;
 	font-family: Consolas, Menlo, monospace;
 }
+
+#dialog-content { 
+	position:absolute; width:346px; height:232px; top:11px; left:368px;
+	box-shadow:5px 5px 5px #888; -o-box-shadow:5px 5px 5px #888; 
+	-icab-box-shadow:5px 5px 5px #888; -khtml-box-shadow:5px 5px 5px #888; 
+	-moz-box-shadow:3px 3px 6px #888; -webkit-box-shadow:5px 5px 5px #888; 
+	border:1px; 
+}

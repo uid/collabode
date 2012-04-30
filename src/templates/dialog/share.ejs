@@ -1,0 +1,33 @@
+<form id="share-form">
+<input type="hidden" name="acl" value="1"/>
+<h2>Permissions</h2>
+<div id="acl">
+<table>
+<%= helpers.renderList("acl", acl, null, { item: 'tr' }) %>
+<tr>
+<td>
+<select name="acl_userid">
+<option value="anyone">anyone</option>
+<% auth.recent_users().forEach(function(userId) { %>
+<option value="<%= userId %>"><%= userId %></option>
+<% }); %>
+</select>
+</td><td><%= folder.getProjectRelativePath().toString() %></td><td>
+<select name="acl_permission">
+<option value="read">Read</option>
+<option value="claim">Claim</option>
+<option value="write">Write</option>
+<option value="owner">Owner</option>
+</select>
+</td><td></td><td><button onclick="submit_form()" type="button">Add permission</button></td>
+</tr>
+</table>
+</div>
+</form>
+<script type="text/javascript">
+function submit_form() {
+  $.post("<%=path %>", $("#share-form").serialize(), function() {
+    location.reload();
+  });
+}
+</script>

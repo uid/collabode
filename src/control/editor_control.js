@@ -344,3 +344,32 @@ function delete_acl(userId, projectname, filename) {
   response.redirect(''+resource.getFullPath());
   return true;
 }
+
+function render_dialog(projectname, path) {
+  var project = Workspace.accessProject(projectname);
+  var resource = project.findMember(path);
+  var action = request.params['action'];
+  helpers.includeJQuery();
+  helpers.includeCss("dialog.css");
+  var fullpath = projectname + "/" + path;
+  switch (action) {
+  case "newfile":
+    renderHtml("dialog/newfile.ejs", {path: fullpath});
+    break;
+  case "newfolder":
+    renderHtml("dialog/newfolder.ejs", {path: fullpath});
+    break;
+  case "delete":
+    renderHtml("dialog/delete.ejs", {path: fullpath});
+    break;
+  case "share":
+    renderHtml("dialog/share.ejs", {
+      project: project,
+      folder: resource,
+      acl: auth.acl(project, resource),
+      path: fullpath
+    });
+    break;
+  }
+  return true;
+}

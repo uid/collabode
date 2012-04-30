@@ -1,0 +1,16 @@
+<form id="newfolder-form" onsubmit="submit_form(); return false">
+<input type="hidden" name="folder" value="1"/>
+<p><img src="/static/img/eclipse/ui.obj.folder.gif"/> Create a sub-folder in <%=path %></p>
+<p><input id="focus" name="foldername"/></p>
+<p><button type="submit">Create sub-folder</button>
+<button onclick="close_dialog()">Cancel</button></p>
+</form>
+<script type="text/javascript">
+function submit_form() {
+  $.post("<%=path %>", $("#newfolder-form").serialize());
+  close_dialog();
+}
+function initialize() {
+  $("#focus").focus();
+}
+</script>

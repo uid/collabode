@@ -41,7 +41,7 @@ function getTreeClient(comet) {
     });
 
     // Add jsTree specific plugins here
-    var jstree_plugins = ["themes", "json_data"];
+    var jstree_plugins = ["themes", "json_data", "contextmenu"];
 
     // Handler for receiving initial tree request
     comet.setOnExtendedMessage("TREE_INIT", function(msg) {
@@ -63,6 +63,127 @@ function getTreeClient(comet) {
 
       // jsTree
       init["plugins"] = jstree_plugins;
+      
+      init["contextmenu"] = {
+        show_at_node : false,
+        items: function(data){
+          if (data.hasClass("tree-folder")) {
+            return {
+              newfile : {
+                label : "New File",
+                action : function (obj) {
+                  var path = obj.attr('id');
+                  $.dialog.show('dialog'+path+'?action=newfile', 250, 136);
+                },
+                _class : "contextmenu_newfile",
+                separator_before : false,
+                separator_after : false,
+                icon : false
+              },
+              newfolder : {
+                label : "New Folder",
+                action : function (obj) {
+                  var path = obj.attr('id');
+                  $.dialog.show('dialog'+path+'?action=newfolder', 250, 136);
+                },
+                _class : "contextmenu_newfolder",
+                separator_before : false,
+                separator_after : true,
+                icon : false
+              },
+              rename : {
+                label : "Rename",
+                action : function (obj) {
+                  //TODO: implement
+                },
+                _class : "contextmenu_rename",
+                separator_before : false,
+                separator_after : false,
+                icon : false
+              },
+              "delete" : {
+                label : "Delete",
+                action : function (obj) {
+                  var path = obj.attr('id');
+                  $.dialog.show('dialog'+path+'?action=delete', 250, 112);
+                },
+                _class : "contextmenu_delete",
+                separator_before : false,
+                separator_after : true,
+                icon : false
+              },
+              share : {
+                label : "Share",
+                action : function (obj) {
+                  var path = obj.attr('id');
+                  $.dialog.show('dialog'+path+'?action=share', 400, 500);
+                },
+                _class : "contextmenu_share",
+                separator_before : false,
+                separator_after : false,
+                icon : false
+              }
+            };
+          } else if (data.hasClass("tree-file")) {
+            return {
+              newfile : {
+                label : "New File",
+                action : function (obj) {
+                  var path = obj.attr('id').replace(/\/[^\/]*$/,'');
+                  $.dialog.show('dialog'+path+'?action=newfile', 250, 136);
+                },
+                _class : "contextmenu_newfile",
+                separator_before : false,
+                separator_after : false,
+                icon : false
+              },
+              newfolder : {
+                label : "New Folder",
+                action : function (obj) {
+                  var path = obj.attr('id').replace(/\/[^\/]*$/,'');
+                  $.dialog.show('dialog'+path+'?action=newfolder', 250, 136);
+                },
+                _class : "contextmenu_newfolder",
+                separator_before : false,
+                separator_after : true,
+                icon : false
+              },
+              rename : {
+                label : "Rename",
+                action : function (obj) {
+                  //TODO: implement
+                },
+                _class : "contextmenu_rename",
+                separator_before : false,
+                separator_after : false,
+                icon : false
+              },
+              "delete" : {
+                label : "Delete",
+                action : function (obj) {
+                  var path = obj.attr('id');
+                  $.dialog.show('dialog'+path+'?action=delete', 250, 112);
+                },
+                _class : "contextmenu_delete",
+                separator_before : false,
+                separator_after : true,
+                icon : false
+              },
+              share : {
+                label : "Share",
+                action : function (obj) {
+                  var path = obj.attr('id');
+                  $.dialog.show('dialog'+path+'?action=share', 400, 500);
+                },
+                _class : "contextmenu_share",
+                separator_before : false,
+                separator_after : false,
+                icon : false
+              }
+            };
+          }
+        }
+      };
 
       // jsTree function to build tree with supplied nodes
       $("#treecontainer").jstree(init);
@@ -181,7 +302,7 @@ function getTreeClient(comet) {
           },
           "icon" : icons[item.icon]
         },
-        "attr" : {id : item.path},
+        "attr" : {id : item.path, "class" : "tree-folder"},
         "state" : item.state,
         "children" : ((item.state == "open") ? getNodeChildren(item) : [])
       }
@@ -194,7 +315,7 @@ function getTreeClient(comet) {
             },
             "icon" : icons[item.icon]
           },
-          "attr" : {id : item.path}
+          "attr" : {id : item.path, "class" : "tree-file"}
       }
     }
 

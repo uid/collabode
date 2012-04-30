@@ -1,0 +1,11 @@
+<form id="delete-form">
+<p>Are you sure you want to delete <%=path %>?</p>
+<p><button onclick="submit_form()" type="button">Delete</button>
+<button onclick="close_dialog()">Cancel</button></p>
+</form>
+<script type="text/javascript">
+function submit_form() {
+  $.post("<%=("delete/"+path) %>", $("#delete-form").serialize());
+  close_dialog();
+}
+</script>

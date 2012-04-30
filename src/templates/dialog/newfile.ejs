@@ -1,0 +1,16 @@
+<form id="newfile-form" onsubmit="submit_form(); return false">
+<input type="hidden" name="file" value="1"/>
+<p><img src="/static/img/eclipse/ui.obj.file.gif"/> Create a file in <%=path %></p>
+<p><input id="focus" name="filename"/></p>
+<p><button type="submit">Create file</button>
+<button onclick="close_dialog()">Cancel</button></p>
+</form>
+<script type="text/javascript">
+function submit_form() {
+  $.post("<%=path %>", $("#newfile-form").serialize());
+  close_dialog();
+}
+function initialize() {
+  $("#focus").focus();
+}
+</script>
