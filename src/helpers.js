@@ -98,7 +98,9 @@ function includeCometJs() {
     var session = getSession();
     addClientVars({
       userId: session.userId,
-      userName: session.userName
+      userName: session.userName,
+      userColorId: session.userColorId,
+      colorPalette: COLOR_PALETTE
     });
 }
 

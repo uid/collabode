@@ -14,15 +14,20 @@ $(document).ready(function() {
   
   var user = {
     userId: clientVars.userId,
-    name: clientVars.userName
-    // ip, colorId, userAgent
+    name: clientVars.userName,
+    colorId: clientVars.userColorId
+    // ip, userAgent
+  };
+  var options = {
+    colorPalette: clientVars.colorPalette
   };
   
   var collab = getCollabClient(ace,
                                clientVars.collab_client_vars,
                                user,
-                               { });
+                               options);
   
+  var userlist = new UserList(ace, collab, user, options);
   var testor = new Testor(collab);
   
   var orgImportsWidget = makeOrgImportsWidget($, ace, function(selection) {

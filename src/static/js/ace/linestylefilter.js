@@ -58,6 +58,10 @@ linestylefilter.getLineStyleFilter = function(lineLength, aline,
 	if (key) {
 	  var value = apool.getAttribValue(n);
 	  if (value) {
+            if (key == 'author') {
+              classes += ' '+linestylefilter.getAuthorClassName(value);
+              return;
+            }
 	    if (namespace) {
 	      if (key.indexOf(namespace+"$") == 0) {
 	        key = key.substring(namespace.length+1);
@@ -67,10 +71,7 @@ linestylefilter.getLineStyleFilter = function(lineLength, aline,
 	        return; // XXX namespace required if set
 	      }
 	    }
-	    if (key == 'author') {
-	      classes += ' '+linestylefilter.getAuthorClassName(value);
-	    }
-            else if (key == 'list') {
+            if (key == 'list') {
               classes += ' list:'+value;
             }
 	    else if (linestylefilter.ATTRIB_CLASSES[key]) {

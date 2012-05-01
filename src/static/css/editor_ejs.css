@@ -32,8 +32,13 @@ body.fullwidth #editorpage { width: auto; margin-left: 6px; margin-right: 6px; }
 	position: absolute; height: auto; left: 265px;
 	width: 35%; font-size: 1.6em; color: #444; font-weight: normal;
 	line-height: 22px; margin-left: 2px; height: 22px; top: 4px;
-	overflow: hidden; text-overflow: ellipsis /*not supported in FF*/;
 	white-space:nowrap;
+}
+#docbarfile .filename {
+	display: inline-block;
+	max-width: 99%;
+	overflow: hidden; text-overflow: ellipsis /*not supported in FF*/;
+	margin-right: 4px;
 }
 #docbaruser {
 	position: absolute; height: auto; right: 9px;
@@ -61,6 +66,19 @@ body.fullwidth #editorpage { width: auto; margin-left: 6px; margin-right: 6px; }
 	background: url(/static/img/eclipse/jst.ws.consum.login.gif) no-repeat center center;
 }
 
+#userlist {
+	display: inline-block;
+	vertical-align: top;
+}
+
+#userlist .user {
+	float: left;
+	width: 12px;
+	height: 22px;
+	background: #ebebeb url(/static/img/user-fbfbfb.png) no-repeat center center;
+}
+#userlist .user p { display: none; }
+
 #docbaroverlay {
 	position: absolute; top: 1px; height: 30px; right: 210px;
 }
@@ -76,7 +94,7 @@ body.fullwidth #editorpage { width: auto; margin-left: 6px; margin-right: 6px; }
 	float:left; height:22px; width:22px; margin:0 4px;
 }
 
-#docbartools p { /* XXX should match annotation popups in ace/editor.css */
+#docbar p, #docbartools p { /* XXX should match annotation popups in ace/editor.css */
 	font-size: 11px; line-height: 16px;
 	text-align: left;
 	font-family: Arial, sans-serif;

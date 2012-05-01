@@ -1,4 +1,6 @@
+import("globals.*");
 import("helpers");
+import("jsutils");
 import("stringutils.md5");
 import("utils.*");
 
@@ -43,11 +45,29 @@ function render_settings() {
 
 function do_login(clazz, username, destination) {
   username = username.replace(/\W+/g, '').toLowerCase();
-  getSession().userId = clazz + '.' + username;
-  getSession().userName = username;
-  getSession().restricted = workspace.restricted(getSession().userId);
-  appjet.cache.recent_users[getSession().userId] = new Date();
+  var session = getSession();
+  session.userId = clazz + '.' + username;
+  session.userName = username;
+  session.restricted = workspace.restricted(session.userId);
+  session.userColorId = _userOrUnusedOrRandomColor(username);
+  appjet.cache.recent_users[session.userId] = session;
   response.redirect(destination);
+}
+
+function _userOrUnusedOrRandomColor(username) {
+  var used = {};
+  jsutils.eachProperty(appjet.cache.recent_users, function(userId, session) {
+    used[session.userColorId] = true;
+  });
+  
+  var hash = Math.abs(new java.lang.String(username).hashCode() % COLOR_PALETTE.length);
+  if ( ! used[hash]) { return hash; }
+  
+  for (var ii = 0; ii < COLOR_PALETTE.length; ii++) {
+    if ( ! used[ii]) { return ii; }
+  }
+  
+  return Math.floor(Math.random() * COLOR_PALETTE.length);
 }
 
 function render_login(username, destination) {
