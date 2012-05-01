@@ -35,8 +35,8 @@ $(document).ready(function() {
   });
   
   var outsourceWidget = makeOutsourceWidget(function(request) {
-    collab.sendExtendedMessage({ type: "OUTSOURCE_REQUEST", request: request });
-  });
+    collab.sendExtendedMessage({ type: "OUTSOURCE_REQUEST", action: "create", request: request });
+  }, options);
   
   collab.setOnInternalAction(function(action) {
     if (action == "commitPerformed") {
@@ -55,6 +55,7 @@ $(document).ready(function() {
       setTimeout(function() {
         collab.sendExtendedMessage({ type: "ANNOTATIONS_REQUEST" });
         collab.sendExtendedMessage({ type: "TESTS_REQUEST", action: "state" });
+        collab.sendExtendedMessage({ type: "OUTSOURCE_REQUEST", action: "state" });
       }, 0);
     } else if (state == "DISCONNECTED") {
       $("#connstatusconnecting").css('display', 'none');
@@ -80,6 +81,9 @@ $(document).ready(function() {
   });
   collab.setOnExtendedMessage("ORGIMPORTS_PROMPT", function(msg) {
     orgImportsWidget.handleOrgImportsResolve(msg.suggestion);
+  });
+  collab.setOnExtendedMessage("OUTSOURCED", function(msg) {
+    outsourceWidget.updateRequests(msg.requests);
   });
   
   ace.addKeyHandler(function(event, char, cb, cmdKey) {

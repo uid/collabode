@@ -122,7 +122,7 @@ function handlePath() {
     [/^\/login()(\/.*)$/, auth_control.render_login],
     ['/logout', auth_control.logout],
     [_file('mturk:([\\w]+)'), turk_control.render_mturk_task],
-    [/^\/instawork()(\/.*)$/, turk_control.render_instawork_task],
+    [_file('instawork()'), turk_control.render_instawork_task],
     [/^\/frame%22([\s\S]*?)%22(\/.*)$/, turk_control.render_framed] // XXX anyone can frame us?
   ]);
   noauth.POST.addLocations([
@@ -176,7 +176,7 @@ function handlePath() {
     [_proj('delacl:([\\w\\.]+)'), r(editor_control.render_confirm_delacl, auth.OWNER, 1)],
     [_file('delacl:([\\w\\.]+)'), r(editor_control.render_confirm_delacl, auth.OWNER, 1)],
     [_file('clone'), r(clone_control.clone_path)],
-    [/^\/instawork:([\w-]+)(\/.*)$/, turk_control.render_instawork_task],
+    [_file('instawork:([\\w-]+)'), turk_control.render_instawork_task],
     [_file('knockout:([\\w,.\\[;]+)"([\\s\\S]*)"'), r(turk_control.render_knockout, auth.READ, 2, 'clones')],
     [/^\/statistics(?:\/(?:([^\/]+)(?:\/([^\/]+)?)?)?)?$/, u(stats_control.render_stats)],
     [_proj(), r(editor_control.render_project)],
@@ -189,6 +189,7 @@ function handlePath() {
     [_file('delete'), u(editor_control.delete_path)],
     [_proj('delacl:([\\w\\.]+)'), r(editor_control.delete_acl, auth.OWNER, 1)],
     [_file('delacl:([\\w\\.]+)'), r(editor_control.delete_acl, auth.OWNER, 1)],
+    [_file('instawork:([\\w-]+)'), turk_control.complete_instawork_task],
     [_file('knockout:([\\w,.\\[;]+)"([\\s\\S]*)"'), r(turk_control.create_knockout, auth.READ, 2, 'clones')],
     ['/', u(editor_control.create_project)],
     [_proj(), r(editor_control.modify_path, auth.OWNER)],

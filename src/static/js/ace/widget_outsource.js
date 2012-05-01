@@ -1,9 +1,9 @@
 
-function makeOutsourceWidget(sendRequest) {
+function makeOutsourceWidget(sendRequest, options) {
   
   var outsourceWidget = {};
   
-  var container;
+  var dialogContainer;
   var lineNo;
   var reqTxt;
   var button;
@@ -19,7 +19,7 @@ function makeOutsourceWidget(sendRequest) {
       .append("<input type='radio' id='outsource-mode' checked='checked' />")
       .append("<label for='outsource-mode'>Direct editing &amp; automatic integration</label>");
     
-    container = $("<div id='outsource-container' />")
+    dialogContainer = $("<div id='outsource-container' />")
       .append($("<input id='outsource-file' type='text' disabled='disabled' />").val(clientVars.editorFile))
       .append("<label for='outsource-line'>line</label>")
       .append(lineNo = $("<input id='outsource-line' type='text' />").val(selection.start[0]+1))
@@ -54,8 +54,8 @@ function makeOutsourceWidget(sendRequest) {
   }
   
   function _show() {
-    $("#editorcontainerbox").append(container);
-    $("label", container).css('font-family', lineNo.css('font-family'));
+    $("#editorcontainerbox").append(dialogContainer);
+    $("label", dialogContainer).css('font-family', lineNo.css('font-family'));
     reqTxt.focus().select();
   }
   
@@ -74,5 +74,46 @@ function makeOutsourceWidget(sendRequest) {
     _close();
   }
   
+  var statusContainer = $('#outsourcedcontainer');
+  var nodes = {};
+  
+  outsourceWidget.updateRequests = function(requests) {
+    $.each(requests, function(idx, req) {
+      if (req.id in nodes) {
+        nodes[req.id].remove();
+      }
+      var node = nodes[req.id] = $('<div>');
+      node.addClass('outsrcreq');
+      node.addClass(req.state);
+      var worker = $('<div class="reqworker">');
+      var avatar = $('<div class="reqavatar">');
+      worker.append(avatar);
+      if (req.user) {
+        worker.append($('<div>').text(req.user.userName));
+        avatar.css('background-color', options.colorPalette[req.user.userColorId]);
+      } else if (req.state == 'new') {
+        avatar.css('background-color', '#fff');
+      }
+      node.append(worker);
+      var location = $('<div class="reqdetail">');
+      if (req.location) {
+        var filename = req.location.substring(req.location.lastIndexOf('/')+1);
+        location.append($('<a href="' + req.location + '">').text(filename))
+      } else {
+        location.html('<i>unknown</i>');
+      }
+      node.append(location);
+      node.append($('<div class="reqdetail">').text(req.description));
+      statusContainer.append(node);
+    });
+  };
+  
   return outsourceWidget;
 }
+
+$(document).ready(function() { // on task framing page
+  $('#task #done').bind('click', function() {
+    $.ajax({ type: 'POST' });
+    return true;
+  });
+});

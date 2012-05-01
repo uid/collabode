@@ -30,22 +30,34 @@ function render_mturk_task(requester, projectname, filename) {
   return true;
 }
 
-function render_instawork_task(taskId, destination) {
-  if (taskId) {
-    try {
-      var task = turk.getInstaworkTask(taskId);
-    } catch (e) {
-      renderError(404);
-    }
-    
-    // XXX claim task, fail if assigned or completed
-    
-    renderHtml("turk/instawork_task.ejs", {
-      task: task,
-      frameURL: request.path.substring(request.path.indexOf('/', 1))
-    });
-  } else {
-    response.redirect('/instawork:' + request.params.taskId + destination);
+function render_instawork_task(taskId, projectname, filename) {
+  var filepath = request.path.substring(request.path.indexOf('/', 1));
+  
+  if ( ! taskId) {
+    response.redirect('/instawork:' + request.params.taskId + filepath);
+    return true;
+  }
+  
+  try {
+    var task = turk.getInstaworkTask(taskId);
+  } catch (e) {
+    renderError(404);
+  }
+  
+  if ( ! turk.claimRequest(taskId, projectname)) {
+    renderError(403);
+  }
+  
+  renderHtml("turk/instawork_task.ejs", {
+    task: task,
+    frameURL: filepath
+  });
+  return true;
+}
+
+function complete_instawork_task(taskId, projectname, filename) {
+  if ( ! turk.completeRequest(taskId, projectname)) {
+    renderError(403);
   }
   return true;
 }

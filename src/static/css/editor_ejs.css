@@ -488,3 +488,57 @@ body.nosidebar #padeditor { margin-left: 0; }
 	white-space: pre;
 	font-family: Consolas, Menlo, monospace;
 }
+
+#outsourcedcontainer {
+	overflow: visible;
+}
+.outsrcreq {
+	border-width:1px;
+	border-style:solid;
+	margin-top:4px;
+	padding:6px 8px 6px 0;
+	position:relative;
+}
+.outsrcreq.new {
+	color: gray;
+	border-color: gray;
+}
+.outsrcreq.done:after {
+	content: "\2713";
+	position: absolute;
+	top: 0;
+	right: -0.3em;
+	font-size: 22px;
+	color: #093;
+	text-shadow: #fff 0 1px 1px, #fff 0 -1px 1px;
+}
+.outsrcreq.done .reqworker {
+	opacity: 0.5;
+}
+.outsrcreq a {
+	color: inherit;
+	text-decoration: none;
+}
+.outsrcreq .reqworker {
+	float: left;
+	width: 44px;
+	padding: 0 2px;
+	font-size: 11px;
+	overflow: hidden;
+	text-align: center;
+}
+.outsrcreq .reqworker .reqavatar {
+	height: 16px;
+	width: 12px;
+	margin: auto;
+	background: #ebebeb url(/static/img/user-fff.png) no-repeat center center;
+}
+.outsrcreq .reqdetail {
+	position: relative;
+	margin-left: 48px;
+	max-height: 1.2em;
+	font-size: smaller;
+	white-space: pre;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
