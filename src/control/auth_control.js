@@ -49,18 +49,18 @@ function do_login(clazz, username, destination) {
   session.userId = clazz + '.' + username;
   session.userName = username;
   session.restricted = workspace.restricted(session.userId);
-  session.userColorId = _userOrUnusedOrRandomColor(username);
+  session.userColorId = _userOrUnusedOrRandomColor(session.userId);
   appjet.cache.recent_users[session.userId] = session;
   response.redirect(destination);
 }
 
-function _userOrUnusedOrRandomColor(username) {
+function _userOrUnusedOrRandomColor(userId) {
   var used = {};
-  jsutils.eachProperty(appjet.cache.recent_users, function(userId, session) {
-    used[session.userColorId] = true;
+  jsutils.eachProperty(appjet.cache.recent_users, function(recentUserId, session) {
+    used[session.userColorId] = recentUserId != userId;
   });
   
-  var hash = Math.abs(new java.lang.String(username).hashCode() % COLOR_PALETTE.length);
+  var hash = Math.abs(new java.lang.String(userId).hashCode() % COLOR_PALETTE.length);
   if ( ! used[hash]) { return hash; }
   
   for (var ii = 0; ii < COLOR_PALETTE.length; ii++) {
