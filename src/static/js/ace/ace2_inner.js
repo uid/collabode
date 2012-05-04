@@ -2195,7 +2195,7 @@ function OUTER(gscope) {
 
     var builder = Changeset.builder(rep.lines.totalWidth());
     buildKeepToStartOfRange(builder, start);
-    buildRemoveRange(builder, start, end);
+    buildRemoveRange(builder, start, end, [['author',thisAuthor]], rep.apool);
     builder.insert(newText, [['author',thisAuthor]], rep.apool);
     var cs = builder.toString();
 
@@ -2224,16 +2224,16 @@ function OUTER(gscope) {
     builder.keep(startLineOffset, start[0]);
     builder.keep(start[1]);
   }
-  function buildRemoveRange(builder, start, end) {
+  function buildRemoveRange(builder, start, end, attribs, pool) {
     var startLineOffset = rep.lines.offsetOfIndex(start[0]);
     var endLineOffset = rep.lines.offsetOfIndex(end[0]);
 
     if (end[0] > start[0]) {
-      builder.remove(endLineOffset - startLineOffset - start[1], end[0] - start[0]);
-      builder.remove(end[1]);
+      builder.remove(endLineOffset - startLineOffset - start[1], end[0] - start[0], attribs, pool);
+      builder.remove(end[1], 0, attribs, pool);
     }
     else {
-      builder.remove(end[1] - start[1]);
+      builder.remove(end[1] - start[1], 0, attribs, pool);
     }
   }
   function buildKeepRange(builder, start, end, attribs, pool) {
@@ -2468,19 +2468,20 @@ function OUTER(gscope) {
       else {
 	var builder = startBuilder();
 
+	var authorAtt = Changeset.makeAttribsString(
+	  '+', (thisAuthor ? [['author', thisAuthor]] : []), rep.apool);
+
 	var spliceEndLine = rep.lines.indexOfOffset(spliceEnd);
 	var spliceEndLineStart = rep.lines.offsetOfIndex(spliceEndLine);
 	if (spliceEndLineStart > spliceStart) {
-	  builder.remove(spliceEndLineStart - spliceStart, spliceEndLine - spliceStartLine);
-	  builder.remove(spliceEnd - spliceEndLineStart);
+	  builder.remove(spliceEndLineStart - spliceStart, spliceEndLine - spliceStartLine, authorAtt);
+	  builder.remove(spliceEnd - spliceEndLineStart, 0, authorAtt);
 	}
 	else {
-	  builder.remove(spliceEnd - spliceStart);
+	  builder.remove(spliceEnd - spliceStart, 0, authorAtt);
 	}
 
         var isNewTextMultiauthor = false;
-	var authorAtt = Changeset.makeAttribsString(
-	  '+', (thisAuthor ? [['author', thisAuthor]] : []), rep.apool);
 	var authorizer = cachedStrFunc(function(oldAtts) {
           if (isNewTextMultiauthor) {
             // prefer colors from DOM
