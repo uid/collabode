@@ -36,6 +36,7 @@
         $.dialog.close();
       }
       $(this).contents().find("body").addClass("dialog");
+      $(this)[0].contentWindow.initialize();
     });
     $("body").append(background).append(content);
   };

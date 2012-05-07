@@ -3627,11 +3627,11 @@
 		$.vakata.css.add_sheet({ str : css_string, title : "vakata" });
 		$.vakata.context.cnt
 			.delegate("a","click", function (e) { e.preventDefault(); })
-			.delegate("a","mouseup", function (e) {
-				if(!$(this).parent().hasClass("jstree-contextmenu-disabled") && $.vakata.context.exec($(this).attr("rel"))) {
+			.delegate("li","mouseup", function (e) {
+				if(!$(this).hasClass("jstree-contextmenu-disabled") && $.vakata.context.exec($(this).find("a").attr("rel"))) {
 					$.vakata.context.hide();
 				}
-				else { $(this).blur(); }
+				else { $(this).find("a").blur(); }
 			})
 			.delegate("a","mouseover", function () {
 				$.vakata.context.cnt.find(".vakata-hover").removeClass("vakata-hover");

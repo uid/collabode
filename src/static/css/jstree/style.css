@@ -11,3 +11,33 @@
 .jstree li {
     margin-left: 0px !important;
 }
+
+#vakata-contextmenu li {
+	height:22px !important;
+	margin-top:1px !important;
+	margin-bottom:1px !important;
+	cursor: pointer;
+}
+
+#vakata-contextmenu li:hover {
+	background-color:gray;
+}
+
+#vakata-contextmenu li:hover a {
+	color:white;
+}
+
+#vakata-contextmenu li.vakata-separator{
+	height:1px !important;
+}
+
+#vakata-contextmenu li a {
+	font-size:16px;
+	color: black;
+	margin-top:1px !important;
+}
+
+#vakata-contextmenu li ins{
+	margin-left:3px !important;
+	margin-top:3px !important;
+}

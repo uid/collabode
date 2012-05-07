@@ -78,7 +78,7 @@ function getTreeClient(comet) {
                 _class : "contextmenu_newfile",
                 separator_before : false,
                 separator_after : false,
-                icon : false
+                icon : "static/img/eclipse/ui.tool.newfile.gif"
               },
               newfolder : {
                 label : "New Folder",
@@ -89,7 +89,7 @@ function getTreeClient(comet) {
                 _class : "contextmenu_newfolder",
                 separator_before : false,
                 separator_after : true,
-                icon : false
+                icon : "static/img/eclipse/ui.tool.newfolder.gif"
               },
               rename : {
                 label : "Rename",
@@ -110,7 +110,7 @@ function getTreeClient(comet) {
                 _class : "contextmenu_delete",
                 separator_before : false,
                 separator_after : true,
-                icon : false
+                icon : "static/img/eclipse/ui.tool.delete.enabled.gif"
               },
               share : {
                 label : "Share",
@@ -135,7 +135,7 @@ function getTreeClient(comet) {
                 _class : "contextmenu_newfile",
                 separator_before : false,
                 separator_after : false,
-                icon : false
+                icon : "static/img/eclipse/ui.tool.newfile.gif"
               },
               newfolder : {
                 label : "New Folder",
@@ -146,7 +146,7 @@ function getTreeClient(comet) {
                 _class : "contextmenu_newfolder",
                 separator_before : false,
                 separator_after : true,
-                icon : false
+                icon : "static/img/eclipse/ui.tool.newfolder.gif"
               },
               rename : {
                 label : "Rename",
@@ -167,7 +167,7 @@ function getTreeClient(comet) {
                 _class : "contextmenu_delete",
                 separator_before : false,
                 separator_after : true,
-                icon : false
+                icon : "static/img/eclipse/ui.tool.delete.enabled.gif"
               },
               share : {
                 label : "Share",
