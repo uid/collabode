@@ -9,8 +9,11 @@ a img { border: none; }
 
 html { font-size: 62.5%; }
 
-body { background: #ebebeb url(/static/img/pad/backgradient.gif) repeat-x left top; }
-body { font-family: Arial, sans-serif; }
+body {
+	background: #ebebeb url(/static/img/pad/backgradient.gif) repeat-x left top;
+	font-family: Arial, sans-serif;
+	overflow-x: hidden;
+}
 
 #editorpage { position: relative; margin-left: auto; margin-right: auto; width: 1010px; }
 
@@ -313,6 +316,28 @@ body.nosidebar #padeditor { margin-left: 0; }
 
 #wizardcontainerbox .wideselect {
 	width: 300px;
+}
+
+#hovercontainerbox {
+	position: absolute;
+	display: none;
+}
+#hovercontainerbox iframe {
+	width: 550px; height: 100%;
+	margin-right: 35px;
+	box-shadow: 5px 5px 5px #888;
+	-o-box-shadow: 5px 5px 5px #888; -moz-box-shadow: 3px 3px 6px #888; -webkit-box-shadow: 5px 5px 5px #888;
+	border: 1px solid #c4c4c4;
+}
+#hoverclose {
+	position: absolute;
+	right: 0; top: 0; bottom: 0;
+	width: 20px;
+	margin: 0 5px;
+	background: url(/static/img/close-left.png) no-repeat center center;
+}
+#hoverclose:hover {
+	background: #fbfbfb url(/static/img/close-left-red.png) no-repeat center center;
 }
 
 #filegrid tr ~ tr td { padding-top:1em; }
