@@ -1,7 +1,7 @@
 package collabode.testing;
 
-import static collabode.testing.AnnotationsInitializer.PACKAGE;
-import static collabode.testing.AnnotationsInitializer.STATUSES;
+import static collabode.testing.TestSupportInitializer.PACKAGE;
+import static collabode.testing.TestSupportInitializer.STATUSES;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;

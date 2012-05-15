@@ -9,13 +9,13 @@ import org.eclipse.jdt.core.*;
 
 import collabode.Application;
 
-public class AnnotationsInitializer extends ClasspathContainerInitializer {
+public class TestSupportInitializer extends ClasspathContainerInitializer {
     
     public static final String PACKAGE = "collabode";
     
     public static final List<String> STATUSES = Arrays.asList(new String[] { "New", "NeedsImpl", "NeedsReview", "Accepted" });
     
-    public static final IPath PATH = new Path("collabode.ANNOTATIONS_CONTAINER");
+    public static final IPath PATH = new Path("collabode.TEST_SUPPORT_CONTAINER");
     
     private final String libPath;
     
@@ -33,7 +33,7 @@ public class AnnotationsInitializer extends ClasspathContainerInitializer {
                         return entry;
                     }
                     public String getDescription() {
-                        return "Collabode Annotations";
+                        return "Collabode Test Support";
                     }
                     public int getKind() {
                         return IClasspathContainer.K_APPLICATION;

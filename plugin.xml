@@ -28,8 +28,8 @@
    <extension
          point="org.eclipse.jdt.core.classpathContainerInitializer">
       <classpathContainerInitializer
-            class="collabode.testing.AnnotationsInitializer"
-            id="collabode.ANNOTATIONS_CONTAINER">
+            class="collabode.testing.TestSupportInitializer"
+            id="collabode.TEST_SUPPORT_CONTAINER">
       </classpathContainerInitializer>
    </extension>
    <extension

@@ -1,7 +1,7 @@
 package collabode.testing;
 
-import static collabode.testing.AnnotationsInitializer.PACKAGE;
-import static collabode.testing.AnnotationsInitializer.STATUSES;
+import static collabode.testing.TestSupportInitializer.PACKAGE;
+import static collabode.testing.TestSupportInitializer.STATUSES;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -47,7 +47,7 @@ public class ProjectTestsOwner {
     public boolean isTestDriven() throws JavaModelException {
         for (IClasspathEntry entry : project.getRawClasspath()) {
             if (entry.getEntryKind() == IClasspathEntry.CPE_CONTAINER
-                    && entry.getPath().equals(AnnotationsInitializer.PATH)) {
+                    && entry.getPath().equals(TestSupportInitializer.PATH)) {
                 return true;
             }
         }
