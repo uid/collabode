@@ -517,12 +517,17 @@ body.nosidebar #padeditor { margin-left: 0; }
 #outsourcedcontainer {
 	overflow: visible;
 }
+#outsourcedcontainer a {
+	text-decoration: none;
+}
 .outsrcreq {
 	border-width:1px;
 	border-style:solid;
 	margin-top:4px;
 	padding:6px 8px 6px 0;
 	position:relative;
+	font-size: smaller;
+	min-height:3.6em;
 }
 .outsrcreq.new {
 	color: gray;
@@ -540,14 +545,18 @@ body.nosidebar #padeditor { margin-left: 0; }
 .outsrcreq.done .reqworker {
 	opacity: 0.5;
 }
-.outsrcreq a {
-	color: inherit;
-	text-decoration: none;
+.outsrcreq .reqdesc {
+	position: relative;
+	max-height: 1.2em;
+	white-space: pre;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	padding-left: 8px;
 }
 .outsrcreq .reqworker {
 	float: left;
 	width: 44px;
-	padding: 0 2px;
+	padding: 2px;
 	font-size: 11px;
 	overflow: hidden;
 	text-align: center;
@@ -560,10 +569,15 @@ body.nosidebar #padeditor { margin-left: 0; }
 }
 .outsrcreq .reqdetail {
 	position: relative;
-	margin-left: 48px;
-	max-height: 1.2em;
-	font-size: smaller;
 	white-space: pre;
 	overflow: hidden;
 	text-overflow: ellipsis;
+}
+.outsrcreq .deltains {
+	font-weight: bold;
+	color: #5b3;
+}
+.outsrcreq .deltadel {
+	font-weight: bold;
+	color: #b44;
 }

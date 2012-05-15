@@ -5,6 +5,7 @@ import("utils.*");
 import("collab.collab_server");
 
 import("editor.auth");
+import("editor.contrib");
 import("editor.workspace");
 
 import("pad.model");
@@ -40,10 +41,16 @@ var _providers = {
       } catch (ioe if ioe.javaException instanceof java.io.IOException) {
         return { id: id }; // XXX
       }
+      function parseDate(date) {
+        return date ? +new Date(date.replace(/-/g, '/').replace(/\.\d+/, '') + ' UTC') : null;
+      }
       return {
         id: task.taskId,
         description: task.description,
-        location: task.url.substring(task.url.indexOf('/instawork/')+11)
+        location: task.url.substring(task.url.indexOf('/instawork/')+11),
+        created: parseDate(task.created),
+        assigned: parseDate(task.assigned),
+        completed: parseDate(task.completed)
       };
     }
   }
@@ -60,6 +67,14 @@ function _outsourcedMessage(project, id) {
       req.state = state[0];
       if (state[1]) {
         req.user = appjet.cache.recent_users[state[1]]; // XXX really, this knows about that?
+      }
+      if (req.user) {
+        var padIds = contrib.padsEdited(project.getName(), req.user.userId);
+        req.deltas = {};
+        padIds.forEach(function(padId) {
+          var change = contrib.padChange(padId, req.assigned, req.completed);
+          req.deltas[workspace.filenameFor(padId)] = contrib.authorDelta(req.user.userId, change);
+        });
       }
       return req;
     })

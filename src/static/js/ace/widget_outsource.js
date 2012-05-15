@@ -85,6 +85,7 @@ function makeOutsourceWidget(sendRequest, options) {
       var node = nodes[req.id] = $('<div>');
       node.addClass('outsrcreq');
       node.addClass(req.state);
+      node.append($('<div class="reqdesc">').text(req.description));
       var worker = $('<div class="reqworker">');
       var avatar = $('<div class="reqavatar">');
       worker.append(avatar);
@@ -103,7 +104,21 @@ function makeOutsourceWidget(sendRequest, options) {
         location.html('<i>unknown</i>');
       }
       node.append(location);
-      node.append($('<div class="reqdetail">').text(req.description));
+      if (req.user) {
+        var changes = $('<div class="reqdetail">');
+        var href = '/contrib:' + req.user.userId + ':';
+        if (req.assigned) { href += req.assigned; }
+        if (req.completed) { href += '..' + req.completed; }
+        href += '/' + clientVars.editorProject;
+        var link = $('<a href="#">').click(function() { return Layout.hoverOpen(href); });
+        $.each(req.deltas, function(filename, delta) {
+          var line = $('<div>').text(filename.substring(filename.lastIndexOf('/')+1));
+          if (delta.ins) { line.append($('<span class="deltains">').text(' +'+delta.ins)); }
+          if (delta.del) { line.append($('<span class="deltadel">').text(' -'+delta.del)); }
+          link.append(line);
+        });
+        node.append(changes.append(link));
+      }
       statusContainer.append(node);
     });
   };
