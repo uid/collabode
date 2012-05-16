@@ -74,6 +74,11 @@ public class ContinuousTesting implements Runnable {
                 launched.remove(session);
             }
         });
+        Coverage.addCoverageListener(new CoverageListener() {
+            public void coverage(Coverage coverage) {
+                ProjectTestsOwner.of(coverage.project).update(coverage);
+            }
+        });
     }
     
     /**
@@ -127,10 +132,19 @@ public class ContinuousTesting implements Runnable {
         config.setAttribute("org.eclipse.jdt.junit.CONTAINER", project.getHandleIdentifier());
         config.setAttribute("org.eclipse.jdt.junit.TEST_KIND", "org.eclipse.jdt.junit.loader.junit4");
         
+        Coverage coverage = new Coverage(project);
+        Map<String, String> env = new HashMap<String, String>();
+        env.put(Coverage.PORT, Integer.toString(coverage.port));
+        config.setAttribute(ILaunchManager.ATTR_ENVIRONMENT_VARIABLES, env);
+        
         String policy = "'" + Application.bundleResourcePath("config/export/security.test.policy") + "'";
         config.setAttribute(IJavaLaunchConfigurationConstants.ATTR_VM_ARGUMENTS,
                 "-Dorg.eclipse.osgi.framework.internal.core.FrameworkSecurityManager " + // XXX does nothing?
-                "-Djava.security.manager -Djava.security.policy==" + policy + " -ea");
+                "-Djava.security.manager -Djava.security.policy==" + policy + " " +
+                // "-Djava.security.debug=access:failure " + 
+                "-javaagent:" + TestSupportInitializer.weaverPath() + " " +
+                // "-Daj.weaving.verbose=true -Dorg.aspectj.weaver.showWeaveInfo=true " +
+                "-ea");
         
         return config.launch(ILaunchManager.RUN_MODE, null);
     }

@@ -36,6 +36,7 @@ public class ProjectTestsOwner {
     
     final IJavaProject project;
     private final ConcurrentMap<Test, TestResult> results = new ConcurrentHashMap<Test, TestResult>();
+    private final ConcurrentMap<String, NavigableSet<MethodRelevance>> rankedCoverage = new ConcurrentHashMap<String, NavigableSet<MethodRelevance>>();
     
     private ProjectTestsOwner(IJavaProject project) {
         this.project = project;
@@ -139,5 +140,33 @@ public class ProjectTestsOwner {
         JavaPadDocument doc = getDocument.apply(project.findType(className).getUnderlyingResource());
         String to = STATUSES.get(STATUSES.indexOf(from) + 1);
         return doc.setAnnotation(new String[] { PACKAGE, from }, new String[] { PACKAGE, to }, className, methodName, new String[0]);
+    }
+    
+    void update(Coverage coverage) {
+        computeRelevance(coverage.calls);
+    }
+    
+    private void computeRelevance(Map<IMethod, Map<IMethod, Integer>> calls) {
+        rankedCoverage.clear();
+        
+        Map<IMethod, Double> idf = new HashMap<IMethod, Double>();
+        for (Map<IMethod, Integer> val : calls.values()) {
+            for (IMethod call : val.keySet()) {
+                Double count = idf.get(call);
+                idf.put(call, count == null ? 1 : count+1);
+            }
+        }
+        for (Map.Entry<IMethod, Double> entry : idf.entrySet()) {
+            entry.setValue(Math.log(calls.size() / entry.getValue()));
+        }
+        for (Map.Entry<IMethod, Map<IMethod, Integer>> test : calls.entrySet()) {
+            NavigableSet<MethodRelevance> set;
+            IMethod method = test.getKey();
+            String name = method.getDeclaringType().getFullyQualifiedName() + "." + method.getElementName();
+            rankedCoverage.put(name, set = new TreeSet<MethodRelevance>());
+            for (Map.Entry<IMethod, Integer> call : test.getValue().entrySet()) {
+                set.add(new MethodRelevance(call.getKey(), call.getValue() * idf.get(call.getKey())));
+            }
+        }
     }
 }
