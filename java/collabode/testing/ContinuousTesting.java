@@ -32,6 +32,7 @@ public class ContinuousTesting implements Runnable {
     private final BlockingQueue<IProject> toRun = new LinkedBlockingQueue<IProject>();
     private final ConcurrentMap<ILaunch, CountDownLatch> latches = new ConcurrentHashMap<ILaunch, CountDownLatch>();
     private final Set<ITestRunSession> launched = Collections.synchronizedSet(new HashSet<ITestRunSession>());
+    private final Set<IProject> broken = new HashSet<IProject>();
     
     public final IResourceChangeListener listener = new IResourceChangeListener() {
         public void resourceChanged(IResourceChangeEvent event) {
@@ -112,8 +113,14 @@ public class ContinuousTesting implements Runnable {
                 }
                 
                 for (ITestRunSession session : launched) {
-                    System.err.println("Retry " + session.getProgressState() + " " + session.getTestRunName()); // XXX
-                    runTests(session.getLaunchedProject().getProject());
+                    IProject failed = session.getLaunchedProject().getProject();
+                    if (broken.contains(failed)) {
+                        System.err.println("Broken " + session.getTestRunName()); // XXX
+                    } else {
+                        System.err.println("Retry " + session.getProgressState() + " " + session.getTestRunName()); // XXX
+                        broken.add(failed);
+                        runTests(failed);
+                    }
                 }
                 launched.clear();
             } catch (Exception e) {
