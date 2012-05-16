@@ -180,7 +180,7 @@ function handlePath() {
     [_file('clone'), r(clone_control.clone_path)],
     [_file('instawork:([\\w-]+)'), turk_control.render_instawork_task],
     [_file('knockout:([\\w,.\\[;]+)"([\\s\\S]*)"'), r(turk_control.render_knockout, auth.READ, 2, 'clones')],
-    [_proj('contrib:([\\w\\.]+):(\\d*)(?:\\.\\.)?(\\d*)'), u(contrib_control.render_contrib)],
+    [_proj('contrib:([\\w\\.]+):(\\d*)(?:\\.\\.)?(\\d*)'), r(contrib_control.render_contrib, auth.WRITE, 3)],
     [/^\/coverage\/([\w-\.]+)():(.+)\.(.+)$/, r(test_control.render_coverage, auth.WRITE)],
     [/^\/statistics(?:\/(?:([^\/]+)(?:\/([^\/]+)?)?)?)?$/, u(stats_control.render_stats)],
     [_proj(), r(editor_control.render_project)],
