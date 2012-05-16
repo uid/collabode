@@ -18,7 +18,7 @@ Layout.hoverOpen = function(url) {
     frame.attr("src", url);
     return false;
   }
-  hover.prepend($("<iframe>").attr("src", url)).fadeIn();
+  hover.prepend($("<iframe>").attr("src", url).attr("frameborder", 0)).fadeIn();
   hover.next().animate({ left: hover.width() }, {
     complete: function() {
       Layout.resize();

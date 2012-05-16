@@ -110,7 +110,7 @@ function makeOutsourceWidget(sendRequest, options) {
         if (req.assigned) { href += req.assigned; }
         if (req.completed) { href += '..' + req.completed; }
         href += '/' + clientVars.editorProject;
-        var link = $('<a href="#">').click(function() { return Layout.hoverOpen(href); });
+        var link = $('<a>').attr('href', '#').click(function() { return Layout.hoverOpen(href); });
         $.each(req.deltas, function(filename, delta) {
           var line = $('<div>').text(filename.substring(filename.lastIndexOf('/')+1));
           if (delta.ins) { line.append($('<span class="deltains">').text(' +'+delta.ins)); }
