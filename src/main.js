@@ -13,6 +13,7 @@ import("control.editor_control");
 import("control.git_control");
 import("control.import_control");
 import("control.stats_control");
+import("control.test_control");
 import("control.turk_control");
 
 import("collab.collabroom_server");
@@ -180,6 +181,7 @@ function handlePath() {
     [_file('instawork:([\\w-]+)'), turk_control.render_instawork_task],
     [_file('knockout:([\\w,.\\[;]+)"([\\s\\S]*)"'), r(turk_control.render_knockout, auth.READ, 2, 'clones')],
     [_proj('contrib:([\\w\\.]+):(\\d*)(?:\\.\\.)?(\\d*)'), u(contrib_control.render_contrib)],
+    [/^\/coverage\/([\w-\.]+)():(.+)\.(.+)$/, r(test_control.render_coverage, auth.WRITE)],
     [/^\/statistics(?:\/(?:([^\/]+)(?:\/([^\/]+)?)?)?)?$/, u(stats_control.render_stats)],
     [_proj(), r(editor_control.render_project)],
     [_file(), r(editor_control.render_path)]

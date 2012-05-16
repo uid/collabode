@@ -361,6 +361,9 @@ body.nosidebar #padeditor { margin-left: 0; }
 #testorcontainer {
 	overflow: visible;
 }
+#testorcontainer a {
+	text-decoration: none;
+}
 .test {
 	border-width:1px;
 	border-style:solid;
@@ -486,20 +489,20 @@ body.nosidebar #padeditor { margin-left: 0; }
 .test.needsreview button div:after {
 	content: "Accept";
 }
-.test a {
+.test .toggle {
 	text-align: center;
 	font-size: x-small;
-	position: absolute;
-	left: 0;
-	right: 0;
-	margin-top: -0.5em;
+	margin: 0 0 -5px 0;
 	display: none;
 	cursor: pointer;
 }
-.test a div:after {
+.test .toggle:hover {
+	background: #fbfbfb;
+}
+.test.hasDetails .toggle div:after {
 	content: "details";
 }
-.test.hasDetails a {
+.test.hasDetails .toggle {
 	display: block;
 }
 .test td {
@@ -507,7 +510,7 @@ body.nosidebar #padeditor { margin-left: 0; }
 }
 .test .testtrace {
 	display: none;
-	margin-top: 0.5em;
+	margin-top: 5px;
 	position: relative;
 	font-size: 11px;
 	white-space: pre;

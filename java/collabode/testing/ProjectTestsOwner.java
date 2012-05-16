@@ -169,4 +169,12 @@ public class ProjectTestsOwner {
             }
         }
     }
+    
+    public IMethod getMethod(String className, String methodName) throws JavaModelException {
+        return project.findType(className).getMethod(methodName, new String[0]);
+    }
+    
+    public NavigableSet<MethodRelevance> getCoverage(String className, String methodName) {
+        return rankedCoverage.get(className + "." + methodName);
+    }
 }

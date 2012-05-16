@@ -36,12 +36,14 @@ function Testor(collab) {
       testNodes[test.name] = node;
       
       node.append($('<div class="extra top"></div><div class="extra left"></div><div class="extra right"></div>'));
-      node.append($('<div>').addClass('testclass').html(test.className));
-      node.append($('<div>').addClass('testmethod').html(test.methodName));
+      node.append($('<div>').addClass('testclass').text(test.className));
+      node.append($('<div>').addClass('testmethod').append($('<a>').attr('href', '#').text(test.methodName).click(function() {
+        return Layout.hoverOpen('/coverage/' + clientVars.editorProject + ':' + test.name);
+      })));
       
       node.append($('<button>').html('<div></div>'));
       
-      node.append($('<a>').html('<div></div>').click(function() { onTestToggleTrace(node); }));
+      node.append($('<a>').addClass('toggle').html('<div></div>').click(function() { onTestToggleTrace(node); }));
       var trace = $('<div>').addClass('testtrace');
       trace.append($('<table><tr><td class="expected"></td><td class="actual"></td></tr><tr><td colspan="2" class="stackTrace"></td></tr></table>'));
       node.append(trace);

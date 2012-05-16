@@ -58,13 +58,13 @@ public class JavaCommitter extends WorkingCopyOwner implements CollabListener, R
         
         List<IRegion> regions = doc.unionOnlyRegionsOfDisk();
         for (IRegion region : regions) {
-            int diskOffset = doc.unionToLocalOffsetOfDisk(region.getOffset());
+            int diskOffset = doc.unionToDiskOffset(region.getOffset());
             edits.add(new ReplaceEdit(diskOffset, 0, doc.union.get(region.getOffset(), region.getLength())));
         }
         
         regions = doc.localOnlyRegionsOfDisk();
         for (IRegion region : regions) {
-            int diskOffset = doc.unionToLocalOffsetOfDisk(region.getOffset()) - region.getLength();
+            int diskOffset = doc.unionToDiskOffset(region.getOffset()) - region.getLength();
             edits.add(new ReplaceEdit(diskOffset, region.getLength(), ""));
         }
         
