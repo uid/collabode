@@ -49,7 +49,7 @@ function render_coverage(projectname, unused, testclassname, testmethodname) {
   var testfilename = _addMethod(test);
   
   var coverage = ProjectTestsOwner.of(project).getCoverage(testclassname, testmethodname);
-  for (var it = coverage.descendingIterator(); it.hasNext(); ) {
+  for (var it = coverage && coverage.descendingIterator(); it && it.hasNext(); ) {
     var mr = it.next();
     if (keys(files).length > 10) {
       calls.push("and " + (coverage.size() - calls.length) + " more");
