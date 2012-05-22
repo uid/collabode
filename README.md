@@ -43,8 +43,7 @@ Running Collabode as a two-headed hydra
  * Download the plug-in ```.jar```, or:
    * Copy ```config/collabode.properties.example``` to
      ```config/export/collabode.properties``` and modify
-   * Open ```plugin.xml``` and use the "Export Wizard" to create the
-     ```.jar```
+   * Open ```plugin.xml``` and use the "Export Wizard" to create a ```.jar```
  * Drop the ```.jar``` into your Eclipse ```plugins``` directory
  * Launch Eclipse &mdash; **to avoid changes to normal Eclipse behavior, use a
    different workspace for Collabode**

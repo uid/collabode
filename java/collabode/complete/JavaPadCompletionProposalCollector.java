@@ -118,6 +118,10 @@ public class JavaPadCompletionProposalCollector extends CompletionProposalCollec
         
         SortedSet<ProposalHolder> sortedHolders = new TreeSet<ProposalHolder>(COMPARE);
         for (IJavaCompletionProposal proposal : proposalHolders){
+            if ( ! (proposal instanceof ProposalHolder)) {
+                System.err.println("Unhandled completion proposal " + proposal); // XXX
+                continue;
+            }
             sortedHolders.add((ProposalHolder)proposal);
         }
         List<JavaPadCompletionProposal> padProposals = new ArrayList<JavaPadCompletionProposal>(proposalHolders.length);

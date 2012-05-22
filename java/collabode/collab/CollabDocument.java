@@ -224,8 +224,18 @@ public class CollabDocument implements Iterable<PadDocument> {
         return localMaps.get(doc).localOnlyRegions();
     }
     
-    int unionToLocalOffsetOfDisk(int offset) {
+    /**
+     * Convert a union offset to a disk local offset.
+     */
+    public int unionToDiskOffset(int offset) {
         return diskMap.unionToLocal(offset);
+    }
+    
+    /**
+     * Convert a disk local offset to a union offset.
+     */
+    public int diskToUnionOffset(int offset) {
+        return diskMap.localToUnion(offset);
     }
     
     /**

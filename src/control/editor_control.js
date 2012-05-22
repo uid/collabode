@@ -54,7 +54,7 @@ function _list_accessible_projects(revealed) {
   }
   if (workspace.restricted(userId)) {
     projects = projects.filter(function(project) {
-      return (project == revealed) || ( ! workspace.restricted(userId)) || auth.has_acl(project.getName(), '', userId, auth.WRITE);
+      return (project == revealed) || ( ! workspace.restricted(userId)) || auth.has_acl(project, '', userId, auth.WRITE);
     });
   }
   return projects;
@@ -208,8 +208,6 @@ var _renderers = {
         initialRevisionList: revisions.getRevisionList(pad),
         serverTimestamp: +(new Date),
         initialOptions: pad.getPadOptionsObj(),
-        userId: getSession().userId,
-        userName: getSession().userName,
         opts: {}
       });
     });
@@ -231,7 +229,10 @@ function _render_file(project, file, lineno, projectfiles) {
     project: project,
     file: file,
     projectfiles: projectfiles,
-    extension: extension
+    extension: extension,
+    user_has_acl: function(permission) {
+      return ( ! getSession().restricted) || auth.has_acl(project, file, getSession().userId, permission);
+    }
   };
   if (extension && _controllers[extension]) {
     data.add = _controllers[extension](project, file);
@@ -248,6 +249,10 @@ function _render_file(project, file, lineno, projectfiles) {
   }
   
   data.__proto__ = _renderers._file(project, file);
+  helpers.addClientVars({
+    editorProject: "" + project.getName(),
+    editorFile: "" + file.getProjectRelativePath()
+  });
   if (lineno) { helpers.addClientVars({ scrollToLineNo: lineno }); }
   renderHtml("editor/file.ejs", data);
   return true;

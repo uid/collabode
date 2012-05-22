@@ -1,0 +1,27 @@
+<% helpers.includeJQuery() %>
+<% helpers.includeCss("ace/editor.css") %>
+<% helpers.includeCss("readonly_ejs.css") %>
+<% helpers.includeJs("json2.js") %>
+<% helpers.includeJs("ace/easysync2.js") %>
+<% helpers.includeJs("ace/domline.js") %>
+<% helpers.includeJs("ace/linestylefilter.js") %>
+<% helpers.includeJs("readonly.js") %>
+<% helpers.includeJs("ode_test.js") %>
+
+<div class="adocbar">
+  <div class="adocbartext">
+    <div class="iconic" style="background-image: url(/static/img/eclipse/jdt.junit.obj.test.gif);"></div>
+    <%= testclassname %> &ndash; <%= testmethodname %>()
+  </div>
+</div>
+
+<div id="test" class="padcontainer faded"></div>
+
+<div class="adocbar">
+  <div class="adocbartext">
+  <div class="iconic" style="background-image: url(/static/img/eclipse/jdt.ui.lcl.ch_callees.gif);"></div>
+  <% if (calls.length) { %>Calls <%= calls.join(", ") %><% } else { %>No call coverage<% } %>
+  </div>
+</div>
+
+<div id="files" class="padcontainer faded"></div>

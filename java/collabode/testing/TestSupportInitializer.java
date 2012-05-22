@@ -9,31 +9,38 @@ import org.eclipse.jdt.core.*;
 
 import collabode.Application;
 
-public class AnnotationsInitializer extends ClasspathContainerInitializer {
+public class TestSupportInitializer extends ClasspathContainerInitializer {
     
     public static final String PACKAGE = "collabode";
     
     public static final List<String> STATUSES = Arrays.asList(new String[] { "New", "NeedsImpl", "NeedsReview", "Accepted" });
     
-    public static final IPath PATH = new Path("collabode.ANNOTATIONS_CONTAINER");
+    public static final IPath PATH = new Path("collabode.TEST_SUPPORT_CONTAINER");
     
-    private final String libPath;
+    public static String weaverPath() throws IOException {
+        return Application.bundleResourcePath("lib/aspectjweaver.jar");
+    }
     
-    public AnnotationsInitializer() throws IOException {
-        libPath = Application.bundleResourcePath("inject-bin"); // XXX
+    private final String annotationsPath;
+    private final String coveragePath;
+    
+    public TestSupportInitializer() throws IOException {
+        annotationsPath = Application.bundleResourcePath("inject-bin");
+        coveragePath = Application.bundleResourcePath("lib/jacto.jar");
     }
 
     public void initialize(final IPath containerPath, IJavaProject project) throws CoreException {
-        final IClasspathEntry[] entry = {
-                JavaCore.newLibraryEntry(new Path(libPath), null, null)
+        final IClasspathEntry[] entries = {
+                JavaCore.newLibraryEntry(new Path(annotationsPath), null, null),
+                JavaCore.newLibraryEntry(new Path(coveragePath), null, null)
         };
         IClasspathContainer[] container = {
                 new IClasspathContainer() {
                     public IClasspathEntry[] getClasspathEntries() {
-                        return entry;
+                        return entries;
                     }
                     public String getDescription() {
-                        return "Collabode Annotations";
+                        return "Collabode Test Support";
                     }
                     public int getKind() {
                         return IClasspathContainer.K_APPLICATION;

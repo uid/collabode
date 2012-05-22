@@ -8,10 +8,12 @@ import("control.static_control");
 import("control.auth_control");
 import("control.clone_control");
 import("control.console_control");
+import("control.contrib_control");
 import("control.editor_control");
 import("control.git_control");
 import("control.import_control");
 import("control.stats_control");
+import("control.test_control");
 import("control.turk_control");
 
 import("collab.collabroom_server");
@@ -20,6 +22,7 @@ import("pad.model");
 import("pad.dbwriter");
 
 import("editor.auth");
+import("editor.turk");
 import("editor.workspace");
 
 jimport("java.lang.System");
@@ -33,6 +36,7 @@ serverhandlers.startupHandler = function() {
     dbwriter.onStartup();
     collabroom_server.onStartup();
     auth.onStartup();
+    turk.onStartup();
     workspace.onStartup();
 };
 
@@ -119,7 +123,8 @@ function handlePath() {
     [/^\/login:([\w]+):([^\/]+)(\/.*)$/, auth_control.external_login],
     [/^\/login()(\/.*)$/, auth_control.render_login],
     ['/logout', auth_control.logout],
-    [_file('turk:([\\w]+)'), turk_control.render_task],
+    [_file('mturk:([\\w]+)'), turk_control.render_mturk_task],
+    [_file('instawork()'), turk_control.render_instawork_task],
     [/^\/frame%22([\s\S]*?)%22(\/.*)$/, turk_control.render_framed] // XXX anyone can frame us?
   ]);
   noauth.POST.addLocations([
@@ -173,7 +178,10 @@ function handlePath() {
     [_proj('delacl:([\\w\\.]+)'), r(editor_control.render_confirm_delacl, auth.OWNER, 1)],
     [_file('delacl:([\\w\\.]+)'), r(editor_control.render_confirm_delacl, auth.OWNER, 1)],
     [_file('clone'), r(clone_control.clone_path)],
+    [_file('instawork:([\\w-]+)'), turk_control.render_instawork_task],
     [_file('knockout:([\\w,.\\[;]+)"([\\s\\S]*)"'), r(turk_control.render_knockout, auth.READ, 2, 'clones')],
+    [_proj('contrib:([\\w\\.]+):(\\d*)(?:\\.\\.)?(\\d*)'), r(contrib_control.render_contrib, auth.WRITE, 3)],
+    [/^\/coverage\/([\w-\.]+)():(.+)\.(.+)$/, r(test_control.render_coverage, auth.WRITE)],
     [/^\/statistics(?:\/(?:([^\/]+)(?:\/([^\/]+)?)?)?)?$/, u(stats_control.render_stats)],
     [_proj(), r(editor_control.render_project)],
     [_file(), r(editor_control.render_path)]
@@ -185,6 +193,7 @@ function handlePath() {
     [_file('delete'), u(editor_control.delete_path)],
     [_proj('delacl:([\\w\\.]+)'), r(editor_control.delete_acl, auth.OWNER, 1)],
     [_file('delacl:([\\w\\.]+)'), r(editor_control.delete_acl, auth.OWNER, 1)],
+    [_file('instawork:([\\w-]+)'), turk_control.complete_instawork_task],
     [_file('knockout:([\\w,.\\[;]+)"([\\s\\S]*)"'), r(turk_control.create_knockout, auth.READ, 2, 'clones')],
     ['/', u(editor_control.create_project)],
     [_proj(), r(editor_control.modify_path, auth.OWNER)],

@@ -1,0 +1,25 @@
+<% helpers.setHtmlTitle(toHTML(task.description)) %>
+<% helpers.includeCss("turk_ejs.css") %>
+<% helpers.includeJQuery() %>
+<% helpers.includeJs("ace/widget_outsource.js") %>
+
+<table cellpadding="0" cellspacing="0" border="0">
+<tr><td height="1%">
+<div id="task">
+<table cellpadding="0" cellspacing="0" border="0"><tr><td>
+Use the code editor to complete this request: <%= toHTML(task.description) %>
+</td><td>
+<form action="<%= appjet.config.instaworkURL %>/done/<%= task.taskId %>" method="POST" class="right">
+<%= toHTML(task.title) %> &ndash;
+<button type="submit" id="done"><img src="/static/img/eclipse/ui.lcl.step_done.green.gif"/> Work complete!</button>
+</form>
+</td></tr></table>
+</div>
+
+</td></tr>
+<tr><td height="99%">
+
+<iframe src="<%= frameURL %>"></iframe>
+
+</td></tr>
+</table>

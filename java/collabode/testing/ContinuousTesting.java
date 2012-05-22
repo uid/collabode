@@ -1,7 +1,7 @@
 package collabode.testing;
 
 import java.io.IOException;
-import java.util.Collections;
+import java.util.*;
 import java.util.concurrent.*;
 
 import org.eclipse.core.resources.*;
@@ -31,6 +31,8 @@ public class ContinuousTesting implements Runnable {
     
     private final BlockingQueue<IProject> toRun = new LinkedBlockingQueue<IProject>();
     private final ConcurrentMap<ILaunch, CountDownLatch> latches = new ConcurrentHashMap<ILaunch, CountDownLatch>();
+    private final Set<ITestRunSession> launched = Collections.synchronizedSet(new HashSet<ITestRunSession>());
+    private final Set<IProject> broken = new HashSet<IProject>();
     
     public final IResourceChangeListener listener = new IResourceChangeListener() {
         public void resourceChanged(IResourceChangeEvent event) {
@@ -65,8 +67,17 @@ public class ContinuousTesting implements Runnable {
             @Override public void testCaseFinished(ITestCaseElement elt) {
                 ProjectTestsOwner.of(elt.getTestRunSession().getLaunchedProject()).update(elt);
             }
+            @Override public void sessionLaunched(ITestRunSession session) {
+                launched.add(session);
+            }
             @Override public void sessionStarted(ITestRunSession session) {
                 ProjectTestsOwner.of(session.getLaunchedProject()).update(session);
+                launched.remove(session);
+            }
+        });
+        Coverage.addCoverageListener(new CoverageListener() {
+            public void coverage(Coverage coverage) {
+                ProjectTestsOwner.of(coverage.project).update(coverage);
             }
         });
     }
@@ -100,6 +111,18 @@ public class ContinuousTesting implements Runnable {
                 } catch (CoreException ce) {
                     ce.printStackTrace(); // XXX
                 }
+                
+                for (ITestRunSession session : launched) {
+                    IProject failed = session.getLaunchedProject().getProject();
+                    if (broken.contains(failed)) {
+                        System.err.println("Broken " + session.getTestRunName()); // XXX
+                    } else {
+                        System.err.println("Retry " + session.getProgressState() + " " + session.getTestRunName()); // XXX
+                        broken.add(failed);
+                        runTests(failed);
+                    }
+                }
+                launched.clear();
             } catch (Exception e) {
                 e.printStackTrace(); // XXX ... and madly soldier on
             }
@@ -116,10 +139,19 @@ public class ContinuousTesting implements Runnable {
         config.setAttribute("org.eclipse.jdt.junit.CONTAINER", project.getHandleIdentifier());
         config.setAttribute("org.eclipse.jdt.junit.TEST_KIND", "org.eclipse.jdt.junit.loader.junit4");
         
+        Coverage coverage = new Coverage(project);
+        Map<String, String> env = new HashMap<String, String>();
+        env.put(Coverage.PORT, Integer.toString(coverage.port));
+        config.setAttribute(ILaunchManager.ATTR_ENVIRONMENT_VARIABLES, env);
+        
         String policy = "'" + Application.bundleResourcePath("config/export/security.test.policy") + "'";
         config.setAttribute(IJavaLaunchConfigurationConstants.ATTR_VM_ARGUMENTS,
                 "-Dorg.eclipse.osgi.framework.internal.core.FrameworkSecurityManager " + // XXX does nothing?
-                "-Djava.security.manager -Djava.security.policy==" + policy + " -ea");
+                "-Djava.security.manager -Djava.security.policy==" + policy + " " +
+                // "-Djava.security.debug=access:failure " + 
+                "-javaagent:" + TestSupportInitializer.weaverPath() + " " +
+                // "-Daj.weaving.verbose=true -Dorg.aspectj.weaver.showWeaveInfo=true " +
+                "-ea");
         
         return config.launch(ILaunchManager.RUN_MODE, null);
     }
