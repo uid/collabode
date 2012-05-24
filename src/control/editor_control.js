@@ -181,6 +181,7 @@ function _find_markers(resource) {
 var _controllers = {
   java: function(project, file) {
     return {
+      outsourceProvider: appjet.config.outsourceProvider,
       continuousTesting: appjet.config.continuousTesting == 'true',
       testDriven: workspace.accessTestsOwner(project).isTestDriven(),
       isTest: file.getName().match(/Test\.java$/)

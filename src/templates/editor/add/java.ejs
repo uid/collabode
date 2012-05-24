@@ -1,7 +1,7 @@
 <% if (add.testDriven) { helpers.addBodyClass('testDriven') } %>
 <% helpers.addBodyClass('editing' + (add.isTest ? 'Test' : 'Impl')) %>
 
-<% if (user_has_acl(auth.OWNER)) { %>
+<% if (add.outsourceProvider && user_has_acl(auth.OWNER)) { %>
 <a href="#" id="outsource" class="docbarbutton enabled" title="Outsource"></a>
 <% } %>
 <% if (user_has_acl(auth.WRITE)) { %>
