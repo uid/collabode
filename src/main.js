@@ -57,7 +57,7 @@ serverhandlers.tasks.pdsyncDocumentText = function(padId, newRev, cs, author) {
 serverhandlers.tasks.pdsyncQueuedStyles = function(collab) {
   try {
     workspace.taskPdsyncQueuedStyles(collab);
-  } catch (e if e.easysync) { System.err.println("Easysync error during pdsyncQueuedStyles: " + e); }
+  } catch (e if e.easysync) { System.err.println("Easysync error during pdsyncQueuedStyles(" + collab.file + "): " + e); }
 };
 serverhandlers.tasks.updateAnnotations = function(username, file, type, annotations) {
     workspace.taskUpdateAnnotations(username, file, type, annotations);
