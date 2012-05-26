@@ -76,6 +76,7 @@ $(document).ready(function() {
   function display(idx, contents) {
     $("#revision").text(history.revisions[idx].revision);
     $("#timestamp").text(history.revisions[idx].timestamp);
+    $("#author").text(history.revisions[idx].author);
     $("#contents").text(contents);
   }
   

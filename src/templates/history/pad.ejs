@@ -61,7 +61,8 @@ var history = <%= fastJSON.stringify({
 
 <div id="editorpage">
 
-<%= helpers.renderPartial("docbar", { project: "History", file: padId + ' revision <span id="revision">r</span> at <span id="timestamp">t</span>' }) %>
+<%= helpers.renderPartial("docbar", { project: "History",
+                                      file: padId + ' revision <span id="revision">r</span> at <span id="timestamp">t</span> by <span id="author">a</span>' }) %>
 
 <div id="padmain">
   <div id="padeditor">
