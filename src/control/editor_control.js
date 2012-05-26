@@ -181,6 +181,7 @@ function _find_markers(resource) {
 var _controllers = {
   java: function(project, file) {
     return {
+      outsourceProvider: appjet.config.outsourceProvider,
       continuousTesting: appjet.config.continuousTesting == 'true',
       testDriven: workspace.accessTestsOwner(project).isTestDriven(),
       isTest: file.getName().match(/Test\.java$/)
@@ -205,8 +206,6 @@ var _renderers = {
         initialRevisionList: revisions.getRevisionList(pad),
         serverTimestamp: +(new Date),
         initialOptions: pad.getPadOptionsObj(),
-        userId: getSession().userId,
-        userName: getSession().userName,
         opts: {}
       });
     });
@@ -248,6 +247,10 @@ function _render_file(project, file, lineno, projectfiles) {
   }
   
   data.__proto__ = _renderers._file(project, file);
+  helpers.addClientVars({
+    editorProject: "" + project.getName(),
+    editorFile: "" + file.getProjectRelativePath()
+  });
   if (lineno) { helpers.addClientVars({ scrollToLineNo: lineno }); }
   renderHtml("editor/file.ejs", data);
   return true;

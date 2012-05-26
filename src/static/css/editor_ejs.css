@@ -9,8 +9,11 @@ a img { border: none; }
 
 html { font-size: 62.5%; }
 
-body { background: #ebebeb url(/static/img/pad/backgradient.gif) repeat-x left top; }
-body, textarea { font-family: Arial, sans-serif; }
+body {
+	background: #ebebeb url(/static/img/pad/backgradient.gif) repeat-x left top;
+	font-family: Arial, sans-serif;
+	overflow-x: hidden;
+}
 
 #editorpage { position: relative; margin-left: auto; margin-right: auto; width: 1010px; }
 
@@ -32,17 +35,23 @@ body.fullwidth #editorpage { width: auto; margin-left: 6px; margin-right: 6px; }
 	position: absolute; height: auto; left: 265px;
 	width: 35%; font-size: 1.6em; color: #444; font-weight: normal;
 	line-height: 22px; margin-left: 2px; height: 22px; top: 4px;
-	overflow: hidden; text-overflow: ellipsis /*not supported in FF*/;
 	white-space:nowrap;
+}
+#docbarfile .filename {
+	display: inline-block;
+	max-width: 99%;
+	overflow: hidden; text-overflow: ellipsis /*not supported in FF*/;
+	margin-right: 4px;
 }
 #docbaruser {
 	position: absolute; height: auto; right: 9px;
 	font-size: 1.6em; color: #888; font-weight: normal;
 	line-height: 22px; margin-right: 2px; height: 22px; top: 4px;
 	white-space:nowrap;
+	text-align: right;
 }
 #docbaruser span {
-	display: block; max-width: 166px; 
+	display: inline-block; max-width: 166px; 
 	overflow: hidden; text-overflow: ellipsis /*not supported in FF*/;
 }
 
@@ -60,6 +69,19 @@ body.fullwidth #editorpage { width: auto; margin-left: 6px; margin-right: 6px; }
 	background: url(/static/img/eclipse/jst.ws.consum.login.gif) no-repeat center center;
 }
 
+#userlist {
+	display: inline-block;
+	vertical-align: top;
+}
+
+#userlist .user {
+	float: left;
+	width: 12px;
+	height: 22px;
+	background: #ebebeb url(/static/img/user-fbfbfb.png) no-repeat center center;
+}
+#userlist .user p { display: none; }
+
 #docbaroverlay {
 	position: absolute; top: 1px; height: 30px; right: 210px;
 }
@@ -75,7 +97,7 @@ body.fullwidth #editorpage { width: auto; margin-left: 6px; margin-right: 6px; }
 	float:left; height:22px; width:22px; margin:0 4px;
 }
 
-#docbartools p { /* XXX should match annotation popups in ace/editor.css */
+#docbar p, #docbartools p { /* XXX should match annotation popups in ace/editor.css */
 	font-size: 11px; line-height: 16px;
 	text-align: left;
 	font-family: Arial, sans-serif;
@@ -204,6 +226,9 @@ body.nosidebar #padeditor { margin-left: 0; }
 #runtests.enabled {
     background: url(/static/img/eclipse/jdt.junit.obj.tsuiterun.gif) no-repeat center center;
 }
+#outsource.enabled {
+    background: url(/static/img/eclipse/help.ui.view.help.gif) no-repeat center center;
+}
 
 #editorcontainerbox {
   border-left: 1px solid #c4c4c4; border-right: 1px solid #c4c4c4;
@@ -241,6 +266,18 @@ body.nosidebar #padeditor { margin-left: 0; }
 #orgimports-input { position:absolute; top:8px; left:9px; width:325px; height:17px; }
 #orgimports-cancel { position:absolute; top:198px; height:25px; width:65px; left:77px; }
 #orgimports-next { position:absolute; top:198px; height:25px; width:65px; left:9px; }
+#outsource-container {
+	position:absolute; width:328px; height:161px; top:11px; left:368px; background-color:#dedede; box-shadow:5px 5px 5px #888; -o-box-shadow:5px 5px 5px #888;
+	-icab-box-shadow:5px 5px 5px #888; -khtml-box-shadow:5px 5px 5px #888; -moz-box-shadow:3px 3px 6px #888; -webkit-box-shadow:5px 5px 5px #888; border:1px;
+	padding:8px 9px;
+}
+#outsource-container label { padding:0 0.75em; height:17px; }
+#outsource-file { width:200px; height:17px; }
+#outsource-line { width:35px; height:17px; }
+#outsource-request { position:absolute; top:36px; height:79px; width:325px; left:9px; }
+#outsource-details { position:absolute; top:126px; height:17px; width:325px; left:9px; }
+#outsource-cancel { position:absolute; top:143px; height:25px; width:65px; left:77px; }
+#outsource-next { position:absolute; top:143px; height:25px; width:65px; left:9px; }
 
 #wizardcontainerbox {
 	border: 1px solid #c4c4c4;
@@ -281,6 +318,28 @@ body.nosidebar #padeditor { margin-left: 0; }
 	width: 300px;
 }
 
+#hovercontainerbox {
+	position: absolute;
+	display: none;
+}
+#hovercontainerbox iframe {
+	width: 550px; height: 100%;
+	margin-right: 35px;
+	box-shadow: 5px 5px 5px #888;
+	-o-box-shadow: 5px 5px 5px #888; -moz-box-shadow: 3px 3px 6px #888; -webkit-box-shadow: 5px 5px 5px #888;
+	border: 1px solid #c4c4c4;
+}
+#hoverclose {
+	position: absolute;
+	right: 0; top: 0; bottom: 0;
+	width: 20px;
+	margin: 0 5px;
+	background: url(/static/img/close-left.png) no-repeat center center;
+}
+#hoverclose:hover {
+	background: #fbfbfb url(/static/img/close-left-red.png) no-repeat center center;
+}
+
 #filegrid tr ~ tr td { padding-top:1em; }
 #filegrid td ~ td { padding-left:2em; }
 
@@ -301,6 +360,9 @@ body.nosidebar #padeditor { margin-left: 0; }
 
 #testorcontainer {
 	overflow: visible;
+}
+#testorcontainer a {
+	text-decoration: none;
 }
 .test {
 	border-width:1px;
@@ -427,20 +489,20 @@ body.nosidebar #padeditor { margin-left: 0; }
 .test.needsreview button div:after {
 	content: "Accept";
 }
-.test a {
+.test .toggle {
 	text-align: center;
 	font-size: x-small;
-	position: absolute;
-	left: 0;
-	right: 0;
-	margin-top: -0.5em;
+	margin: 0 0 -5px 0;
 	display: none;
 	cursor: pointer;
 }
-.test a div:after {
+.test .toggle:hover {
+	background: #fbfbfb;
+}
+.test.hasDetails .toggle div:after {
 	content: "details";
 }
-.test.hasDetails a {
+.test.hasDetails .toggle {
 	display: block;
 }
 .test td {
@@ -448,9 +510,77 @@ body.nosidebar #padeditor { margin-left: 0; }
 }
 .test .testtrace {
 	display: none;
-	margin-top: 0.5em;
+	margin-top: 5px;
 	position: relative;
 	font-size: 11px;
 	white-space: pre;
 	font-family: Consolas, Menlo, monospace;
+}
+
+#outsourcedcontainer {
+	overflow: visible;
+}
+#outsourcedcontainer a {
+	text-decoration: none;
+}
+.outsrcreq {
+	border-width:1px;
+	border-style:solid;
+	margin-top:4px;
+	padding:6px 8px 6px 0;
+	position:relative;
+	font-size: smaller;
+	min-height:3.6em;
+}
+.outsrcreq.new {
+	color: gray;
+	border-color: gray;
+}
+.outsrcreq.done:after {
+	content: "\2713";
+	position: absolute;
+	top: 0;
+	right: -0.3em;
+	font-size: 22px;
+	color: #093;
+	text-shadow: #fff 0 1px 1px, #fff 0 -1px 1px;
+}
+.outsrcreq.done .reqworker {
+	opacity: 0.5;
+}
+.outsrcreq .reqdesc {
+	position: relative;
+	max-height: 1.2em;
+	white-space: pre;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	padding-left: 8px;
+}
+.outsrcreq .reqworker {
+	float: left;
+	width: 44px;
+	padding: 2px;
+	font-size: 11px;
+	overflow: hidden;
+	text-align: center;
+}
+.outsrcreq .reqworker .reqavatar {
+	height: 16px;
+	width: 12px;
+	margin: auto;
+	background: #ebebeb url(/static/img/user-fff.png) no-repeat center center;
+}
+.outsrcreq .reqdetail {
+	position: relative;
+	white-space: pre;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+.outsrcreq .deltains {
+	font-weight: bold;
+	color: #5b3;
+}
+.outsrcreq .deltadel {
+	font-weight: bold;
+	color: #b44;
 }

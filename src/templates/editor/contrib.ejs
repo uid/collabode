@@ -1,0 +1,17 @@
+<% helpers.includeJQuery() %>
+<% helpers.includeCss("ace/editor.css") %>
+<% helpers.includeCss("readonly_ejs.css") %>
+<% helpers.includeJs("json2.js") %>
+<% helpers.includeJs("ace/easysync2.js") %>
+<% helpers.includeJs("ace/domline.js") %>
+<% helpers.includeJs("ace/linestylefilter.js") %>
+<% helpers.includeJs("readonly.js") %>
+<% helpers.includeJs("ode_contrib.js") %>
+
+<div class="adocbar">
+  <div class="adocbartext"><%= projectname %> edits by <%= author %>
+  <% if (since && until) { %>from <%= since %> to <%= until %><% } else if (since) { %>since <%= since %><% } %>
+  </div>
+</div>
+
+<div id="pads" class="padcontainer faded"></div>

@@ -14,20 +14,29 @@ $(document).ready(function() {
   
   var user = {
     userId: clientVars.userId,
-    name: clientVars.userName
-    // ip, colorId, userAgent
+    name: clientVars.userName,
+    colorId: clientVars.userColorId
+    // ip, userAgent
+  };
+  var options = {
+    colorPalette: clientVars.colorPalette
   };
   
   var collab = getCollabClient(ace,
                                clientVars.collab_client_vars,
                                user,
-                               { });
+                               options);
   
+  var userlist = new UserList(ace, collab, user, options);
   var testor = new Testor(collab);
   
   var orgImportsWidget = makeOrgImportsWidget($, ace, function(selection) {
-    collab.sendExtendedMessage({ type: "ORGIMPORTS_RESOLVED" , choices: selection});
+    collab.sendExtendedMessage({ type: "ORGIMPORTS_RESOLVED" , choices: selection });
   });
+  
+  var outsourceWidget = makeOutsourceWidget(function(request) {
+    collab.sendExtendedMessage({ type: "OUTSOURCE_REQUEST", action: "create", request: request });
+  }, options);
   
   collab.setOnInternalAction(function(action) {
     if (action == "commitPerformed") {
@@ -46,6 +55,7 @@ $(document).ready(function() {
       setTimeout(function() {
         collab.sendExtendedMessage({ type: "ANNOTATIONS_REQUEST" });
         collab.sendExtendedMessage({ type: "TESTS_REQUEST", action: "state" });
+        collab.sendExtendedMessage({ type: "OUTSOURCE_REQUEST", action: "state" });
       }, 0);
     } else if (state == "DISCONNECTED") {
       $("#connstatusconnecting").css('display', 'none');
@@ -71,6 +81,9 @@ $(document).ready(function() {
   });
   collab.setOnExtendedMessage("ORGIMPORTS_PROMPT", function(msg) {
     orgImportsWidget.handleOrgImportsResolve(msg.suggestion);
+  });
+  collab.setOnExtendedMessage("OUTSOURCED", function(msg) {
+    outsourceWidget.updateRequests(msg.requests);
   });
   
   ace.addKeyHandler(function(event, char, cb, cmdKey) {
@@ -116,6 +129,10 @@ $(document).ready(function() {
   });
   $("#runtests").click(function() {
     collab.sendExtendedMessage({ type: "TESTS_RUN_REQUEST" });
+    return false;
+  });
+  $("#outsource").click(function() {
+    outsourceWidget.createRequest(ace.getSelection());
     return false;
   });
 });

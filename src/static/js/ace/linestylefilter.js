@@ -58,6 +58,10 @@ linestylefilter.getLineStyleFilter = function(lineLength, aline,
 	if (key) {
 	  var value = apool.getAttribValue(n);
 	  if (value) {
+            if (key == 'author') {
+              classes += ' '+linestylefilter.getAuthorClassName(value);
+              return;
+            }
 	    if (namespace) {
 	      if (key.indexOf(namespace+"$") == 0) {
 	        key = key.substring(namespace.length+1);
@@ -67,10 +71,7 @@ linestylefilter.getLineStyleFilter = function(lineLength, aline,
 	        return; // XXX namespace required if set
 	      }
 	    }
-	    if (key == 'author') {
-	      classes += ' '+linestylefilter.getAuthorClassName(value);
-	    }
-            else if (key == 'list') {
+            if (key == 'list') {
               classes += ' list:'+value;
             }
 	    else if (linestylefilter.ATTRIB_CLASSES[key]) {
@@ -240,4 +241,23 @@ linestylefilter.textAndClassFuncSplitter = function(func, splitPointsOpt) {
     }
   }
   return spanHandler;
+};
+
+// domLineObj is like that returned by domline.createDomLine
+linestylefilter.populateDomLine = function(textLine, aline, apool,
+                                           domLineObj, namespace) {
+  // remove final newline from text if any
+  var text = textLine;
+  if (text.slice(-1) == '\n') {
+    text = text.substring(0, text.length-1);
+  }
+
+  function textAndClassFunc(tokenText, tokenClass) {
+    domLineObj.appendSpan(tokenText, tokenClass);
+  }
+
+  var func = textAndClassFunc;
+  func = linestylefilter.getLineStyleFilter(text.length, aline,
+                                            func, apool, namespace);
+  func(text, '');
 };

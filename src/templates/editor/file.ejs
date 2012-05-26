@@ -8,7 +8,9 @@
 <% helpers.includeJs("ace/ace2_outer.js") %>
 <% helpers.includeJs("ace/widget_list.js") %>
 <% helpers.includeJs("ace/widget_orgimports.js") %>
+<% helpers.includeJs("ace/widget_outsource.js") %>
 <% helpers.includeJs("testor.js") %>
+<% helpers.includeJs("userlist.js") %>
 <% helpers.includeJs("collab_client.js") %>
 <% helpers.includeJs("ode_file.js") %>
 <% helpers.includeJs("layout.js") %>
@@ -39,10 +41,15 @@
   </div>
   <div id="testorcontainer" class="sidebarsection">
   </div>
+  <div id="outsourcedcontainer" class="sidebarsection">
+  </div>
 </div>
 
 <div id="padmain">
   <div id="padeditor">
+    <div id="hovercontainerbox" class="autoresized">
+      <a id="hoverclose" href="#" title="Close"></a>
+    </div>
     <div id="editorcontainerbox" class="autoresized">
       <div id="editorloadingbox">Loading...</div>
       <div id="editorcontainer"><!-- --></div>

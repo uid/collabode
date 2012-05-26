@@ -226,6 +226,7 @@ function Ace2Editor() {
 	'{ window.onload = null; setTimeout'+
 	'(function() '+
 	'{ var iframe = document.createElement("IFRAME"); '+
+	'iframe.id = "innereditorframe"; ' +
 	'iframe.scrolling = "no"; var outerdocbody = document.getElementById("outerdocbody"); '+
 	'iframe.frameBorder = 0; iframe.allowTransparency = true; '+ // for IE
 	'outerdocbody.insertBefore(iframe, outerdocbody.firstChild); '+
@@ -244,6 +245,7 @@ function Ace2Editor() {
 	'</head><body id="outerdocbody"><div id="sidediv"><!-- --></div><div id="linemetricsdiv">x</div><div id="overlaysdiv"><!-- --></div></body></html>'];
 
       var outerFrame = document.createElement("IFRAME");
+      outerFrame.id = "outereditorframe";
       outerFrame.frameBorder = 0; // for IE
       info.frame = outerFrame;
       document.getElementById(containerId).appendChild(outerFrame);

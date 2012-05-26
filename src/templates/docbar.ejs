@@ -4,7 +4,8 @@
       <a href="/" id="home" title="Home"></a>
       <span><%= project %></span>
     </div>
-    <div id="docbarfile"><span><%= typeof file == "undefined" ? "" : file %></span></div>
+    <div id="docbarfile"><span class="filename"><%= typeof file == "undefined" ? "" : file %></span>
+    <span id="userlist"></span></div>
 <% if (session.userId) { %>
     <div id="docbaruser">
       <a href="/logout" id="logout" title="Log out"></a>

@@ -19,7 +19,7 @@ import org.eclipse.jdt.launching.JavaRuntime;
 import org.osgi.service.prefs.BackingStoreException;
 import org.osgi.service.prefs.Preferences;
 
-import collabode.testing.AnnotationsInitializer;
+import collabode.testing.TestSupportInitializer;
 
 @SuppressWarnings("restriction")
 interface Restricted {
@@ -145,7 +145,7 @@ public class Workspace {
         IClasspathEntry[] entries = new IClasspathEntry[] {
                 JavaRuntime.getDefaultJREContainerEntry(),
                 JavaCore.newContainerEntry(JUnitCore.JUNIT4_CONTAINER_PATH),
-                JavaCore.newContainerEntry(AnnotationsInitializer.PATH),
+                JavaCore.newContainerEntry(TestSupportInitializer.PATH),
                 JavaCore.newSourceEntry(srcFolder.getFullPath())
         };
         javaProject.setRawClasspath(entries, null);
