@@ -2,3 +2,43 @@ body {
 	background-color: #ffffff;
 	font-family: Arial, sans-serif; 
 }
+
+.share-row-add .share-row-user, .share-row-add .share-row-permission {
+	background-color: #77ff77;
+}
+
+.share-row-delete .share-row-user, .share-row-delete .share-row-permission {
+	background-color: #ffcccc;
+	text-decoration: line-through;
+	color: red;
+}
+
+#share-table td{
+	text-align: center;
+	padding: 0;
+	font-size: 16px;
+	height: 20px;
+	border-top: 3px solid white;
+}
+
+#share-header-user {
+	width: 120px;
+  border-bottom: 1px solid black;
+}
+
+#share-header-permission {
+	width: 120px;
+  border-bottom: 1px solid black;
+}
+
+.share-row-action button, #share-new-add, #share-ok, #share-cancel {
+	width: 70px;
+	height: 25px;
+	margin-left: 6px;
+}
+
+#share-actions {
+	position:absolute;
+	right:20px;
+	bottom:20px;
+}

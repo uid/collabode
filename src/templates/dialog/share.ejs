@@ -1,33 +1,55 @@
-<form id="share-form">
-<input type="hidden" name="acl" value="1"/>
-<h2>Permissions</h2>
-<div id="acl">
-<table>
-<%= helpers.renderList("acl", acl, null, { item: 'tr' }) %>
-<tr>
-<td>
-<select name="acl_userid">
-<option value="anyone">anyone</option>
-<% auth.recent_users().forEach(function(userId) { %>
-<option value="<%= userId %>"><%= userId %></option>
-<% }); %>
-</select>
-</td><td><%= folder.getProjectRelativePath().toString() %></td><td>
-<select name="acl_permission">
-<option value="read">Read</option>
-<option value="claim">Claim</option>
-<option value="write">Write</option>
-<option value="owner">Owner</option>
-</select>
-</td><td></td><td><button onclick="submit_form()" type="button">Add permission</button></td>
-</tr>
+<% helpers.includeJs('dialog/share.js') %>
+<h2>Permissions for <%=path %></h2>
+<table id="share-table" cellspacing="0" cellpadding="0">
+  <tr id="share-table-header">
+    <td id="share-header-user">User</td>
+    <td id="share-header-permission">Access</td>
+    <td id="share-header-action"></td>
+  </tr>
+  <tr id="share-new-row">
+    <td>
+      <select id="share-new-user"></select>
+    </td>
+    <td>
+      <select id="share-new-permission"></select>
+    </td>
+    <td>
+      <button id="share-new-add">Add</button>
+    </td>
+  </tr>
 </table>
+
+<div id="share-actions">
+<button id="share-ok">OK</button>
+<button id="share-cancel" onclick="close_dialog()">Cancel</button>
 </div>
-</form>
 <script type="text/javascript">
 function submit_form() {
   $.post("<%=path %>", $("#share-form").serialize(), function() {
     location.reload();
   });
+}
+function initialize() {
+  var users = ['anyone' 
+    <% auth.recent_users().forEach(function(userId) { %>
+    , '<%=userId %>'
+    <% }); %>
+  ];
+  var permissions = ['read', 'claim', 'write', 'owner'];
+  var existingPermissions = [
+    <% 
+    acl.forEach(function(entry) {
+      if(entry.path == folderPath) {
+        %>{user: '<%=entry.userId %>', permission: '<%=entry.permission %>'},<%
+      }
+    });
+    %>
+  ];
+  var callback = function(modifications) {
+    $.post("<%=path %>", {acl_batch: JSON.stringify(modifications)}, function() {
+      close_dialog();
+    });
+  };
+  initShareDialog(users, permissions, existingPermissions, callback);
 }
 </script>

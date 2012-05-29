@@ -8,6 +8,7 @@ import("editor.workspace");
 
 import("pad.model");
 import("pad.revisions");
+import("fastJSON");
 
 jimport("collabode.Workspace");
 
@@ -288,6 +289,22 @@ function modify_path(projectname, filename) {
     auth.add_acl(project, folder.getProjectRelativePath(), request.params["acl_userid"], request.params["acl_permission"]);
   }
   
+  if (request.params["acl_batch"]) {
+    var modifications = fastJSON.parse(request.params["acl_batch"]);
+
+    // first run the deletes, and then the adds
+    modifications.forEach(function(item) {
+      if(item.action=='delete') {
+        auth.del_acl(project, folder.getProjectRelativePath(), item.user);
+      }
+    });
+    modifications.forEach(function(item) {
+      if(item.action=='add') {
+        auth.add_acl(project, folder.getProjectRelativePath(), item.user, item.permission);
+      }
+    });
+  }
+  
   response.redirect(request.url);
   return true;
 }
@@ -367,7 +384,8 @@ function render_dialog(projectname, path) {
       project: project,
       folder: resource,
       acl: auth.acl(project, resource),
-      path: fullpath
+      path: fullpath,
+      folderPath: path
     });
     break;
   }

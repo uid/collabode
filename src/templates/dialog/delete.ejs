@@ -5,7 +5,8 @@
 </form>
 <script type="text/javascript">
 function submit_form() {
-  $.post("<%=("delete/"+path) %>", $("#delete-form").serialize());
-  close_dialog();
+  $.post("<%=("delete/"+path) %>", $("#delete-form").serialize(),, function() {
+    close_dialog();
+  });
 }
 </script>

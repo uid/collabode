@@ -7,8 +7,9 @@
 </form>
 <script type="text/javascript">
 function submit_form() {
-  $.post("<%=path %>", $("#newfolder-form").serialize());
-  close_dialog();
+  $.post("<%=path %>", $("#newfolder-form").serialize(), function() {
+    close_dialog();
+  });
 }
 function initialize() {
   $("#focus").focus();
