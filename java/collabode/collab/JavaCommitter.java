@@ -54,6 +54,7 @@ public class JavaCommitter extends WorkingCopyOwner implements CollabListener, R
     }
     
     private void handleUpdated(CollabDocument doc) throws BadLocationException, JavaModelException, InterruptedException {
+        Debug.Entry debug = Debug.begin().add("queueSize", queue.size());
         List<ReplaceEdit> edits = new ArrayList<ReplaceEdit>();
         
         List<IRegion> regions = doc.unionOnlyRegionsOfDisk();
@@ -69,6 +70,7 @@ public class JavaCommitter extends WorkingCopyOwner implements CollabListener, R
         }
         
         handleEdits(doc, edits);
+        debug.end();
     }
     
     private void handleEdits(CollabDocument doc, List<ReplaceEdit> options) throws BadLocationException, JavaModelException, InterruptedException {
@@ -101,9 +103,11 @@ public class JavaCommitter extends WorkingCopyOwner implements CollabListener, R
     
     private Collection<ReplaceEdit> bestEdits(ICompilationUnit wc, String disk, List<ReplaceEdit> options, Set<Problem> existing) throws JavaModelException, InterruptedException {
         if (options.isEmpty()) { return options; }
+        Debug.Entry debug = Debug.begin().add("path", wc.getPath()).add("options", options.size());
         
         Collection<ReplaceEdit> best = new ArrayList<ReplaceEdit>();
         
+        int compilations = 0;
         for (int ii = 0; ii < options.size(); ii += LargeToSmallPowerSet.MAX_SIZE) {
             List<ReplaceEdit> considerable = options.subList(ii, Math.min(options.size(), ii + LargeToSmallPowerSet.MAX_SIZE));
             for (Collection<ReplaceEdit> subset : new LargeToSmallPowerSet<ReplaceEdit>(considerable)) {
@@ -113,6 +117,7 @@ public class JavaCommitter extends WorkingCopyOwner implements CollabListener, R
                     wc.getBuffer().replace(edit.getOffset(), edit.getLength(), edit.getText());
                     map.unionOnly(edit);
                 }
+                compilations++;
                 wc.reconcile(ICompilationUnit.NO_AST, true, this, null);
                 IProblem[] problems = reported.take();
                 
@@ -123,6 +128,7 @@ public class JavaCommitter extends WorkingCopyOwner implements CollabListener, R
             }
         }
         
+        debug.add("compilations", compilations).add("accepted", best.size()).end();
         return best;
     }
     
