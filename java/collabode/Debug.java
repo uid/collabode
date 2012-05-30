@@ -65,6 +65,7 @@ public class Debug {
         private final long start = System.currentTimeMillis();
         private final String event;
         private final Map<String, Object> map = new HashMap<String, Object>();
+        private long expire = start + 60000;
         
         private Entry(String event) {
             this.event = event;
@@ -87,10 +88,17 @@ public class Debug {
             return this;
         }
         
+        public void end() {
+            queue.remove(this);
+            map.put("ended", System.currentTimeMillis());
+            expire = 0;
+            queue.add(this);
+        }
+        
         /**
          * Write this entry to the debug log.
          */
-        public void write() {
+        void write() {
             queue.remove(this);
             map.put("started", start);
             map.put("written", System.currentTimeMillis());
@@ -105,13 +113,13 @@ public class Debug {
         
         public int compareTo(Delayed o) {
             Entry other = (Entry)o;
-            if (start < other.start) { return -1; }
-            if (other.start < start) { return 1; }
+            if (expire < other.expire) { return -1; }
+            if (other.expire < expire) { return 1; }
             return event.compareTo(other.event);
         }
         
         public long getDelay(TimeUnit unit) {
-            return unit.convert(start + 600000 - System.currentTimeMillis(), TimeUnit.MILLISECONDS);
+            return unit.convert(expire - System.currentTimeMillis(), TimeUnit.MILLISECONDS);
         }
     }
 }
