@@ -116,6 +116,7 @@ p {
 #sidedivinner .problem-annotation.problem-info-annotation { background-image: url("/static/img/eclipse/jdt.ui.obj.info.gif"); }
 #sidedivinner .problem-annotation.problem-warning-annotation { background-image: url("/static/img/eclipse/jdt.ui.obj.warning.gif"); }
 #sidedivinner .problem-annotation.problem-error-annotation { background-image: url("/static/img/eclipse/jdt.ui.obj.error.gif"); }
+#sidedivinner .problem-annotation.problem-task-annotation { background-image: url("/static/img/eclipse/ui.ide.obj.taskmrk_tsk.gif"); }
 
 #sidedivinner .collab-annotation { background-position: left center; }
 #sidedivinner .collab-annotation.collab-local-add-annotation { background-image: url("/static/img/eclipse/compare.ovr/r_inadd_ov.gif"); }
