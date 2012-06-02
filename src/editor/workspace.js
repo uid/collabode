@@ -109,6 +109,16 @@ function getSettings(userId, key) {
 }
 
 function taskPdsyncDocumentText(padId, newRev, cs, author) {
+  if ( ! author) {
+    System.err.println("Missing author for " + padId + " revision " + newRev); // XXX
+    model.accessPadGlobal(padId, function(pad) {
+      for (var rev = newRev-1; rev > 0; rev--) {
+        author = pad.getRevisionAuthor(rev);
+        if (author && author.length && author[0] != "#") { return; }
+      }
+    });
+    System.err.println("Faking author " + author + " for " + padId + " revision " + newRev);
+  }
   var doc = documentFor(author, padId);
   doc.collab.syncUnionCoordinateEdits(doc, newRev, _makeReplaceEdits(cs));
 }
