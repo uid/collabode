@@ -186,7 +186,7 @@ function applyUserChanges(pad, baseRev, changeset, optSocketId, optAuthor) {
 
   var correctionChangeset = _correctMarkersInPad(pad.atext(), pad.pool());
   if (correctionChangeset) {
-    pad.appendRevision(correctionChangeset);
+    pad.appendRevision(correctionChangeset, thisAuthor); // XXX should be null-authored
   }
 
   ///// make document end in blank line if it doesn't:
