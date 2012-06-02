@@ -11,6 +11,7 @@ import("control.console_control");
 import("control.contrib_control");
 import("control.editor_control");
 import("control.git_control");
+import("control.history_control");
 import("control.import_control");
 import("control.stats_control");
 import("control.test_control");
@@ -182,6 +183,9 @@ function handlePath() {
     [_file('knockout:([\\w,.\\[;]+)"([\\s\\S]*)"'), r(turk_control.render_knockout, auth.READ, 2, 'clones')],
     [_proj('contrib:([\\w\\.]+):(\\d*)(?:\\.\\.)?(\\d*)'), r(contrib_control.render_contrib, auth.WRITE, 3)],
     [/^\/coverage\/([\w-\.]+)():(.+)\.(.+)$/, r(test_control.render_coverage, auth.WRITE)],
+    ['/history', u(history_control.render_list)],
+    [/^\/history\/(.*):(\d+)$/, u(history_control.render_version)],
+    [/^\/history\/(.*)$/, u(history_control.render_pad)],
     [/^\/statistics(?:\/(?:([^\/]+)(?:\/([^\/]+)?)?)?)?$/, u(stats_control.render_stats)],
     [_proj(), r(editor_control.render_project)],
     [_file(), r(editor_control.render_path)]
