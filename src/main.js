@@ -26,6 +26,8 @@ import("editor.auth");
 import("editor.turk");
 import("editor.workspace");
 
+jimport("net.appjet.oui.exceptionlog");
+
 jimport("java.lang.System");
 
 serverhandlers.startupHandler = function() {
@@ -44,6 +46,23 @@ serverhandlers.startupHandler = function() {
 serverhandlers.requestHandler = function() {
     // XXX maybe check some stuff?
     handlePath();
+};
+
+serverhandlers.errorHandler = function(ex) {
+    exceptionlog.apply(ex);
+    var attribs = appjet.context.attributes();
+    if (request.isDefined) {
+      System.err.println("Request " + request.method + " " + request.path + " failed");
+      try { System.err.println("  attribs = " + attribs); } catch (e) { }
+      try { System.err.println("  params = " + fastJSON.stringify(request.params)); } catch (e) { }
+      try { System.err.println("  session = " + fastJSON.stringify(utils.getSession())); } catch (e) { }
+      utils.renderError(500);
+    } else if (attribs.apply("taskName")) {
+      System.err.println("Task " + attribs.apply("taskName") + " failed");
+      System.err.println("  args = " + java.util.Arrays.toString(attribs.apply("taskArguments")));
+    } else {
+      response.write(ex.getMessage());
+    }
 };
 
 serverhandlers.tasks.willShutdown = function() {
