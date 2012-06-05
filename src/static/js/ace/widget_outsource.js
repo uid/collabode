@@ -42,6 +42,7 @@ function makeOutsourceWidget(sendRequest, options) {
         button.attr('disabled', reqTxt.val() == '');
       })
       .keyup(function() {
+        reqTxt.data('edited', reqTxt.val() != '');
         button.attr('disabled', reqTxt.val() == '');
       })
       .blur(function() {
