@@ -86,6 +86,9 @@ function makeOutsourceWidget(sendRequest, options) {
       var node = nodes[req.id] = $('<div>');
       node.addClass('outsrcreq');
       node.addClass(req.state);
+      if (req.requester.userId == clientVars.userId || req.worker.userId == clientVars.userId) {
+        node.addClass('mine');
+      }
       node.append($('<div class="reqdesc">').text(req.details.description));
       var worker = $('<div class="reqworker">');
       var avatar = $('<div class="reqavatar">');

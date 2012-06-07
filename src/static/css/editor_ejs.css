@@ -531,10 +531,10 @@ body.nosidebar #padeditor { margin-left: 0; }
 	position:relative;
 	font-size: smaller;
 	min-height:3.6em;
+	opacity: 0.5;
 }
-.outsrcreq.new {
-	color: gray;
-	border-color: gray;
+.outsrcreq.assigned.mine, .outsrcreq.done.mine {
+	opacity: inherit;
 }
 .outsrcreq.done:after {
 	content: "\2713";
