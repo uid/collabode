@@ -86,30 +86,33 @@ function makeOutsourceWidget(sendRequest, options) {
       var node = nodes[req.id] = $('<div>');
       node.addClass('outsrcreq');
       node.addClass(req.state);
-      node.append($('<div class="reqdesc">').text(req.description));
+      node.append($('<div class="reqdesc">').text(req.details.description));
       var worker = $('<div class="reqworker">');
       var avatar = $('<div class="reqavatar">');
       worker.append(avatar);
-      if (req.user) {
-        worker.append($('<div>').text(req.user.userName));
-        avatar.css('background-color', options.colorPalette[req.user.userColorId]);
-      } else if (req.state == 'new') {
-        avatar.css('background-color', '#fff');
-      }
       node.append(worker);
       var location = $('<div class="reqdetail">');
-      if (req.location) {
-        var filename = req.location.substring(req.location.lastIndexOf('/')+1);
-        location.append($('<a href="' + req.location + '">').text(filename))
+      var url = req.details.location;
+      if (url) {
+        var filename = url.substring(url.lastIndexOf('/')+1);
+        location.append($('<a href="' + url + '">').text(filename));
       } else {
         location.html('<i>unknown</i>');
       }
       node.append(location);
-      if (req.user) {
+      
+      if (req.worker.userId) {
+        worker.append($('<div>').text(req.worker.userName));
+        avatar.css('background-color', options.colorPalette[req.worker.userColorId]);
+      } else if (req.state == 'new') {
+        avatar.css('background-color', '#fff');
+      }
+      
+      if (req.worker.userId && req.requester.userId == clientVars.userId) {
         var changes = $('<div class="reqdetail">');
-        var href = '/contrib:' + req.user.userId + ':';
-        if (req.assigned) { href += req.assigned; }
-        if (req.completed) { href += '..' + req.completed; }
+        var href = '/contrib:' + req.worker.userId + ':';
+        if (req.details.assigned) { href += req.details.assigned; }
+        if (req.details.completed) { href += '..' + req.details.completed; }
         href += '/' + clientVars.editorProject;
         var link = $('<a>').attr('href', '#').click(function() { return Layout.hoverOpen(href); });
         $.each(req.deltas, function(filename, delta) {
@@ -120,6 +123,7 @@ function makeOutsourceWidget(sendRequest, options) {
         });
         node.append(changes.append(link));
       }
+      
       statusContainer.append(node);
     });
   };
