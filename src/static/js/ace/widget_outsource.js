@@ -128,8 +128,16 @@ function makeOutsourceWidget(sendRequest, options) {
 }
 
 $(document).ready(function() { // on task framing page
+  function start() {
+    $('#overlay').hide();
+    $('#done').removeAttr('disabled');
+  }
+  $('#intro #start').bind('click', start);
   $('#task #done').bind('click', function() {
     $.ajax({ type: 'POST' });
     return true;
   });
+  if (clientVars.skipIntro) {
+    start();
+  }
 });

@@ -48,6 +48,9 @@ function render_instawork_task(taskId, projectname, filename) {
     renderError(403);
   }
   
+  helpers.addClientVars({
+    skipIntro: !! getSession().instaworked
+  });
   renderHtml("turk/instawork_task.ejs", {
     task: task,
     frameURL: filepath
@@ -59,6 +62,7 @@ function complete_instawork_task(taskId, projectname, filename) {
   if ( ! turk.completeRequest(taskId, projectname)) {
     renderError(403);
   }
+  getSession().instaworked = true;
   return true;
 }
 
