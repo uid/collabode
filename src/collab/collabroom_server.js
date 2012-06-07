@@ -281,6 +281,10 @@ function getRoomConnections(roomName) {
   return _getConnections(roomName);
 }
 
+function getAllRooms() {
+  return _getCache().rooms.keySet().toArray();
+}
+
 function getAllRoomsOfType(roomType) {
   var rooms = _getCache().rooms;
   var roomsIter = rooms.entrySet().iterator();

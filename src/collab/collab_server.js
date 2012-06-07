@@ -863,3 +863,16 @@ function sendPadExtendedMessage(pad, msg) {
     sendConnectionExtendedMessage(connection.connectionId, msg);
   });
 }
+
+function sendUserExtendedMessage(userId, msg) {
+  var sent = false;
+  getAllRooms().forEach(function(roomName) {
+    getRoomConnections(roomName).forEach(function(connection) {
+      if (connection.data.userInfo.userId == userId) {
+        sendConnectionExtendedMessage(connection.connectionId, msg);
+        sent = true;
+      }
+    });
+  });
+  return sent;
+}
