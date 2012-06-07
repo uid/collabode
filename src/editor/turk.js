@@ -159,6 +159,8 @@ function completeRequest(id, projectname) {
     _updateRequest(id, projectname);
     auth.del_acl(project, '', userId);
     return true;
+  } else if (req.state == 'done') {
+    return true;
   } else {
     return false;
   }

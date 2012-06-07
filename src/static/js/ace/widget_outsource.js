@@ -140,10 +140,6 @@ $(document).ready(function() { // on task framing page
     $('#done').removeAttr('disabled');
   }
   $('#intro #start').bind('click', start);
-  $('#task #done').bind('click', function() {
-    $.ajax({ type: 'POST' });
-    return true;
-  });
   if (clientVars.skipIntro) {
     start();
   }

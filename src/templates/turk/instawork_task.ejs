@@ -9,7 +9,7 @@
 <table cellpadding="0" cellspacing="0" border="0"><tr><td>
 <%= toHTML(task.description) %>
 </td><td>
-<form action="<%= appjet.config.instaworkURL %>/done/<%= task.taskId %>" method="POST" class="right">
+<form method="POST" class="right">
 <button type="submit" id="done" disabled="disabled">Work complete!</button>
 </form>
 </td></tr></table>
