@@ -34,7 +34,7 @@ $(document).ready(function() {
     collab.sendExtendedMessage({ type: "ORGIMPORTS_RESOLVED" , choices: selection });
   });
   
-  var outsourceWidget = makeOutsourceWidget(function(request) {
+  var outsourceWidget = makeOutsourceWidget(userlist, function(request) {
     collab.sendExtendedMessage({ type: "OUTSOURCE_REQUEST", action: "create", request: request });
   }, options);
   

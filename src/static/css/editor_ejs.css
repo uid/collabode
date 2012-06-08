@@ -677,6 +677,7 @@ body.nosidebar #padeditor { margin-left: 0; }
 }
 .outsrcreq .reqdetail {
 	position: relative;
+	display: block;
 	white-space: pre;
 	overflow: hidden;
 	text-overflow: ellipsis;

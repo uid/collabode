@@ -1,5 +1,5 @@
 
-function makeOutsourceWidget(sendRequest, options) {
+function makeOutsourceWidget(userlist, sendRequest, options) {
   
   var outsourceWidget = {};
   
@@ -78,6 +78,17 @@ function makeOutsourceWidget(sendRequest, options) {
   var statusContainer = $('#outsourcedcontainer');
   var nodes = {};
   
+  function _makeChat(userInfo, text) {
+    return $('<a href="#" class="reqdetail"></a>')
+      .text(text + ' ' + userInfo.userName)
+      .prepend($('<div class="chatbutton"></div>')
+        .css('background-color', options.colorPalette[userInfo.userColorId]))
+      .click(function() {
+        userlist.chat(userInfo);
+        return false;
+      });
+  }
+  
   outsourceWidget.updateRequests = function(requests) {
     $.each(requests, function(idx, req) {
       if (req.id in nodes) {
@@ -107,6 +118,13 @@ function makeOutsourceWidget(sendRequest, options) {
       if (req.worker.userId) {
         worker.append($('<div>').text(req.worker.userName));
         avatar.css('background-color', options.colorPalette[req.worker.userColorId]);
+        if (req.state == 'assigned') {
+          if (req.worker.userId == clientVars.userId) {
+            node.append(_makeChat(req.requester, 'Chat with requester:'));
+          } else if (req.requester.userId == clientVars.userId) {
+            node.append(_makeChat(req.worker, 'Chat with'));
+          }
+        }
       } else if (req.state == 'new') {
         avatar.css('background-color', '#fff');
       }
