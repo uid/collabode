@@ -23,6 +23,7 @@ import("pad.model");
 import("pad.dbwriter");
 
 import("editor.auth");
+import("editor.chat");
 import("editor.turk");
 import("editor.workspace");
 
@@ -39,6 +40,7 @@ serverhandlers.startupHandler = function() {
     dbwriter.onStartup();
     collabroom_server.onStartup();
     auth.onStartup();
+    chat.onStartup();
     turk.onStartup();
     workspace.onStartup();
 };
