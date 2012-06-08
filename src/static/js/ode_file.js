@@ -15,7 +15,7 @@ $(document).ready(function() {
   var user = {
     userId: clientVars.userId,
     name: clientVars.userName,
-    colorId: clientVars.userColorId
+    colorId: clientVars.colorId
     // ip, userAgent
   };
   var options = {

@@ -59,7 +59,7 @@ function UserList(ace2editor, collab, user, options) {
       
       container.append(node);
     }
-    node.css('background-color', options.colorPalette[userInfo.colorId || userInfo.userColorId]); // XXX ||
+    node.css('background-color', options.colorPalette[userInfo.colorId]);
     $('.usertip p', node).text(userInfo.name || userInfo.userName); // XXX ||
   }
   

@@ -82,7 +82,7 @@ function makeOutsourceWidget(userlist, sendRequest, options) {
     return $('<a href="#" class="reqdetail"></a>')
       .text(text + ' ' + userInfo.userName)
       .prepend($('<div class="chatbutton"></div>')
-        .css('background-color', options.colorPalette[userInfo.userColorId]))
+        .css('background-color', options.colorPalette[userInfo.colorId]))
       .click(function() {
         userlist.chat(userInfo);
         return false;
@@ -117,7 +117,7 @@ function makeOutsourceWidget(userlist, sendRequest, options) {
       
       if (req.worker.userId) {
         worker.append($('<div>').text(req.worker.userName));
-        avatar.css('background-color', options.colorPalette[req.worker.userColorId]);
+        avatar.css('background-color', options.colorPalette[req.worker.colorId]);
         if (req.state == 'assigned') {
           if (req.worker.userId == clientVars.userId) {
             node.append(_makeChat(req.requester, 'Chat with requester:'));
