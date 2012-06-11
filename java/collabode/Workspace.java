@@ -2,12 +2,15 @@ package collabode;
 
 import java.io.ByteArrayInputStream;
 import java.util.Hashtable;
+import java.util.concurrent.Callable;
 
 import net.appjet.ajstdlib.execution;
 
 import org.eclipse.core.resources.*;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunchConfiguration;
@@ -18,6 +21,8 @@ import org.eclipse.jdt.junit.JUnitCore;
 import org.eclipse.jdt.launching.JavaRuntime;
 import org.osgi.service.prefs.BackingStoreException;
 import org.osgi.service.prefs.Preferences;
+
+import scala.Function1;
 
 import collabode.testing.AnnotationsInitializer;
 
@@ -117,6 +122,66 @@ public class Workspace {
         }
         
         return dest;
+    }
+    
+    public static boolean copyPath(String username, String oldPath, String newPath) throws CoreException {
+        String projectName = oldPath.split("/", 2)[0];
+        String relativeOld = oldPath.substring(oldPath.indexOf('/') + 1);
+        String relativeNew = newPath.substring(newPath.indexOf('/') + 1);
+        
+        IProject project = getWorkspace().getRoot().getProject(projectName);
+        project.open(null);
+        
+        if (project.findMember(relativeNew) != null) {
+            return false; //destination exists
+        }
+        
+        IPath relativeOldPath = new Path(relativeOld);
+        IPath relativeNewPath = new Path(relativeNew);
+        
+        IResource member = project.findMember(relativeOld);
+        member.copy(relativeNewPath.makeRelativeTo(member.getParent().getProjectRelativePath()), false, null);
+
+        for (PadDocument doc : PadDocumentOwner.of(username).documents()) {
+            if (doc.collab.file.getProject().equals(project)) {
+                IPath path = doc.collab.file.getProjectRelativePath();
+                if (relativeOldPath.isPrefixOf(path)) {
+                    IPath newpath = relativeNewPath.append(path.removeFirstSegments(relativeOldPath.segmentCount()));
+                    IFile file = (IFile)project.findMember(newpath);
+                    file.setContents(new ByteArrayInputStream(doc.get().getBytes()), false, true, null);
+                }
+            }
+        }
+        return true;
+    }
+    
+    public static void deletePath(String username, String path, Function1<IFile, Void> padDestroyCallback) throws CoreException {
+        String projectName = path.split("/", 2)[0];
+        String relative = path.substring(path.indexOf('/') + 1);
+        
+        IProject project = getWorkspace().getRoot().getProject(projectName);
+        project.open(null);
+        
+        IResource member = project.findMember(relative);
+        
+        if (member == null) {
+            return;
+        }
+        
+        member.delete(false, null);
+        
+        IPath relativePath = new Path(relative);
+        PadDocumentOwner owner = PadDocumentOwner.of(username);
+        for (PadDocument doc : owner.documents()) {
+            if (doc.collab.file.getProject().equals(project)) {
+                IPath myPath = doc.collab.file.getProjectRelativePath();
+                if (relativePath.isPrefixOf(myPath)) {
+                    padDestroyCallback.apply(doc.collab.file);
+                    owner.remove(doc.collab.file.getFullPath().toString());
+                }
+            }
+        }
+        
     }
     
     public static ILaunchConfiguration accessLaunchConfig(IFile file) {

@@ -1,0 +1,20 @@
+<form id="rename-form" onsubmit="submit_form(); return false">
+<input type="hidden" name="rename" value="1"/>
+<input type="hidden" name="foldername" value="<%=folder %>"/>
+<input type="hidden" name="filename" value="<%=name %>" />
+<p>Rename <%=path %> to:</p>
+<p><input id="focus" name="newname" value="<%=name %>"/></p>
+<p><button type="submit">Rename</button>
+<button onclick="close_dialog()">Cancel</button></p>
+</form>
+<script type="text/javascript">
+function submit_form() {
+  $.post("<%=path %>", $("#rename-form").serialize(), function() {
+    close_dialog();
+  });
+  
+}
+function initialize() {
+  $("#focus").focus();
+}
+</script>

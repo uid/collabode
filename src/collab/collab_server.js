@@ -60,6 +60,8 @@ function _roomToPadId(roomName) {
   return roomName.substring(roomName.indexOf("/")+1);
 }
 
+var roomToPadId = _roomToPadId; // XXX How else to convert from room to pad ID?
+
 function removeFromMemory(pad) {
   // notification so we can free stuff
   if (getNumConnections(pad) == 0) {

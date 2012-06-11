@@ -94,7 +94,8 @@ function getTreeClient(comet) {
               rename : {
                 label : "Rename",
                 action : function (obj) {
-                  //TODO: implement
+                  var path = obj.attr('id');
+                  $.dialog.show('dialog'+path+'?action=rename', 250, 136);
                 },
                 _class : "contextmenu_rename",
                 separator_before : false,
@@ -151,7 +152,8 @@ function getTreeClient(comet) {
               rename : {
                 label : "Rename",
                 action : function (obj) {
-                  //TODO: implement
+                  var path = obj.attr('id');
+                  $.dialog.show('dialog'+path+'?action=rename', 250, 136);
                 },
                 _class : "contextmenu_rename",
                 separator_before : false,

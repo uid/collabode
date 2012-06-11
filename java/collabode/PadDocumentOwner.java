@@ -89,6 +89,14 @@ public class PadDocumentOwner extends WorkingCopyOwner {
     }
     
     /**
+     * Remove the document at the given path.
+     * @param path
+     */
+    public void remove(String path) {
+        documents.remove(path);
+    }
+    
+    /**
      * Obtain the document of a known type for the given path.
      * Must already have been {@link #create}d, and of this type.
      */

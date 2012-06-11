@@ -68,6 +68,9 @@ function _filenameFor(padId) {
   return cf[1];
 }
 
+var padIdFor = _padIdFor; // XXX How else to convert from file to padId?
+var filenameFor = _filenameFor; // XXX How else to convert from padId to file?
+
 function restricted(userId) {
   return userId[0] != 'u';
 }

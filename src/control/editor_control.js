@@ -1,7 +1,9 @@
 import("helpers");
 import("utils.*");
+import("jsutils.scalaFn");
 
 import("collab.collab_server");
+import("collab.collabroom_server");
 
 import("editor.auth");
 import("editor.workspace");
@@ -269,24 +271,51 @@ function render_confirm_delete(projectname, filename) {
 function modify_path(projectname, filename) {
   var project = Workspace.accessProject(projectname);
   var folder = project.findMember(filename);
-  
-  if ( ! (folder instanceof IContainer)) { // XXX
-    return true;
-  }
-  
+    
   var foldername = request.params["foldername"] || "";
   var filename = request.params["filename"] || "";
   
-  if ((request.params["folder"] || ! filename.length) && foldername.length) {
-    _create_path_folder(project, folder, foldername);
-  }
-  
-  if ((request.params["file"] || ! foldername.length) && filename.length) {
-    _create_path_file(project, folder, filename, request.params["content"] || "");
+  if (folder instanceof IContainer) { // XXX
+    if ((request.params["folder"] || ! filename.length) && foldername.length) {
+      _create_path_folder(project, folder, foldername);
+    }
+    
+    if ((request.params["file"] || ! foldername.length) && filename.length) {
+      _create_path_file(project, folder, filename, request.params["content"] || "");
+    }
   }
   
   if (request.params["acl"]) {
     auth.add_acl(project, folder.getProjectRelativePath(), request.params["acl_userid"], request.params["acl_permission"]);
+  }
+  
+  if (request.params["rename"]) {
+    var oldpath = foldername + '/' + filename;
+    var newpath = foldername + '/' + request.params['newname'];
+    var result = Workspace.copyPath(getSession().userId, oldpath, newpath);
+    if (!result) return true;
+    
+    // redirect all connections to relocated pads
+    var rooms = collabroom_server.getAllRoomsOfType(collab_server.PADPAGE_ROOMTYPE);
+    rooms.forEach(function(room) {
+      var padId = collab_server.roomToPadId(room);
+      var file = workspace.filenameFor(padId).substr(1); // get rid of the first slash
+      if (file.indexOf(oldpath) == 0) {
+        newfile = newpath + file.substr(oldpath.length);
+        collabroom_server.getRoomConnections(room).forEach(function(connection) {
+          System.out.println(connection.connectionId);
+          collab_server.sendConnectionExtendedMessage(connection.connectionId, {type: "RENAME_REDIRECT", data: newfile});
+        });
+      }
+    });
+    
+    // delete the old file / folder
+    Workspace.deletePath(getSession().userId, oldpath, scalaFn(1, function(file) {
+        var padId = workspace.padIdFor(getSession().userId, file);
+        model.accessPadGlobal(padId, function(pad) {
+          pad.destroy();
+        });
+      }));
   }
   
   if (request.params["acl_batch"]) {
@@ -333,7 +362,12 @@ function delete_path(projectname, filename) {
   var resource = project.findMember(filename);
   var parentpath = ''+resource.getParent().getFullPath();
   
-  resource['delete'](IResource.ALWAYS_DELETE_PROJECT_CONTENT, null); // workaround because `delete` is a JS keyword
+  Workspace.deletePath(getSession().userId, projectname + '/' + filename, scalaFn(1, function(file) {
+    var padId = workspace.padIdFor(getSession().userId, file);
+    model.accessPadGlobal(padId, function(pad) {
+      pad.destroy();
+    });
+  }));
   
   response.redirect(parentpath);
   return true;
@@ -378,6 +412,16 @@ function render_dialog(projectname, path) {
     break;
   case "delete":
     renderHtml("dialog/delete.ejs", {path: fullpath});
+    break;
+  case "rename":
+    var name = path;
+    var folder = projectname;
+    var slashIndex = path.lastIndexOf('/');
+    if (slashIndex != -1) {
+      name = path.substr(slashIndex+1);
+      folder = projectname + '/'+ path.substr(0, slashIndex);
+    }
+    renderHtml("dialog/rename.ejs", {path: fullpath, folder: folder, name: name});
     break;
   case "share":
     renderHtml("dialog/share.ejs", {

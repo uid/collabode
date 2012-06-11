@@ -73,6 +73,9 @@ $(document).ready(function() {
   collab.setOnExtendedMessage("ORGIMPORTS_PROMPT", function(msg) {
     orgImportsWidget.handleOrgImportsResolve(msg.suggestion);
   });
+  collab.setOnExtendedMessage("RENAME_REDIRECT", function(msg) {
+    window.location = msg.data;
+  })
   
   ace.addKeyHandler(function(event, char, cb, cmdKey) {
     if (( ! cb.specialHandled) && cmdKey && char == "s" &&
