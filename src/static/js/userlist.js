@@ -31,7 +31,6 @@ function UserList(ace2editor, collab, user, options) {
       if (away) { node.addClass('useraway'); }
       node.chatHistory = false;
       node.chatStart = Number.MAX_VALUE;
-      node.chatOpened = false;
       node.chatPopped = false;
       
       if (userInfo != user) {
@@ -78,10 +77,7 @@ function UserList(ace2editor, collab, user, options) {
       _chatAppend(chatUserId, user, text.val());
     }
     text.val('');
-    if (node.chatPopped) {
-      node.chatPopped = false;
-      collab.sendExtendedMessage({ type: "USER_CHAT", action: "ack", to: chatUserId });
-    }
+    _chatAck(chatUserId);
   }
   
   function _chatOpen(userInfo, pop) {
@@ -93,7 +89,6 @@ function UserList(ace2editor, collab, user, options) {
       collab.sendExtendedMessage({ type: "USER_CHAT", action: "history", to: userInfo.userId });
     }
     node.chatPopped = node.chatPopped || pop;
-    node.chatOpened = true;
     $('.chatbubble', node).show();
     $('.chathistory', node).scrollTop(10000000);
     return node;
@@ -101,19 +96,15 @@ function UserList(ace2editor, collab, user, options) {
   
   function _chatFocus(chatUserId) {
     var node = nodes[chatUserId];
-    if (node.chatPopped) {
-      node.chatPopped = false;
-      collab.sendExtendedMessage({ type: "USER_CHAT", action: "ack", to: chatUserId });
-    }
     $('.chatbubble').css('z-index', 40);
     $('.chatbubble', node).css('z-index', 50);
     $('.chattext', node).focus();
+    _chatAck(chatUserId);
   }
   
   function _chatClose(chatUserId) {
+    _chatAck(chatUserId);
     var node = nodes[chatUserId];
-    node.chatOpened = false;
-    node.chatPopped = false;
     $('.chatbubble', node).hide();
   }
   
@@ -123,6 +114,14 @@ function UserList(ace2editor, collab, user, options) {
     var message = $('<span>').text(': ' + message);
     $(archive ? '.chatarchive' : '.chathistory', node).append($('<div class="chatline">').append(from).append(message));
     $('.chathistory', node).scrollTop(10000000);
+  }
+  
+  function _chatAck(chatUserId) {
+    var node = nodes[chatUserId];
+    if (node.chatPopped) {
+      node.chatPopped = false;
+      collab.sendExtendedMessage({ type: "USER_CHAT", action: "ack", to: chatUserId });
+    }
   }
   
   function _chatDropped(chatUserId) {
