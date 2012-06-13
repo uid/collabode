@@ -11,6 +11,7 @@ import("control.console_control");
 import("control.contrib_control");
 import("control.editor_control");
 import("control.git_control");
+import("control.history_control");
 import("control.import_control");
 import("control.stats_control");
 import("control.test_control");
@@ -22,8 +23,11 @@ import("pad.model");
 import("pad.dbwriter");
 
 import("editor.auth");
+import("editor.chat");
 import("editor.turk");
 import("editor.workspace");
+
+jimport("net.appjet.oui.exceptionlog");
 
 jimport("java.lang.System");
 
@@ -36,6 +40,7 @@ serverhandlers.startupHandler = function() {
     dbwriter.onStartup();
     collabroom_server.onStartup();
     auth.onStartup();
+    chat.onStartup();
     turk.onStartup();
     workspace.onStartup();
 };
@@ -43,6 +48,23 @@ serverhandlers.startupHandler = function() {
 serverhandlers.requestHandler = function() {
     // XXX maybe check some stuff?
     handlePath();
+};
+
+serverhandlers.errorHandler = function(ex) {
+    exceptionlog.apply(ex);
+    var attribs = appjet.context.attributes();
+    if (request.isDefined) {
+      System.err.println("Request " + request.method + " " + request.path + " failed");
+      try { System.err.println("  attribs = " + attribs); } catch (e) { }
+      try { System.err.println("  params = " + fastJSON.stringify(request.params)); } catch (e) { }
+      try { System.err.println("  session = " + fastJSON.stringify(utils.getSession())); } catch (e) { }
+      utils.renderError(500);
+    } else if (attribs.apply("taskName")) {
+      System.err.println("Task " + attribs.apply("taskName") + " failed");
+      System.err.println("  args = " + java.util.Arrays.toString(attribs.apply("taskArguments")));
+    } else {
+      response.write(ex.getMessage());
+    }
 };
 
 serverhandlers.tasks.willShutdown = function() {
@@ -182,6 +204,9 @@ function handlePath() {
     [_file('knockout:([\\w,.\\[;]+)"([\\s\\S]*)"'), r(turk_control.render_knockout, auth.READ, 2, 'clones')],
     [_proj('contrib:([\\w\\.]+):(\\d*)(?:\\.\\.)?(\\d*)'), r(contrib_control.render_contrib, auth.WRITE, 3)],
     [/^\/coverage\/([\w-\.]+)():(.+)\.(.+)$/, r(test_control.render_coverage, auth.WRITE)],
+    ['/history', u(history_control.render_list)],
+    [/^\/history\/(.*):(\d+)$/, u(history_control.render_version)],
+    [/^\/history\/(.*)$/, u(history_control.render_pad)],
     [/^\/statistics(?:\/(?:([^\/]+)(?:\/([^\/]+)?)?)?)?$/, u(stats_control.render_stats)],
     [_proj(), r(editor_control.render_project)],
     [_file(), r(editor_control.render_path)]

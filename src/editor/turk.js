@@ -62,23 +62,32 @@ function _outsourcedMessage(project, id) {
   return {
     type: "OUTSOURCED",
     requests: (id ? [ id ] : reqs.keys()).map(function(id) {
-      var req = provider.get(id);
-      var state = reqs.get(id, "unknown").split('@');
-      req.state = state[0];
-      if (state[1]) {
-        req.user = appjet.cache.recent_users[state[1]]; // XXX really, this knows about that?
-      }
-      if (req.user) {
-        var padIds = contrib.padsEdited(project.getName(), req.user.userId);
+      var req = _getRequest(id, project);
+      req.id = id;
+      req.details = provider.get(id);
+      req.requester = appjet.cache.recent_users[req.requester]; // XXX really, this knows about that?
+      req.worker = req.worker ? appjet.cache.recent_users[req.worker] || {} : {}; // XXX really, this knows about that?
+      if (req.worker.userId) {
+        var padIds = contrib.padsEdited(project.getName(), req.worker.userId);
         req.deltas = {};
         padIds.forEach(function(padId) {
-          var change = contrib.padChange(padId, req.assigned, req.completed);
-          req.deltas[workspace.filenameFor(padId)] = contrib.authorDelta(req.user.userId, change);
+          var change = contrib.padChange(padId, req.details.assigned, req.details.completed);
+          req.deltas[workspace.filenameFor(padId)] = contrib.authorDelta(req.worker.userId, change);
         });
       }
       return req;
     })
   };
+}
+
+function _getRequest(id, project) {
+  return fastJSON.parse(Workspace.getProjectPrefs(project, "outsource").node("req").get(id, "{}"));
+}
+
+function _putRequest(id, project, data) {
+  var reqs = Workspace.getProjectPrefs(project, "outsource").node("req");
+  reqs.put(id, fastJSON.stringify(data));
+  Workspace.getWorkspace().run(function() { reqs.flush(); }, null);
 }
 
 function _updateRequest(id, projectname) {
@@ -116,9 +125,7 @@ function _onOutsourceRequest(padId, userId, connectionId, msg) {
                              workspace.filenameFor(padId),
                              msg.request.reqTxt,
                              msg.request.lineNo);
-    var reqs = Workspace.getProjectPrefs(project, "outsource").node("req");
-    reqs.put(id, "new");
-    Workspace.getWorkspace().run(function() { reqs.flush(); }, null);
+    _putRequest(id, project, { state: 'new', requester: userId });
     _updateRequest(id, project.getName());
     break;
   }
@@ -126,16 +133,16 @@ function _onOutsourceRequest(padId, userId, connectionId, msg) {
 
 function claimRequest(id, projectname) {
   var project = Workspace.accessProject(projectname);
-  var reqs = Workspace.getProjectPrefs(project, "outsource").node("req");
-  var state = reqs.get(id, "unknown");
+  var req = _getRequest(id, project);
   var userId = getSession().userId;
-  if (state == 'new') {
-    reqs.put(id, 'assigned@' + userId);
-    Workspace.getWorkspace().run(function() { reqs.flush(); }, null);
+  if (req.state == 'new') {
+    req.state = 'assigned';
+    req.worker = userId;
+    _putRequest(id, project, req);
     _updateRequest(id, projectname);
     auth.add_acl(project, '', userId, auth.WRITE);
     return true;
-  } else if (state.split('@')[1] == userId) {
+  } else if (req.worker == userId) {
     return true;
   } else {
     return false;
@@ -144,17 +151,18 @@ function claimRequest(id, projectname) {
 
 function completeRequest(id, projectname) {
   var project = Workspace.accessProject(projectname);
-  var reqs = Workspace.getProjectPrefs(project, "outsource").node("req");
-  var state = reqs.get(id, "unknown");
+  var req = _getRequest(id, project);
   var userId = getSession().userId;
-  if (state != 'assigned@' + userId) {
-    return false;
-  } else {
-    reqs.put(id, 'done@' + userId);
-    Workspace.getWorkspace().run(function() { reqs.flush(); }, null);
+  if (req.state == 'assigned' && req.worker == userId) {
+    req.state = 'done';
+    _putRequest(id, project, req);
     _updateRequest(id, projectname);
     auth.del_acl(project, '', userId);
     return true;
+  } else if (req.state == 'done') {
+    return true;
+  } else {
+    return false;
   }
 }
 

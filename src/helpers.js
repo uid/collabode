@@ -99,7 +99,7 @@ function includeCometJs() {
     addClientVars({
       userId: session.userId,
       userName: session.userName,
-      userColorId: session.userColorId,
+      colorId: session.colorId,
       colorPalette: COLOR_PALETTE
     });
 }
