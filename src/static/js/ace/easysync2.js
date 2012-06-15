@@ -131,10 +131,10 @@ Changeset.opIterator = function(opsStr, optStartIndex) {
     else {
       regex.lastIndex = curIndex;
       result = regex.exec(opsStr);
-      curIndex = regex.lastIndex;
       if (result == null) {
         Changeset.error("Hit bad opcode in op stream at " + curIndex + " in " + opsStr);
       }
+      curIndex = regex.lastIndex;
       if (result[0] == '?') {
         Changeset.error("Hit error opcode in op stream");
       }
