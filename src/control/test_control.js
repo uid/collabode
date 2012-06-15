@@ -30,17 +30,19 @@ function render_coverage(projectname, unused, testclassname, testmethodname) {
   function _addMethod(method) {
     var filename = method.getResource().getProjectRelativePath().toString();
     var padId = workspace.accessDocumentPad(userId, method.getResource());
-    var unfold = _methodRange(padId, method);
-    if (files[filename]) {
-      files[filename].unfolded.push(unfold);
-    } else {
+    if ( ! files[filename]) {
       model.accessPadGlobal(padId, function(pad) {
         files[filename] = {
           atext: pad.atext(),
           apool: pad.pool().toJsonable(),
-          unfolded: [ unfold ]
+          unfolded: []
         };
       });
+    }
+    if (method.exists()) {
+      files[filename].unfolded.push(_methodRange(padId, method));
+    } else {
+      System.err.println("Coverage includes missing method " + method); // XXX
     }
     return filename;
   }
