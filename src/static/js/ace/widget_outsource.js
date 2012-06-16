@@ -133,7 +133,10 @@ function makeOutsourceWidget(userlist, sendRequest, options) {
         if (req.completed) { href += '..' + req.completed; }
         href += '/' + clientVars.editorProject;
         var link = $('<a>').attr('href', '#').click(function() { return Layout.hoverOpen(href); });
-        $.each(req.deltas, function(filename, delta) {
+        var filenames = [];
+        $.each(req.deltas, function(filename) { filenames.push(filename); });
+        $.each(filenames.sort(), function(idx, filename) {
+          var delta = req.deltas[filename];
           var line = $('<div>').text(filename.substring(filename.lastIndexOf('/')+1));
           if (delta.ins) { line.append($('<span class="deltains">').text(' +'+delta.ins)); }
           if (delta.del) { line.append($('<span class="deltadel">').text(' -'+delta.del)); }
