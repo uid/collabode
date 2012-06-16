@@ -638,10 +638,10 @@ body.nosidebar #padeditor { margin-left: 0; }
 	min-height:3.6em;
 	opacity: 0.5;
 }
-.outsrcreq.assigned.mine, .outsrcreq.done.mine {
+.outsrcreq.assigned.mine, .outsrcreq.completed.mine {
 	opacity: inherit;
 }
-.outsrcreq.done:after {
+.outsrcreq.completed:after {
 	content: "\2713";
 	position: absolute;
 	top: 0;
@@ -650,7 +650,7 @@ body.nosidebar #padeditor { margin-left: 0; }
 	color: #093;
 	text-shadow: #fff 0 1px 1px, #fff 0 -1px 1px;
 }
-.outsrcreq.done .reqworker {
+.outsrcreq.completed .reqworker {
 	opacity: 0.5;
 }
 .outsrcreq .reqdesc {

@@ -123,3 +123,16 @@ CREATE TABLE "pro_domains" (
   PRIMARY KEY  ("id"),
   UNIQUE ("subDomain")
 );
+
+CREATE TABLE OUTSOURCE_TASKS (
+  "id" varchar(128) NOT NULL,
+  "projectname" varchar(128) NOT NULL,
+  "description" longvarchar NOT NULL,
+  "location" varchar(256) NOT NULL,
+  "created" timestamp NOT NULL,
+  "assigned" timestamp default NULL,
+  "completed" timestamp default NULL,
+  "requester" varchar(64) NOT NULL,
+  "worker" varchar(64) default NULL,
+  PRIMARY KEY  ("id")
+);

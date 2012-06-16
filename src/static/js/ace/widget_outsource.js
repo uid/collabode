@@ -96,20 +96,20 @@ function makeOutsourceWidget(userlist, sendRequest, options) {
       }
       var node = nodes[req.id] = $('<div>');
       node.addClass('outsrcreq');
-      node.addClass(req.state);
+      var state = req.completed ? 'completed' : req.assigned ? 'assigned' : 'new';
+      node.addClass(state);
       if (req.requester.userId == clientVars.userId || req.worker.userId == clientVars.userId) {
         node.addClass('mine');
       }
-      node.append($('<div class="reqdesc">').text(req.details.description));
+      node.append($('<div class="reqdesc">').text(req.description));
       var worker = $('<div class="reqworker">');
       var avatar = $('<div class="reqavatar">');
       worker.append(avatar);
       node.append(worker);
       var location = $('<div class="reqdetail">');
-      var url = req.details.location;
-      if (url) {
-        var filename = url.substring(url.lastIndexOf('/')+1);
-        location.append($('<a href="' + url + '">').text(filename));
+      if (req.location) {
+        var filename = req.location.substring(req.location.lastIndexOf('/')+1);
+        location.append($('<a href="' + req.location + '">').text(filename));
       } else {
         location.html('<i>unknown</i>');
       }
@@ -118,22 +118,22 @@ function makeOutsourceWidget(userlist, sendRequest, options) {
       if (req.worker.userId) {
         worker.append($('<div>').text(req.worker.userName));
         avatar.css('background-color', options.colorPalette[req.worker.colorId]);
-        if (req.state == 'assigned') {
+        if (state == 'assigned') {
           if (req.worker.userId == clientVars.userId) {
             node.append(_makeChat(req.requester, 'Chat with requester:'));
           } else if (req.requester.userId == clientVars.userId) {
             node.append(_makeChat(req.worker, 'Chat with'));
           }
         }
-      } else if (req.state == 'new') {
+      } else if (state == 'new') {
         avatar.css('background-color', '#fff');
       }
       
       if (req.worker.userId && req.requester.userId == clientVars.userId) {
         var changes = $('<div class="reqdetail">');
         var href = '/contrib:' + req.worker.userId + ':';
-        if (req.details.assigned) { href += req.details.assigned; }
-        if (req.details.completed) { href += '..' + req.details.completed; }
+        if (req.assigned) { href += req.assigned; }
+        if (req.completed) { href += '..' + req.completed; }
         href += '/' + clientVars.editorProject;
         var link = $('<a>').attr('href', '#').click(function() { return Layout.hoverOpen(href); });
         $.each(req.deltas, function(filename, delta) {
