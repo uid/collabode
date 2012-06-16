@@ -91,10 +91,7 @@ function makeOutsourceWidget(userlist, sendRequest, options) {
   
   outsourceWidget.updateRequests = function(requests) {
     $.each(requests, function(idx, req) {
-      if (req.id in nodes) {
-        nodes[req.id].remove();
-      }
-      var node = nodes[req.id] = $('<div>');
+      var node = $('<div>');
       node.addClass('outsrcreq');
       var state = req.completed ? 'completed' : req.assigned ? 'assigned' : 'new';
       node.addClass(state);
@@ -145,7 +142,12 @@ function makeOutsourceWidget(userlist, sendRequest, options) {
         node.append(changes.append(link));
       }
       
-      statusContainer.append(node);
+      if (req.id in nodes) {
+        nodes[req.id].replaceWith(node);
+      } else {
+        statusContainer.prepend(node);
+      }
+      nodes[req.id] = node;
     });
   };
   
