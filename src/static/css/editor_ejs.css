@@ -637,6 +637,7 @@ body.nosidebar #padeditor { margin-left: 0; }
 	font-size: smaller;
 	min-height:3.6em;
 	opacity: 0.5;
+	z-index: 20;
 }
 .outsrcreq.assigned.mine, .outsrcreq.completed.mine {
 	opacity: inherit;
@@ -689,4 +690,17 @@ body.nosidebar #padeditor { margin-left: 0; }
 .outsrcreq .deltadel {
 	font-weight: bold;
 	color: #b44;
+}
+.outsrcreq .reqhighlight {
+	position: absolute;
+	top: 0; left: 0;
+	height: 100%;
+	width: 100%;
+	z-index: -1;
+}
+.outsrcreq.assigned .reqhighlight {
+	background: #ffb;
+}
+.outsrcreq.completed .reqhighlight {
+	background: #bfb;
 }

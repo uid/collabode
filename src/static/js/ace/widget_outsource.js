@@ -94,7 +94,7 @@ function makeOutsourceWidget(userlist, sendRequest, options) {
       var node = $('<div>');
       node.addClass('outsrcreq');
       var state = req.completed ? 'completed' : req.assigned ? 'assigned' : 'new';
-      node.addClass(state);
+      node.data('state', state).addClass(state);
       if (req.requester.userId == clientVars.userId || req.worker.userId == clientVars.userId) {
         node.addClass('mine');
       }
@@ -146,7 +146,10 @@ function makeOutsourceWidget(userlist, sendRequest, options) {
       }
       
       if (req.id in nodes) {
-        nodes[req.id].replaceWith(node);
+        var old = nodes[req.id].replaceWith(node);
+        if (state != old.data('state')) {
+          node.prepend($('<div class="reqhighlight">').fadeIn(1000).delay(1000).fadeOut(2000));
+        }
       } else {
         statusContainer.prepend(node);
       }
