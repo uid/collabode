@@ -79,7 +79,7 @@ function makeOutsourceWidget(userlist, sendRequest, options) {
   var nodes = {};
   
   function _makeChat(userInfo, text) {
-    return $('<a href="#" class="reqdetail"></a>')
+    return $('<a>').addClass('reqdetail').attr('href', '#')
       .text(text + ' ' + userInfo.userName)
       .prepend($('<div class="chatbutton"></div>')
         .css('background-color', options.colorPalette[userInfo.colorId]))
@@ -106,7 +106,7 @@ function makeOutsourceWidget(userlist, sendRequest, options) {
       var location = $('<div class="reqdetail">');
       if (req.location) {
         var filename = req.location.substring(req.location.lastIndexOf('/')+1);
-        location.append($('<a href="' + req.location + '">').text(filename));
+        location.append($('<a>').attr('href', req.location).text(filename));
       } else {
         location.html('<i>unknown</i>');
       }
@@ -138,8 +138,8 @@ function makeOutsourceWidget(userlist, sendRequest, options) {
         $.each(filenames.sort(), function(idx, filename) {
           var delta = req.deltas[filename];
           var line = $('<span>').text(filename.substring(filename.lastIndexOf('/')+1));
-          if (delta.ins) { line.append($('<span class="deltains">').text(' +'+delta.ins)); }
-          if (delta.del) { line.append($('<span class="deltadel">').text(' -'+delta.del)); }
+          if (delta.ins) { line.append($('<span class="deltains"></span>').text(' +'+delta.ins)); }
+          if (delta.del) { line.append($('<span class="deltadel"></span>').text(' -'+delta.del)); }
           link.append(line.append('<br/>'));
         });
         node.append(changes.append(link));
