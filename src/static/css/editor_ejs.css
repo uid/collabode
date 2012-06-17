@@ -632,20 +632,24 @@ body.nosidebar #padeditor { margin-left: 0; }
 	text-decoration: none;
 }
 .outsrcreq {
-	border-width:1px;
-	border-style:solid;
+	position: relative;
+	font-size: smaller;
+	width: 300%;
+}
+.reqbox {
+	border: 1px solid black;
 	margin-top:4px;
 	padding:6px 8px 6px 0;
 	position:relative;
-	font-size: smaller;
 	min-height:3.6em;
+	width: 221px; /* XXX should match other sidebar elements */
 	opacity: 0.5;
 	z-index: 20;
 }
-.outsrcreq.assigned.mine, .outsrcreq.completed.mine {
+.outsrcreq.assigned.mine .reqbox, .outsrcreq.completed.mine .reqbox {
 	opacity: inherit;
 }
-.outsrcreq.completed:after {
+.outsrcreq.completed .reqbox:after {
 	content: "\2713";
 	position: absolute;
 	top: 0;
@@ -657,7 +661,18 @@ body.nosidebar #padeditor { margin-left: 0; }
 .outsrcreq.completed .reqworker {
 	opacity: 0.5;
 }
+.outsrcreq .reqdescfull {
+	position: absolute;
+	top: 0; left: 33%;
+	white-space: pre-wrap;
+	margin-left: 6px;
+	padding: 6px;
+	background: #fff;
+	border: 1px solid black;
+	display: none;
+}
 .outsrcreq .reqdesc {
+	display: block;
 	position: relative;
 	max-height: 1.2em;
 	white-space: pre;

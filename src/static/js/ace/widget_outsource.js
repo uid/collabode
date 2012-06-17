@@ -91,18 +91,24 @@ function makeOutsourceWidget(userlist, sendRequest, options) {
   
   outsourceWidget.updateRequests = function(requests) {
     $.each(requests, function(idx, req) {
-      var node = $('<div>');
-      node.addClass('outsrcreq');
+      var node = $('<div class="outsrcreq">');
       var state = req.completed ? 'completed' : req.assigned ? 'assigned' : 'new';
       node.data('state', state).addClass(state);
       if (req.requester.userId == clientVars.userId || req.worker.userId == clientVars.userId) {
         node.addClass('mine');
       }
-      node.append($('<div class="reqdesc">').text(req.description));
+      var box = $('<div class="reqbox">');
+      var full = $('<div class="reqdescfull">').text(req.description);
+      node.append(full);
+      box.append($('<a>')
+        .addClass('reqdesc')
+        .attr('href', '#')
+        .text(req.description.replace('\n', '  '))
+        .click(function() { full.slideToggle('fast'); return false; }));
       var worker = $('<div class="reqworker">');
       var avatar = $('<div class="reqavatar">');
       worker.append(avatar);
-      node.append(worker);
+      box.append(worker);
       var location = $('<div class="reqdetail">');
       if (req.location) {
         var filename = req.location.substring(req.location.lastIndexOf('/')+1);
@@ -110,16 +116,16 @@ function makeOutsourceWidget(userlist, sendRequest, options) {
       } else {
         location.html('<i>unknown</i>');
       }
-      node.append(location);
+      box.append(location);
       
       if (req.worker.userId) {
         worker.append($('<div>').text(req.worker.userName));
         avatar.css('background-color', options.colorPalette[req.worker.colorId]);
         if (state == 'assigned') {
           if (req.worker.userId == clientVars.userId) {
-            node.append(_makeChat(req.requester, 'Chat with requester:'));
+            box.append(_makeChat(req.requester, 'Chat with requester:'));
           } else if (req.requester.userId == clientVars.userId) {
-            node.append(_makeChat(req.worker, 'Chat with'));
+            box.append(_makeChat(req.worker, 'Chat with'));
           }
         }
       } else if (state == 'new') {
@@ -142,13 +148,14 @@ function makeOutsourceWidget(userlist, sendRequest, options) {
           if (delta.del) { line.append($('<span class="deltadel"></span>').text(' -'+delta.del)); }
           link.append(line.append('<br/>'));
         });
-        node.append(changes.append(link));
+        box.append(changes.append(link));
       }
       
+      node.append(box);
       if (req.id in nodes) {
         var old = nodes[req.id].replaceWith(node);
         if (state != old.data('state')) {
-          node.prepend($('<div class="reqhighlight">').fadeIn(1000).delay(1000).fadeOut(2000));
+          box.prepend($('<div class="reqhighlight">').fadeIn(1000).delay(1000).fadeOut(2000));
         }
       } else {
         statusContainer.prepend(node);
