@@ -137,10 +137,10 @@ function makeOutsourceWidget(userlist, sendRequest, options) {
         $.each(req.deltas, function(filename) { filenames.push(filename); });
         $.each(filenames.sort(), function(idx, filename) {
           var delta = req.deltas[filename];
-          var line = $('<div>').text(filename.substring(filename.lastIndexOf('/')+1));
+          var line = $('<span>').text(filename.substring(filename.lastIndexOf('/')+1));
           if (delta.ins) { line.append($('<span class="deltains">').text(' +'+delta.ins)); }
           if (delta.del) { line.append($('<span class="deltadel">').text(' -'+delta.del)); }
-          link.append(line);
+          link.append(line.append('<br/>'));
         });
         node.append(changes.append(link));
       }
