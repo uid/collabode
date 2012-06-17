@@ -354,7 +354,7 @@ function _testResultMessage(test, result) {
         status: "" + result.status
       };
       if (result.trace) {
-        msg.result.trace = { stackTrace: "" + result.trace.getTrace() };
+        msg.result.trace = { stackTrace: "" + result.filteredTrace() };
         // XXX always seems to be null, even in the TestResult c'tor
         if (result.trace.getExpected()) {
           msg.result.trace.expected = "" + result.trace.getExpected();
