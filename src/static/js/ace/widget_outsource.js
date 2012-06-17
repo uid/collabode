@@ -56,7 +56,7 @@ function makeOutsourceWidget(userlist, sendRequest, options) {
   
   function _show() {
     $("#editorcontainerbox").append(dialogContainer);
-    $("label", dialogContainer).css('font-family', lineNo.css('font-family'));
+    $("label, textarea", dialogContainer).css('font-family', lineNo.css('font-family'));
     reqTxt.focus().select();
   }
   
