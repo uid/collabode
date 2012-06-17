@@ -32,7 +32,7 @@ function Testor(collab) {
         return;
       }
       
-      node = $('<div>');
+      node = $('<div>').data('testname', test.name);
       testNodes[test.name] = node;
       
       node.append($('<div class="extra top"></div><div class="extra left"></div><div class="extra right"></div>'));
@@ -48,7 +48,13 @@ function Testor(collab) {
       trace.append($('<table><tr><td class="expected"></td><td class="actual"></td></tr><tr><td colspan="2" class="stackTrace"></td></tr></table>'));
       node.append(trace);
       
-      container.append(node);
+      container.children().each(function(idx) {
+        if ($(this).data('testname') > test.name) {
+          node.insertBefore(this);
+          return false;
+        }
+      });
+      if ( ! node.parent().length) { container.append(node); }
     }
     node.attr('class', 'test');
     node.addClass(result.resultName);
