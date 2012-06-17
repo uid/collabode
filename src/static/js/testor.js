@@ -56,8 +56,8 @@ function Testor(collab) {
     if (result.trace) {
       node.addClass('hasDetails');
       $('.testtrace .stackTrace', node).text(result.trace.stackTrace);
-      $('.testtrace .expected', node).text(result.trace.expected);
-      $('.testtrace .actual', node).text(result.trace.actual);
+      $('.testtrace .expected', node).text(result.trace.expected || "");
+      $('.testtrace .actual', node).text(result.trace.actual || "");
     } else {
       $('.testtrace .stackTrace', node).text("");
       $('.testtrace .expected', node).text("");
