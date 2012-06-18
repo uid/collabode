@@ -634,6 +634,8 @@ body.nosidebar #padeditor { margin-left: 0; }
 .outsrcreq {
 	position: relative;
 	font-size: smaller;
+}
+.outsrcreq.showdesc {
 	width: 300%;
 }
 .reqbox {
@@ -670,6 +672,9 @@ body.nosidebar #padeditor { margin-left: 0; }
 	background: #fff;
 	border: 1px solid black;
 	display: none;
+}
+.outsrcreq.showdesc .reqdescfull {
+	display: block;
 }
 .outsrcreq .reqdesc {
 	display: block;

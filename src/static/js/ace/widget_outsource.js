@@ -104,7 +104,7 @@ function makeOutsourceWidget(userlist, sendRequest, options) {
         .addClass('reqdesc')
         .attr('href', '#')
         .text(req.description.replace('\n', '  '))
-        .click(function() { full.slideToggle('fast'); return false; }));
+        .click(function() { node.toggleClass('showdesc'); return false; }));
       var worker = $('<div class="reqworker">');
       var avatar = $('<div class="reqavatar">');
       worker.append(avatar);
