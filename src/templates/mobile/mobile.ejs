@@ -1,5 +1,5 @@
 <% helpers.addToHead('<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">') %>
-<% helpers.setHtmlTitle("Mobile Instructor") %>
+<% helpers.setHtmlTitle("CollabodeTA") %>
 <% helpers.includeCss("jquery.mobile-1.0.min.css") %>
 
 <% helpers.addToHead('<link rel="stylesheet/less" type="text/css" href="static/css/mobile.less"/>') %>
@@ -22,9 +22,9 @@
 
   <div data-role="header" id="header">
     <div data-role="controlgroup" data-type="horizontal" id="filterBar">
-      <a data-role="button" class="filter ui-btn-active" id="page-layout">Class layout</a>
-      <a data-role="button" class="filter" id="page-classsummary">Class Statistics</a>
-      <a data-role="button" class="filter" id="page-consolediffs" href="../replayall" rel="external">Console Output View</a>
+      <a data-role="button" class="filter ui-btn-active" id="page-layout">Class Layout View</a>
+      <!--<a data-role="button" class="filter" id="page-classsummary">Class Statistics</a>-->
+      <a data-role="button" class="filter" id="page-consolediffs">Console Output View</a>
     </div>
     <a data-role="button" data-inline="true" class="ui-btn-left" id="queue-toggle">Hide Queue</a>
     <!--<a data-role="button" data-inline="true" class="ui-btn-right" id="details">Apply selected filter</a>-->
@@ -41,6 +41,7 @@
       
       <%= helpers.renderPartial("mobile/student_panel", {}) %>
 	  <%= helpers.renderPartial("mobile/class_summary", {}) %>
+	  <%= helpers.renderPartial("mobile/console_output_view", {}) %>
 	  
     </div>
   </div>

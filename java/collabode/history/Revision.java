@@ -11,15 +11,19 @@ public class Revision implements Comparable<Revision> {
     public String timestamp;
     public String cs;
     public String action;
-
+    public int replayId;
+    public int replayDataId;
+    
     public Revision(String padId, int num, String author, String timestamp, 
-            String cs, String action) {
+            String cs, String action, int replayId, int replayDataId) {
         this.padId = padId;
         this.num = num;
         this.author = author;
         this.timestamp = timestamp;
         this.cs = cs;
         this.action = action;
+        this.replayId = replayId;
+        this.replayDataId = replayDataId;
     }
 
     @Override

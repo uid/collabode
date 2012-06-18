@@ -24,6 +24,10 @@ jimport("java.util.PriorityQueue");
 
 jimport("java.lang.System");
 
+function onStartup() {
+  //collab_server.setExtendedHandler("REQUEST_CLUSTERDATA", _onRequestClusterData);
+}
+
 function render_history(whoId, projectname) {
   var project = Workspace.accessProject(projectname);
   
@@ -281,12 +285,14 @@ function replayAll() {
   
   var pq = new PriorityQueue();
   
+  var verbose = false;
+  
   var projects = Workspace.listProjects();
   for (var p in projects) {
     var project = projects[p];
     if (project.hasNature("org.eclipse.jdt.core.javanature")) {
       var jproject = JavaCore.create(project);
-      //System.out.println(jproject.getElementName());
+      if (verbose) System.out.println(jproject.getElementName());
       
       var projectName = jproject.getElementName();
       var session = projectName.split("-")[0];
@@ -301,20 +307,20 @@ function replayAll() {
       for (var pp in packages) {
         var ppackage = packages[pp]; 
         if (ppackage.getKind() == IPackageFragmentRoot.K_SOURCE) {
-          //System.out.println("  src/");
+          if (verbose) System.out.println("  src/");
 
           var units = ppackage.getCompilationUnits();
           for (var u in units) {
             var unit = units[u];
-            //System.out.println("    -> " + unit.getElementName());
-            //System.out.println(unit.getPath().toString());
+            if (verbose) System.out.println("    -> " + unit.getElementName());
+            if (verbose) System.out.println(unit.getPath().toString());
             
             var filename = unit.getPath().toString();
             filename = filename.substring(1, filename.length); // remove first /
             filename = filename.substring(filename.indexOf("/"), filename.length); // trim off project name
-              // Generate replays if they don't already exist
-              handleReplay("choir", username, session, projectName, 
-                  filename, pq);
+            // Generate replays if they don't already exist
+            handleReplay("choir", username, session, projectName, 
+                filename, pq);
           }
         }
       }
@@ -334,8 +340,35 @@ function replayAll() {
   // after the revision is done playing, check the consoles
   // TODO: if this ends up being useful, move the code to do stuff in the 
   // mobile interface in real time
-  postprocess();
+//  postprocess();
+//  renderConsoleOutputView();
   return true;
+}
+
+function renderConsoleOutputView() {
+  
+  var allStudentReplays = sqlobj.selectMulti("REPLAYS", {});
+  var start;
+  var end;
+  
+  for (var r in allStudentReplays) {
+    var replay = allStudentReplays[r];
+    if (replay.startRevisionTime < start || start == null) {
+      start = replay.startRevisionTime;
+    }
+    if (replay.endRevisionTime < end || end == null) {
+      end = replay.endRevisionTime;
+    }
+  }
+//  System.out.println(start);
+//  System.out.println(end);
+  
+  // Render the outputGlobs map to a page
+  renderHtml("mobile/outputGlobs.ejs", {
+    outputGlobs: {},
+    startTimestamp: start,
+    endTimestamp: end
+  });
 }
 
 function postprocess() {
@@ -480,39 +513,38 @@ function handleReplay(whoId, defaultId, session, projectname, filename, pq) {
 }
 
 function initReplay(session, padId, whoId, defaultId, pq) {
+  var replay;
+  var replayId;
+  
   try {
 
     // Look up replayId in db
-    var replay = sqlobj.selectSingle("REPLAYS", {
+    replay = sqlobj.selectSingle("REPLAYS", {
       session: session,
       padId: padId
     });
-
+    
     if (replay == null) {
-      // This replay hasn't been recorded yet.    
-      //playback(generateReplay(session, padId));
-      try {        
-        generateReplay(session, padId, whoId, defaultId);
+      // This replay hasn't been recorded yet.
+      try {
+        replayId = generateReplay(session, padId, whoId, defaultId);
+        System.out.println("Generated replay " + replayId);
+        
       } catch (e) {
         //System.out.println("GENERATE ERROR: " + e);
       }
 
     } else {    
-      // This replay has been recorded, can play back directly   
-      //playback(replay.replayId);
+      // This replay has been recorded, just return its id
       //System.out.println("Replay exists! skipping..");
+      replayId = replay.replayId;
     }
     
     // Go through all the replays and insert them into a priority queue
-    // by timestamp so they can be played back in order.
-    var replayId = sqlobj.selectSingle("REPLAYS", {
-      session: session,
-      padId: padId
-    }).replayId;
-    
+    // by timestamp so they can be played back in order.    
     var revs = sqlobj.selectMulti("REPLAY_DATA", { replayId: replayId });
     for (var r in revs) {
-      /*System.out.println(revs[r].revisionNum + ": " + 
+      /*System.out.println(r + " " + revs[r].revisionNum + ": " + 
           revs[r].timestamp + " " +
           revs[r].changeset + " " +
           revs[r].action);*/
@@ -522,10 +554,12 @@ function initReplay(session, padId, whoId, defaultId, pq) {
           revs[r].author,
           revs[r].timestamp,
           revs[r].changeset,
-          revs[r].action));
+          revs[r].action,
+          replayId,
+          revs[r].id));
     }
     
-    //System.out.println("done! pq size: " + pq.size());
+//    System.out.println("done! pq size: " + pq.size());
   } catch (e) {
     //System.out.println("ERROR: " + e);
   }
@@ -535,6 +569,8 @@ function initReplay(session, padId, whoId, defaultId, pq) {
 function generateReplay(session, padId, whoId, defaultId) {
   //System.out.println("No replay exists for " + session + " - " + padId + " generating..");
 
+  var replay;
+  
   // Get head revision number from db
   model.accessPadGlobal(padId, function(sourcePad) {
     // Generate a replayId and add this item to the db
@@ -545,15 +581,17 @@ function generateReplay(session, padId, whoId, defaultId) {
     sqlobj.insert("REPLAYS", {
       session: session,
       padId: padId,
-      headRevision: headRevision
+      headRevision: headRevision,
+      endRevisionTime: sourcePad.getRevisionDate(headRevision),
+      startRevisionTime: sourcePad.getRevisionDate(0)
     });
 
-    var replay = sqlobj.selectSingle("REPLAYS", {
+    replay = sqlobj.selectSingle("REPLAYS", {
       session: session,
       padId: padId
     });
     
-    // XXX: Wow.
+    /* XXX: Wow.
     if (replay == null) {
       System.out.println("... this happens?!");
       setTimeout(function() {
@@ -562,7 +600,7 @@ function generateReplay(session, padId, whoId, defaultId) {
           padId: padId
         });
       }, 100);
-    }
+    }*/
     
     var timestamp = "unknown";
     for (var rev = 0; rev < headRevision; rev++) {
@@ -606,7 +644,6 @@ function generateReplay(session, padId, whoId, defaultId) {
       } else {
         action = "WRITE";
       }
-      
       sqlobj.insert("REPLAY_DATA", {
         replayId: replay.replayId,
         padId: replay.padId,
@@ -634,4 +671,104 @@ function playback(rev) { // rev is a single Java Revision object
   } else if (rev.action == "RUN") {
     workspace.replayOnRunRequest(rev.padId, rev.author);
   }
+  
+  computeCluster(rev);
 }
+
+function computeCluster(rev) {
+  //if this is a console pad and it hasn't already been done, 
+  // capture the console output and precompute a cluster for it
+  if (rev.padId.indexOf("*run*") != -1) {
+//    var consoleOutput = sqlobj.selectSingle("REPLAY_CONSOLE_OUTPUTS", {
+//      replayDataId: rev.replayId
+//    });
+    var replayDataItem = sqlobj.selectSingle("REPLAY_DATA", {
+      id: rev.replayDataId
+    });
+    if (replayDataItem.clusterId == null) {    
+      // access the console pad, get its text, and assign a cluster id to it
+      var text;
+      model.accessPadGlobal(rev.padId, function(pad) {
+//      var fileGlobs = outputGlobs[sourceFileName];
+        text = pad.text();
+        // trim out the start and end, which will always be different!
+        var firstEndBracket = text.indexOf("]");
+        var lastStartBracket = text.lastIndexOf("[");
+        text = text.substring(firstEndBracket+1, lastStartBracket);
+        text = text.replace(/^\s+|\s+$/g,''); // trim whitespace from front and back
+        //text = text.replace(/^\s\s*/, '').replace(/\s\s*$/, '');
+        
+//      if (fileGlobs[text] != null) {
+//        fileGlobs[text].count++;
+//      } else {
+//        fileGlobs[text] = {
+//            text: text,
+//            count: 1,
+//            authors: new Array()
+//        };
+//      }
+//      (fileGlobs[text].authors).push(username);
+      });
+      
+      // generate a unique id for this text cluster if it hasn't been seen yet
+      var cluster = sqlobj.selectSingle("REPLAY_CLUSTERS", { text: text });
+      var clusterId;
+      if (cluster == null) {
+        sqlobj.insert("REPLAY_CLUSTERS", { text: text });
+        clusterId = sqlobj.selectSingle("REPLAY_CLUSTERS", { text: text }).id;
+      } else {
+        clusterId = cluster.id;
+      }
+      
+      // insert this output into the db with its cluster id
+//      sqlobj.insert("REPLAY_CONSOLE_OUTPUTS", {
+//        replayDataId: rev.replayId,
+//        clusterId: clusterId
+//      });
+      System.out.println("computed cluster " + clusterId);
+      sqlobj.update("REPLAY_DATA", {
+        id: rev.replayDataId
+      }, {
+        clusterId: clusterId
+      });
+    }
+//    else {
+//      System.out.println(replayDataItem.id + " " + replayDataItem.author + ": " + replayDataItem.clusterId);
+//    }
+  }
+}
+
+function renderClusterProgressions() {  
+  var allreplays = sqlobj.selectMulti("REPLAY_DATA", {});
+  var allclusters = sqlobj.selectMulti("REPLAY_CLUSTERS", {});
+  
+  var replays = [];
+  for (var i in allreplays) {
+    if (allreplays[i].clusterId != null) {
+      replays.push(allreplays[i]);
+    }
+  }
+  
+  renderHtml("mobile/clustergraph.ejs", {
+    replays: replays,
+    clusters: allclusters
+  });
+  return true;
+}
+
+function _onRequestClusterData() {
+  // run through all the clusters stored in REPLAY_DATA
+  // store a point for each data point
+  // render the {id: cluster} map separately
+  var allreplays = sqlobj.selectMulti("REPLAY_DATA", {});
+  var allclusters = sqlobj.selectMulti("REPLAY_CLUSTERS", {});
+  
+
+  
+  collab_server.sendConnectionExtendedMessage(connectionId, {
+    type: "CLUSTERDATA",
+    replays: allreplays,
+    clusters: allclusters
+  });
+}
+

@@ -7,6 +7,7 @@ var queue;
 var cardTray;
 var details;
 var classSummary;
+var consoleDiffs;
 
 var myConnectionId;
 
@@ -98,6 +99,9 @@ function setExtendedMessages() {
   // Login of a new user
   //collab.setOnExtendedMessage("USER_JOINED", _userJoined);
   collab.setOnExtendedMessage("FILTERBY_EXCEPTION_TYPE", _showFilterByExceptionType);
+  // For console output view
+  collab.setOnExtendedMessage("SESSION_START_END_TIMES", _onStartEndTimes);
+  collab.setOnExtendedMessage("CONSOLE_OUTPUTS", _onConsoleOutputs);
 }
 
 // XXX: myConnectionId is not currently used, but it's used in mobile.js
@@ -134,6 +138,16 @@ function _userJoined(msg) {
 
 function _showFilterByExceptionType(msg) {
   details.showSimilarExceptions(msg);
+}
+
+function _onStartEndTimes(msg) {
+  consoleDiffs.dataStartTime = msg.startTime;
+  consoleDiffs.dataEndTime = msg.endTime;
+}
+
+function _onConsoleOutputs(msg) {
+  consoleDiffs.data = msg.data;
+  consoleDiffs.display();
 }
 
 /************************
@@ -287,6 +301,19 @@ function init() {
   cardTray = new CardTray();
   details = new StudentPanel().hide();
   classSummary = new ClassSummary().hide();
+  consoleDiffs = new ConsoleDiffs().hide();
+  
+//  var pageMap = {
+//      "#page-classsummary": classSummary//,
+////      "#page-consoleDiffs": consoleDiffs
+//  }
+  
+  
+//  for (var pageId in pageMap) {
+//    $(pageId).click(function() {
+//      pageMap[pageId].show();
+//    });
+//  }
   
   //TODO: Replace with stored card sizes; this is a temporary workaround
   cardw = $('.card').width();
@@ -294,6 +321,7 @@ function init() {
   
   // TODO: reenable? Recode?
   //initFilters();
+  
   $('a.filter').click(function() {    
     /*$(this).siblings().each(function() {
       $(this).removeClass('ui-btn-active');
@@ -301,11 +329,15 @@ function init() {
     $('a.filter').removeClass('ui-btn-active');
     $(this).addClass('ui-btn-active');
     classSummary.hide();
+    consoleDiffs.hide();
     details.hide();
   })
   
-  $('#page-classsummary').click(function() {
-    classSummary.show();
+//  $('#page-classsummary').click(function() {
+//    classSummary.show();
+//  });
+  $('#page-consolediffs').click(function() {
+    consoleDiffs.show();
   });
   
   $('#queue-toggle').click( handleQueueToggle ); // 'Help Queue' button

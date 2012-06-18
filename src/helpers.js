@@ -104,12 +104,14 @@ function includeJQueryMobile() {
 function includeMobileJs() {
   includeJQueryMobile();
   includeJs("jquery-ui-1.8.16.custom.min.js");
+//  includeJs("mobile/jquery-ui-1.8.19.custom/js/jquery-ui-1.8.19.custom.min.js");
   includeJs("jquery.ui.touch.js");
   includeJs("iscroll/src/iscroll.js");
   //includeJs("jquery.mobile.swipeupdown.js");
   //includeJs("jquery.ui.touch-punch.min.js");
   includeJs("flot/jquery.flot.min.js");
   includeJs("date.format.js");
+  includeJs("mobile/diff_match_patch.js");
   includeJs("mobile/utils.js");
   includeJs("mobile/card_tray.js");
   includeJs("mobile/queue_tray.js");
@@ -118,6 +120,7 @@ function includeMobileJs() {
   includeJs("mobile/eventStream.js");
   includeJs("mobile/queueStatus.js");
   includeJs("mobile/class_summary.js");
+  includeJs("mobile/consoleDiffs.js");
 }
 
 function hideHeader() {

@@ -151,9 +151,11 @@ CREATE TABLE REPLAYS (
   "session" varchar(128) NOT NULL,
   "padId" varchar(128) NOT NULL,
   "headRevision" int default 0 NOT NULL,
+  "endRevisionTime" varchar(128) NOT NULL,
+  "startRevisionTime" varchar(128) NOT NULL,
   PRIMARY KEY ("replayId")
-)
-
+);
+ 
 CREATE TABLE REPLAY_DATA (
   "id" int generated always as identity NOT NULL, 
   "replayId" int NOT NULL,
@@ -163,5 +165,13 @@ CREATE TABLE REPLAY_DATA (
   "timestamp" varchar(128) NOT NULL,
   "changeset" longvarchar NOT NULL,
   "action" varchar(128) NOT NULL,
+  "clusterId" int default NULL,
   PRIMARY KEY ("id")
-)
+);
+
+CREATE TABLE REPLAY_CLUSTERS (
+  "id" int generated always as identity NOT NULL,
+  "text" longvarchar NOT NULL,
+  PRIMARY KEY ("id"),
+  UNIQUE("text")
+);

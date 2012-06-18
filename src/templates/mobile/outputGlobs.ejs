@@ -5,10 +5,12 @@
 <% helpers.addToHead('<link rel="stylesheet/less" type="text/css" href="static/css/mobile.less"/>') %>
 <% helpers.addToHead('<script type="text/javascript" src="static/js/less-1.1.3.min.js"></script>') %>
 
+<% helpers.includeCometJs() %>
 <% helpers.includeJQuery() %>
 <% helpers.includeJQueryMobile() %>
+<% helpers.includeJs("collab_client.js") %>
 <% helpers.includeJs("mobile/diff_match_patch.js") %>
-<% helpers.includeJs("mobile/globs.js") %>
+<% helpers.includeJs("ode_globs.js") %>
 
 <div data-role="page">
 

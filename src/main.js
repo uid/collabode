@@ -36,6 +36,7 @@ serverhandlers.startupHandler = function() {
     auth.onStartup();
     workspace.onStartup();
     mobile.onStartup();
+    history_control.onStartup();
 };
 
 serverhandlers.requestHandler = function() {
@@ -129,7 +130,8 @@ function handlePath() {
     [_file('replay:([\\w.]+):([\\w.]+)'), history_control.render_replay], // XXX completely unsafe!
     [_file('replaymx:([\\w.]+)'), history_control.render_replay_mobile],
     //[_file('replaym:([\\w.]+)'), history_control.handleReplay],
-    ['/replayall', history_control.replayAll]
+    ['/replayall', history_control.replayAll],
+    ['/clustergraph', history_control.renderClusterProgressions]
   ]);
   noauth.POST.addLocations([
     [/^\/login(\/.*)$/, auth_control.login]
