@@ -34,7 +34,8 @@ var _providers = {
         secretKey: appjet.config.instaworkKey,
         title: 'Quick collaborative programming',
         description: description,
-        url: url
+        url: url,
+        pool: appjet.config.instaworkPool
       });
       return fastJSON.parse(result.content).taskId;
     }
