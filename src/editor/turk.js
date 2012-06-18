@@ -95,7 +95,8 @@ function _onOutsourceRequest(padId, userId, connectionId, msg) {
     if (workspace.restricted(userId) && ! auth.has_acl(project, doc.collab.file, userId, auth.OWNER)) {
       return;
     }
-    var host = InetAddress.getLocalHost().getHostName() + ':' + appjet.config.listenPort; // XXX not reliable
+    var host = appjet.config.listenHost || InetAddress.getLocalHost().getHostName();
+    if (appjet.config.listenPort != '80') { host += ':' + appjet.config.listenPort; }
     var location = workspace.filenameFor(padId) + ':' + msg.request.lineNo;
     var provider = _providers[appjet.config.outsourceProvider];
     var id = provider.create(request.scheme + '://' + host,
