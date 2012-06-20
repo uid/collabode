@@ -42,29 +42,36 @@ var _providers = {
   }
 }
 
-function _outsourcedMessage(projectname, id) {
+function getRequestObj(id) {
+  return sqlobj.selectSingle(TABLE, { id: id });
+}
+
+function getRequestsFull(projectname, id) {
   var provider = _providers[appjet.config.outsourceProvider];
   var constraints = { projectname: projectname };
   if (id) { constraints.id = id };
-  var reqs = sqlobj.selectMulti(TABLE, constraints, { orderBy: 'created' });
+  return sqlobj.selectMulti(TABLE, constraints, { orderBy: 'created' }).map(function(req) {
+    req.created = +req.created;
+    req.assigned = req.assigned ? +req.assigned : null;
+    req.completed = req.completed ? +req.completed : null;
+    req.requester = appjet.cache.recent_users[req.requester] || { userId: req.requester }; // XXX really, this knows about that?
+    req.worker = req.worker ? appjet.cache.recent_users[req.worker] || { userId: req.worker } : {}; // XXX really, this knows about that?
+    if (req.worker.userId) {
+      var padIds = contrib.padsEdited(projectname, req.worker.userId);
+      req.deltas = {};
+      padIds.forEach(function(padId) {
+        var change = contrib.padChange(padId, req.assigned, req.completed);
+        req.deltas[workspace.filenameFor(padId)] = contrib.authorDelta(req.worker.userId, change);
+      });
+    }
+    return req;
+  });
+}
+
+function _outsourcedMessage(projectname, id) {
   return {
     type: "OUTSOURCED",
-    requests: reqs.map(function(req) {
-      req.created = +req.created;
-      req.assigned = req.assigned ? +req.assigned : null;
-      req.completed = req.completed ? +req.completed : null;
-      req.requester = appjet.cache.recent_users[req.requester] || { userId: req.requester }; // XXX really, this knows about that?
-      req.worker = req.worker ? appjet.cache.recent_users[req.worker] || { userId: req.worker } : {}; // XXX really, this knows about that?
-      if (req.worker.userId) {
-        var padIds = contrib.padsEdited(projectname, req.worker.userId);
-        req.deltas = {};
-        padIds.forEach(function(padId) {
-          var change = contrib.padChange(padId, req.assigned, req.completed);
-          req.deltas[workspace.filenameFor(padId)] = contrib.authorDelta(req.worker.userId, change);
-        });
-      }
-      return req;
-    })
+    requests: getRequestsFull(projectname, id)
   };
 }
 
@@ -157,8 +164,4 @@ function getMTurkHIT(userId, hitId) {
                                    'GetHIT',
                                    'HITId',
                                    hitId))..HIT;
-}
-
-function getInstaworkTask(taskId) {
-  return sqlobj.selectSingle(TABLE, { id: taskId });
 }
