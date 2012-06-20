@@ -2,6 +2,7 @@ import("helpers");
 import("utils.*");
 
 import("editor.contrib");
+import("editor.workspace");
 
 jimport("java.lang.System");
 
@@ -9,7 +10,7 @@ function render_contrib(author, since, until, projectname) {
   var padIds = contrib.padsEdited(projectname, author);
   var changes = {};
   padIds.forEach(function(padId) {
-    changes[padId] = contrib.padChangeAText(contrib.padChange(padId, since, until));
+    changes[workspace.filenameFor(padId)] = contrib.padChangeAText(contrib.padChange(padId, since, until));
   });
   
   helpers.addClientVars({

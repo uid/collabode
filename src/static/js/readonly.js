@@ -1,6 +1,9 @@
 var Readonly = {};
 
-Readonly.appendHTML = function(target, rep) {
+Readonly.appendHTML = function(target, rep, title) {
+  if (title) {
+    $('<div>').addClass('padtitle').text(title).appendTo(target);
+  }
   var div = $('<div>').addClass('pad').appendTo(target);
   var divs = [ $('<div>').addClass('pre') ];
   

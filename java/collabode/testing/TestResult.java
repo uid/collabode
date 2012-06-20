@@ -66,6 +66,13 @@ public class TestResult {
         return "unknown";
     }
     
+    /**
+     * Filtered stack track.
+     */
+    public String filteredTrace() {
+        return FailureTraceFilter.filterStack(trace.getTrace());
+    }
+    
     @Override public boolean equals(Object obj) {
         if ( ! (obj instanceof TestResult)) { return false; }
         TestResult other = (TestResult)obj;

@@ -56,7 +56,7 @@ function makeOutsourceWidget(userlist, sendRequest, options) {
   
   function _show() {
     $("#editorcontainerbox").append(dialogContainer);
-    $("label", dialogContainer).css('font-family', lineNo.css('font-family'));
+    $("label, textarea", dialogContainer).css('font-family', lineNo.css('font-family'));
     reqTxt.focus().select();
   }
   
@@ -79,7 +79,7 @@ function makeOutsourceWidget(userlist, sendRequest, options) {
   var nodes = {};
   
   function _makeChat(userInfo, text) {
-    return $('<a href="#" class="reqdetail"></a>')
+    return $('<a>').addClass('reqdetail').attr('href', '#')
       .text(text + ' ' + userInfo.userName)
       .prepend($('<div class="chatbutton"></div>')
         .css('background-color', options.colorPalette[userInfo.colorId]))
@@ -91,61 +91,76 @@ function makeOutsourceWidget(userlist, sendRequest, options) {
   
   outsourceWidget.updateRequests = function(requests) {
     $.each(requests, function(idx, req) {
-      if (req.id in nodes) {
-        nodes[req.id].remove();
-      }
-      var node = nodes[req.id] = $('<div>');
-      node.addClass('outsrcreq');
-      node.addClass(req.state);
+      var node = $('<div class="outsrcreq">');
+      var state = req.completed ? 'completed' : req.assigned ? 'assigned' : 'new';
+      node.data('state', state).addClass(state);
       if (req.requester.userId == clientVars.userId || req.worker.userId == clientVars.userId) {
         node.addClass('mine');
       }
-      node.append($('<div class="reqdesc">').text(req.details.description));
+      var box = $('<div class="reqbox">');
+      var full = $('<div class="reqdescfull">').text(req.description);
+      node.append(full);
+      box.append($('<a>')
+        .addClass('reqdesc')
+        .attr('href', '#')
+        .text(req.description.replace('\n', '  '))
+        .click(function() { node.toggleClass('showdesc'); return false; }));
       var worker = $('<div class="reqworker">');
       var avatar = $('<div class="reqavatar">');
       worker.append(avatar);
-      node.append(worker);
+      box.append(worker);
       var location = $('<div class="reqdetail">');
-      var url = req.details.location;
-      if (url) {
-        var filename = url.substring(url.lastIndexOf('/')+1);
-        location.append($('<a href="' + url + '">').text(filename));
+      if (req.location) {
+        var filename = req.location.substring(req.location.lastIndexOf('/')+1);
+        location.append($('<a>').attr('href', req.location).text(filename));
       } else {
         location.html('<i>unknown</i>');
       }
-      node.append(location);
+      box.append(location);
       
       if (req.worker.userId) {
         worker.append($('<div>').text(req.worker.userName));
         avatar.css('background-color', options.colorPalette[req.worker.colorId]);
-        if (req.state == 'assigned') {
+        if (state == 'assigned') {
           if (req.worker.userId == clientVars.userId) {
-            node.append(_makeChat(req.requester, 'Chat with requester:'));
+            box.append(_makeChat(req.requester, 'Chat with requester:'));
           } else if (req.requester.userId == clientVars.userId) {
-            node.append(_makeChat(req.worker, 'Chat with'));
+            box.append(_makeChat(req.worker, 'Chat with'));
           }
         }
-      } else if (req.state == 'new') {
+      } else if (state == 'new') {
         avatar.css('background-color', '#fff');
       }
       
       if (req.worker.userId && req.requester.userId == clientVars.userId) {
         var changes = $('<div class="reqdetail">');
         var href = '/contrib:' + req.worker.userId + ':';
-        if (req.details.assigned) { href += req.details.assigned; }
-        if (req.details.completed) { href += '..' + req.details.completed; }
+        if (req.assigned) { href += req.assigned; }
+        if (req.completed) { href += '..' + req.completed; }
         href += '/' + clientVars.editorProject;
         var link = $('<a>').attr('href', '#').click(function() { return Layout.hoverOpen(href); });
-        $.each(req.deltas, function(filename, delta) {
-          var line = $('<div>').text(filename.substring(filename.lastIndexOf('/')+1));
-          if (delta.ins) { line.append($('<span class="deltains">').text(' +'+delta.ins)); }
-          if (delta.del) { line.append($('<span class="deltadel">').text(' -'+delta.del)); }
-          link.append(line);
+        var filenames = [];
+        $.each(req.deltas, function(filename) { filenames.push(filename); });
+        $.each(filenames.sort(), function(idx, filename) {
+          var delta = req.deltas[filename];
+          var line = $('<span>').text(filename.substring(filename.lastIndexOf('/')+1));
+          if (delta.ins) { line.append($('<span class="deltains"></span>').text(' +'+delta.ins)); }
+          if (delta.del) { line.append($('<span class="deltadel"></span>').text(' -'+delta.del)); }
+          link.append(line.append('<br/>'));
         });
-        node.append(changes.append(link));
+        box.append(changes.append(link));
       }
       
-      statusContainer.append(node);
+      node.append(box);
+      if (req.id in nodes) {
+        var old = nodes[req.id].replaceWith(node);
+        if (state != old.data('state')) {
+          box.prepend($('<div class="reqhighlight">').fadeIn(1000).delay(1000).fadeOut(2000));
+        }
+      } else {
+        statusContainer.prepend(node);
+      }
+      nodes[req.id] = node;
     });
   };
   

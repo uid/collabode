@@ -144,14 +144,17 @@ public class ContinuousTesting implements Runnable {
         env.put(Coverage.PORT, Integer.toString(coverage.port));
         config.setAttribute(ILaunchManager.ATTR_ENVIRONMENT_VARIABLES, env);
         
+        StringBuilder vmArgs = new StringBuilder();
         String policy = "'" + Application.bundleResourcePath("config/export/security.test.policy") + "'";
-        config.setAttribute(IJavaLaunchConfigurationConstants.ATTR_VM_ARGUMENTS,
-                "-Dorg.eclipse.osgi.framework.internal.core.FrameworkSecurityManager " + // XXX does nothing?
-                "-Djava.security.manager -Djava.security.policy==" + policy + " " +
-                // "-Djava.security.debug=access:failure " + 
-                "-javaagent:" + TestSupportInitializer.weaverPath() + " " +
-                // "-Daj.weaving.verbose=true -Dorg.aspectj.weaver.showWeaveInfo=true " +
-                "-ea");
+        vmArgs.append("-Dorg.eclipse.osgi.framework.internal.core.FrameworkSecurityManager "); // XXX does nothing?
+        vmArgs.append("-Djava.security.manager -Djava.security.policy==" + policy + " ");
+        // vmArgs.append("-Djava.security.debug=access:failure ");
+        if (ProjectTestsOwner.of(project).isTestDriven()) {
+            vmArgs.append("-javaagent:" + TestSupportInitializer.weaverPath() + " ");
+            // vmArgs.append("-Daj.weaving.verbose=true -Dorg.aspectj.weaver.showWeaveInfo=true ");
+        }
+        vmArgs.append("-ea");
+        config.setAttribute(IJavaLaunchConfigurationConstants.ATTR_VM_ARGUMENTS, vmArgs.toString());
         
         return config.launch(ILaunchManager.RUN_MODE, null);
     }

@@ -46,6 +46,12 @@ function padChange(padId, since, until) {
   until = +until;
   
   return model.accessPadGlobal(padId, function(pad) {
+    if (since && since > +pad.getRevisionDate(pad.getHeadRevisionNumber())) {
+      return null;
+    } else if (until && until < +pad.getRevisionDate(1)) {
+      return null;
+    }
+    
     since = since ? binarySearch(pad.getHeadRevisionNumber() + 1, function(rev) {
       return since < +pad.getRevisionDate(rev);
     }) - 1 : 0;
@@ -89,7 +95,7 @@ function padChange(padId, since, until) {
 }
 
 function authorDelta(author, change) {
-  if (Changeset.isIdentity(change.cs)) { return null; }
+  if (( ! change) || Changeset.isIdentity(change.cs)) { return null; }
   
   var delta = { del: 0, ins: 0 };
   model.accessPadGlobal(change.padId, function(pad) {
@@ -119,6 +125,8 @@ function authorDelta(author, change) {
 }
 
 function padChangeAText(change) {
+  if ( ! change) { return null; }
+  
   // use underline and strikethrough to mark insertions and deletions; must be in the pool
   var insAttrib, delAttrib, apool;
   model.accessPadGlobal(change.padId, function(pad) {

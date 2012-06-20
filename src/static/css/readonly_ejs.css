@@ -23,11 +23,13 @@ body { font-family: Arial, sans-serif; }
 	background-position: center center;
 }
 
-.padcontainer {
-	padding: 0;
-	font-size: 12px;
-	font-family: Consolas, Menlo, monospace;
-	line-height: 16px;
+.padtitle {
+	margin: 0 12px; position: relative; zoom: 1;
+	background: #fbfbfb; border: 1px solid #c4c4c4; -webkit-border-radius:0 0 6px 6px; -moz-border-radius:0 0 6px 6px;
+	position: absolute; right: 0;
+	font-size: 1.6em; color: #444; font-weight: normal;
+	padding: 4px;
+	z-index: 20;
 }
 
 .pad {
@@ -35,6 +37,9 @@ body { font-family: Arial, sans-serif; }
 	background: #fff;
 	margin: 6px;
 	padding: 7px;
+	font-size: 12px;
+	font-family: Consolas, Menlo, monospace;
+	line-height: 16px;
 }
 .faded .ace-line {
 	opacity: 0.3;

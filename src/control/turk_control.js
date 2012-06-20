@@ -39,8 +39,9 @@ function render_instawork_task(taskId, projectname, filename) {
   }
   
   try {
-    var task = turk.getInstaworkTask(taskId);
+    var task = turk.getRequestObj(taskId);
   } catch (e) {
+    System.err.println(e); // XXX
     renderError(404);
   }
   
