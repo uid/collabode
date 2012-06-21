@@ -4,6 +4,7 @@ import("collab.ace.easysync2.{AttribPool,Changeset}");
 import("collab.collab_server");
 
 import("editor.auth");
+import("editor.log");
 
 import("pad.model");
 
@@ -33,6 +34,10 @@ function onStartup() {
   collab_server.setExtendedHandler("ORGIMPORTS_REQUEST", _onOrganizeImportsRequest);
   collab_server.setExtendedHandler("ORGIMPORTS_RESOLVED", _onOrganizeImportsResolved);
 }
+
+function _log(type, padId, userId) {
+  log.log('editor', { type: type, padId: padId, userId: userId });
+} 
 
 function _padIdFor(userId, file) {
   return Collab.of(userId).id + "@" + file.getFullPath();
@@ -295,6 +300,7 @@ function _onTestsRequest(padId, userId, connectionId, msg) {
     model.accessPadGlobal(testsPadId, function(pad) {
       collab_server.applyChangesetToPad(pad, _makeChangeSetStr(pad, iterator), userId);
     });
+    _log('tests-advance', padId, userId);
     break;
   }
 }
@@ -302,6 +308,7 @@ function _onTestsRequest(padId, userId, connectionId, msg) {
 function _onTestsRunRequest(padId, userId, connectionId, msg) {
   var doc = documentFor(userId, padId)
   ProjectTestsOwner.of(doc.collab.file.getProject()).scheduleRun();
+  _log('tests-run', padId, userId);
 }
 
 function _onCodeCompleteRequest(padId, userId, connectionId, msg) {
@@ -321,6 +328,7 @@ function _onCodeCompleteRequest(padId, userId, connectionId, msg) {
       })
     });
   }));
+  _log('codecomplete', padId, userId);
 }
 
 function getContentTypeName(author, padId) {
@@ -413,9 +421,11 @@ function _onRunRequest(padId, userId, connectionId, msg) {
     break;
   case 'launch':
     owner.run(filename);
+    _log('run-launch', padId, userId);
     break;
   case 'terminate':
     owner.stop(filename);
+    _log('run-terminate', padId, userId);
     break;
   }
 }
@@ -430,10 +440,12 @@ function _onFormatRequest(padId, userId, connectionId, msg) {
       apool: pad.pool()
     });
   });
+  _log('format', padId, userId);
 }
 
 function _onOrganizeImportsRequest(padId, userId, connectionId, msg) {
   documentFor(userId, padId).organizeImports(connectionId);
+  _log('orgimports', padId, userId);
 }
 
 function taskOrgImportsPrompt(connectionId, openChoices, ranges) {
