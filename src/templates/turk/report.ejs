@@ -1,0 +1,79 @@
+<% helpers.setHtmlTitle("Outsourcing report") %>
+<% helpers.addBodyClass("fullwidth") %>
+<% helpers.addBodyClass("nosidebar") %>
+<% helpers.includeCss("editor_ejs.css") %>
+<% helpers.includeCss("readonly_ejs.css") %>
+
+<style>
+.onerequest { position: relative; margin: 30px; }
+.onerequest iframe { width: 55%; height: 500px; border: none; margin: 0 0 0 50px; }
+.details {
+  width: 35%; float: right; margin: 6px; max-height: 200px; clear: both; overflow-y: auto;
+}
+.chatbubble {
+  width: 35%; display: block; float: right; margin: 6px; padding: 6px; position: inherit; clear: both;
+  box-shadow: none; -o-box-shadow: none; -icab-box-shadow: none;
+  -khtml-box-shadow: none; -moz-box-shadow: none; -webkit-box-shadow: none;
+}
+.chatbubble .chathistory { max-height: 300px; margin: 0; }
+.questions {
+  width: 35%; float: right; margin: 6px; clear: both;
+}
+.questions ul { margin-left: 15px; list-style-type: none; }
+.questions li { margin-top: 5px; }
+.questions table { margin-left: 10px; }
+.questions td { padding: 0 5px; text-align: center; }
+.questions select { margin-left: 15px; }
+.questions textarea { width: 80%; height: 60px; margin-left: 15px; font-size: 14px; }
+.ss-leftlabel, .ss-rightlabel, .ss-scalenumbers { font-size: 75%; }
+#submitbox { text-align: center; margin: 30px; }
+#submitbox button {
+  padding: 0.4em 0.8em;
+  font-size: 16px;
+  font-weight: bold;
+  -webkit-appearance: square-button;
+}
+</style>
+
+<div id="editorpage">
+
+<%= helpers.renderPartial("docbar", { project: "Outsourcing report" }) %>
+
+<div id="padmain">
+<form method="post">
+
+<% requests.forEach(function(req) { %>
+  <div class="onerequest">
+  <div class="adocbar"><div class="adocbartext">
+    <div class="iconic" style="background-image: url(/static/img/eclipse/help.ui.view.help.gif);"></div>
+    <%= toHTML(req.description) %>
+  </div></div>
+  <div class="details sidebarsection"><%= toHTML(req.description) %></div>
+  <div class="chatbubble report"><div class="chathistory">
+  <% chatlogs[req.created].forEach(function(chat) {
+    if (req.assigned <= chat.date
+        && chat.date <= req.completed
+        && ((chat.to == req.worker.userId && chat.from.userId == req.requester.userId)
+            || (chat.to == req.requester.userId && chat.from.userId == req.worker.userId))) {
+      %><div class="chatline"><b><%= toHTML(chat.from.name) %>:</b> <%= toHTML(chat.message) %></div><%
+    }
+  }) %>
+  </div></div>
+  <% if (appjet.config.outsourceFeedbackKey) { %>
+  <div class="questions sidebarsection">
+  <%= helpers.renderPartial("turk/report_" + (req.requester.userId == session.userId ? "requester" : "worker"), { id: req.id }) %>
+  </div>
+  <% } %>
+  <iframe src="/contrib:<%= req.worker.userId %>:<%= req.assigned %>..<%= req.completed %>/<%= req.projectname %>"></iframe>
+  </div>
+  <br clear="both" />
+<% }) %>
+
+<% if (appjet.config.outsourceFeedbackKey) { %>
+  <div id="submitbox"><button type="submit">Submit outsourcing feedback</button></div>
+<% } %>
+
+</form>
+</div>
+
+</div>

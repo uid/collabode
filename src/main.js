@@ -202,7 +202,8 @@ function handlePath() {
     [_file('clone'), r(clone_control.clone_path)],
     [_file('instawork:([\\w-]+)'), turk_control.render_instawork_task],
     [_file('knockout:([\\w,.\\[;]+)"([\\s\\S]*)"'), r(turk_control.render_knockout, auth.READ, 2, 'clones')],
-    [_proj('contrib:([\\w\\.]+):(\\d*)(?:\\.\\.)?(\\d*)'), r(contrib_control.render_contrib, auth.WRITE, 3)],
+    [_proj('contrib:([\\w\\.]+):(\\d*)(?:\\.\\.)?(\\d*)'), r(contrib_control.render_contrib, auth.READ, 3)],
+    ['/outsourced', turk_control.render_report],
     [/^\/coverage\/([\w-\.]+)():(.+)\.(.+)$/, r(test_control.render_coverage, auth.WRITE)],
     ['/history', u(history_control.render_list)],
     [/^\/history\/(.*):(\d+)$/, u(history_control.render_version)],
@@ -220,6 +221,7 @@ function handlePath() {
     [_file('delacl:([\\w\\.]+)'), r(editor_control.delete_acl, auth.OWNER, 1)],
     [_file('instawork:([\\w-]+)'), turk_control.complete_instawork_task],
     [_file('knockout:([\\w,.\\[;]+)"([\\s\\S]*)"'), r(turk_control.create_knockout, auth.READ, 2, 'clones')],
+    ['/outsourced', turk_control.record_report],
     ['/', u(editor_control.create_project)],
     [_proj(), r(editor_control.modify_path, auth.OWNER)],
     [_file(), r(editor_control.modify_path, auth.OWNER)]

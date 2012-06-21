@@ -1,7 +1,12 @@
+import("fastJSON");
+import("fileutils.fileLineIterator");
 import("helpers");
+import("jsutils");
+import("netutils");
 import("utils.*");
 
 import("editor.auth");
+import("editor.log");
 import("editor.turk");
 import("editor.workspace");
 
@@ -67,6 +72,56 @@ function complete_instawork_task(taskId, projectname, filename) {
   getSession().instaworked = true;
   response.setStatusCode(307);
   response.setHeader('Location', appjet.config.instaworkURL + '/done/' + taskId);
+  return true;
+}
+
+function render_report() {
+  var userId = getSession().userId;
+  var requests = turk.getRequestsFull().filter(function(req) {
+    return req.requester.userId == userId || req.worker.userId == userId;
+  });
+  
+  var chatlogs = {};
+  requests.forEach(function(req) {
+    if ( ! chatlogs[req.created]) {
+      chatlogs[req.created] = [];
+      var filename = log.logFileName('frontend', 'chats', new Date(req.created));
+      for (var it = fileLineIterator(filename); it.hasNext; ) {
+        chatlogs[req.created].push(fastJSON.parse(it.next));
+      }
+    }
+  });
+  
+  renderHtml("turk/report.ejs", {
+    requests: requests,
+    chatlogs: chatlogs
+  });
+  return true;
+}
+
+function record_report() {
+  var userId = getSession().userId;
+  var requests = turk.getRequestsFull().filter(function(req) {
+    return req.requester.userId == userId || req.worker.userId == userId;
+  });
+  
+  var url = "https://docs.google.com/spreadsheet/formResponse?formkey=" + appjet.config.outsourceFeedbackKey;
+  var keys = jsutils.keys(request.params);
+  requests.forEach(function(req) {
+    var params = { 'entry.0.single': req.id };
+    keys.filter(function(key) { return key.indexOf(req.id) == 0 }).forEach(function(key) {
+      params[key.substring(req.id.length)] = request.params[key];
+    });
+    
+    try {
+      netutils.urlPost(url, params);
+    } catch (e) {
+      System.err.println("Failed to record " + fastJSON.stringify(params)); // XXX
+      System.err.println(e); // XXX
+    }
+  });
+  
+  renderHtml("turk/reported.ejs", {});
   return true;
 }
 
