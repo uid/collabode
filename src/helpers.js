@@ -160,7 +160,7 @@ function jsIncludes() {
         return '<script type="text/javascript" src="/static/compressed/'+key+'"></script>';
     } else {
      */
-    var ts = +(new Date);
+    var ts = appjet.cache.server_ts || (appjet.cache.server_ts = +(new Date));
     var r = [];
     if (_hd().includeCometJs) {
         r.push('<script type="text/javascript" src="'+COMETPATH+'/js/client.js?'+ts+'"></script>');
@@ -179,7 +179,7 @@ function cssIncludes() {
         return '<link href="/static/compressed/'+key+'" rel="stylesheet" type="text/css" />';
     } else {
      */
-    var ts = +(new Date);
+    var ts = appjet.cache.server_ts || (appjet.cache.server_ts = +(new Date));
     var r = [];
     _hd().cssIncludes.asArray().forEach(function(relpath) {
         r.push('<link href="/static/css/'+relpath+'?'+ts+'" rel="stylesheet" type="text/css" />');

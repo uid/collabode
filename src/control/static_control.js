@@ -4,7 +4,7 @@ import("dispatch.{Dispatcher,PrefixMatcher}");
 function onRequest() {
     var staticBase = '/static';
     
-    var opts = { };
+    var opts = { cache: true };
     
     var serveFavicon = singleFileServer(staticBase+'/img/favicon.ico', opts);
     var serveStaticDir = directoryServer(staticBase, opts);
