@@ -4,6 +4,8 @@ import("cache_utils.syncedWithCache");
 import("collab.collab_server");
 import("collab.collabroom_server");
 
+import("editor.log");
+
 jimport("net.appjet.oui.GenericLogger");
 
 jimport("java.util.concurrent.ConcurrentHashMap");
@@ -13,8 +15,6 @@ jimport("java.lang.System");
 
 function onStartup() {
   collab_server.setExtendedHandler("USER_CHAT", _onChat);
-  appjet.cache.chat_logger = new GenericLogger('frontend', 'chats', true);
-  appjet.cache.chat_logger.start();
 }
 
 function _getChatCache() {
@@ -43,7 +43,7 @@ function _onChat(padId, userId, connectionId, msg) {
       });
       System.err.println("Dropped chat message " + fastJSON.stringify(chat)); // XXX
     }
-    appjet.cache.chat_logger.logObject(chat);
+    log.log('chats', chat);
     break;
   case 'history':
     msg.history = _getChatCache(userId, msg.to).toArray().slice();

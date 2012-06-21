@@ -47,11 +47,11 @@ body { font-family: Arial, sans-serif; }
 .faded .ace-line.unfaded {
 	opacity: inherit;
 }
-s {
+.pad s {
 	text-decoration: line-through;
 	background-color: #faa;
 }
-u {
+.pad u {
 	text-decoration: none;
 	background-color: #afa;
 }

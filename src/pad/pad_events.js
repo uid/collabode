@@ -29,68 +29,30 @@ import("pad.pad_utils");
 //import("etherpad.pad.noprowatcher");
 import("collab.collab_server");
 
+import("editor.log");
+
 jimport("java.lang.System.out.println");
 
 function onNewPad(pad) {
-  //log.custom("padevents", {
-  //  type: "newpad",
-  //  padId: pad.getId()
-  //});
-  //pro_pad_db.onCreatePad(pad);
+  log.log('padevents', { type: 'newpad', padId: pad.getId() });
 }
 
 function onDestroyPad(pad) {
-  //log.custom("padevents", {
-  //  type: "destroypad",
-  //  padId: pad.getId()
-  //});
-  //pro_pad_db.onDestroyPad(pad);
+  log.log('padevents', { type: 'destroypad', padId: pad.getId() });
 }
 
 function onUserJoin(pad, userInfo) {
-  //log.callCatchingExceptions(function() {
-
-  //  var name = userInfo.name || "unnamed";
-  //  log.custom("padevents", {
-  //    type: "userjoin",
-  //    padId: pad.getId(),
-  //    username: name,
-  //    ip: userInfo.ip,
-  //    userId: userInfo.userId
-  //  });
-    activepads.touch(pad.getId());
-  //  licensing.onUserJoin(userInfo);
-  //  log.onUserJoin(userInfo.userId);
-  //  padusers.notifyActive();
-  //  noprowatcher.onUserJoin(pad, userInfo);
-
-  //});
+  activepads.touch(pad.getId());
+  log.log('padevents', { type: 'userjoin', padId: pad.getId(), userId: userInfo.userId });
 }
 
 function onUserLeave(pad, userInfo) {
-  //log.callCatchingExceptions(function() {
-
-  //  var name = userInfo.name || "unnamed";
-  //  log.custom("padevents", {
-  //    type: "userleave",
-  //    padId: pad.getId(),
-  //    username: name,
-  //    ip: userInfo.ip,
-  //    userId: userInfo.userId
-  //  });
-    activepads.touch(pad.getId());
-  //  licensing.onUserLeave(userInfo);
-  //  noprowatcher.onUserLeave(pad, userInfo);
-
-  //});
+  activepads.touch(pad.getId());
+  log.log('padevents', { type: 'userleave', padId: pad.getId(), userId: userInfo.userId });
 }
 
 function onUserInfoChange(pad, userInfo) {
-  //log.callCatchingExceptions(function() {
-
-    activepads.touch(pad.getId());
-
-  //});
+  activepads.touch(pad.getId());
 }
 
 function onClientMessage(pad, senderUserInfo, msg) {
@@ -161,11 +123,4 @@ function onClientMessage(pad, senderUserInfo, msg) {
 }
 
 function onEditPad(pad, authorId) {
-  //log.callCatchingExceptions(function() {
-
-  //  pro_pad_db.onEditPad(pad, authorId);
-
-  //});
 }
-
-
