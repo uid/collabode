@@ -48,8 +48,9 @@ function getRequestObj(id) {
 
 function getRequestsFull(projectname, id) {
   var provider = _providers[appjet.config.outsourceProvider];
-  var constraints = { projectname: projectname };
-  if (id) { constraints.id = id };
+  var constraints = {};
+  if (projectname) { constraints.projectname = projectname; }
+  if (id) { constraints.id = id; }
   return sqlobj.selectMulti(TABLE, constraints, { orderBy: 'created' }).map(function(req) {
     req.created = +req.created;
     req.assigned = req.assigned ? +req.assigned : null;
