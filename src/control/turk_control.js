@@ -86,6 +86,7 @@ function render_report() {
     if ( ! chatlogs[req.created]) {
       chatlogs[req.created] = [];
       var filename = log.logFileName('frontend', 'chats', new Date(req.created));
+      if ( ! filename) { return; }
       for (var it = fileLineIterator(filename); it.hasNext; ) {
         chatlogs[req.created].push(fastJSON.parse(it.next));
       }
