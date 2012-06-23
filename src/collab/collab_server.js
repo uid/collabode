@@ -30,6 +30,7 @@ import("jsutils.{eachProperty,keys}");
 import("cache_utils.syncedWithCache");
 import("collab.collabroom_server.*");
 
+import("editor.log");
 import("editor.workspace");
 
 jimport("java.util.concurrent.ConcurrentHashMap");
@@ -763,6 +764,7 @@ function _handleCometMessage(connection, msg) {
       _accessConnectionPad(connection, "USER_SELECTION", function(pad) {
         updateUserSelection(pad, msg.selection, connection.socketId);
         updatePadClients(pad);
+        log.log('padevents', { type: 'selection', padId: pad.getId(), userId: socketUserId, selection: msg.selection });
       });
     }
     catch (e if e.easysync) {
