@@ -1,3 +1,12 @@
+grant codeBase "file:${java.home}/lib/-" {
+    permission java.security.AllPermission;
+};
+
+grant codeBase "file:${java.home}/jre/lib/ext/-" {
+    permission java.security.AllPermission;
+};
+
 grant {
     permission java.net.SocketPermission "*:80", "connect,resolve";
+    permission java.net.SocketPermission "*:443", "connect,resolve";
 };

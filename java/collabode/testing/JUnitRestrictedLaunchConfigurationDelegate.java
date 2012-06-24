@@ -8,6 +8,9 @@ import org.eclipse.debug.core.*;
 import org.eclipse.jdt.junit.launcher.JUnitLaunchConfigurationDelegate;
 import org.eclipse.jdt.launching.IVMRunner;
 import org.eclipse.jdt.launching.VMRunnerConfiguration;
+import org.mortbay.util.IO;
+
+import collabode.Application;
 
 /**
  * Launch configuration delegate for JUnit tests with restricted security permissions.
@@ -34,6 +37,10 @@ public class JUnitRestrictedLaunchConfigurationDelegate extends JUnitLaunchConfi
             policy.deleteOnExit();
             
             PrintWriter out = new PrintWriter(new OutputStreamWriter(new FileOutputStream(policy)));
+            
+            // baseline permissions
+            InputStream run = new FileInputStream(Application.bundleResourcePath("config/export/security.run.policy"));
+            IO.copy(new InputStreamReader(run), out);
             
             String junit = FileLocator.toFileURL(Platform.getBundle("org.eclipse.jdt.junit.runtime").getEntry("/")).getPath();
             out.println("grant codeBase \"file:" + junit + "\" {");
