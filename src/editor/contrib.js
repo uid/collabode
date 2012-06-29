@@ -98,28 +98,28 @@ function authorDelta(author, change) {
   if (( ! change) || Changeset.isIdentity(change.cs)) { return null; }
   
   var delta = { del: 0, ins: 0 };
+  var authorAttribNum;
   model.accessPadGlobal(change.padId, function(pad) {
-    var pool = pad.pool();
-    authorAttribNum = pool.putAttrib([ 'author', author ], false);
-    var authored = Changeset.filterAttribNumbers(change.cs, function(num) {
-      return num == authorAttribNum;
-    });
-    
-    var iter = Changeset.opIterator(Changeset.unpack(authored).ops);
-    var assem = Changeset.smartOpAssembler();
-    while (iter.hasNext()) {
-      assem.append(iter.next());
-    }
-    assem.endDocument();
-    
-    iter = Changeset.opIterator(assem.toString());
-    while (iter.hasNext()) {
-      var op = iter.next();
-      if ( ! op.attribs) { continue; }
-      if (op.opcode == '-') { delta.del += op.lines || 1; }
-      else if (op.opcode == '+') { delta.ins += op.lines || 1; }
-    }
+    authorAttribNum = pad.pool().putAttrib([ 'author', author ], false);
   });
+  var authored = Changeset.filterAttribNumbers(change.cs, function(num) {
+    return num == authorAttribNum;
+  });
+  
+  var packIter = Changeset.opIterator(Changeset.unpack(authored).ops);
+  var assem = Changeset.smartOpAssembler();
+  while (packIter.hasNext()) {
+    assem.append(packIter.next());
+  }
+  assem.endDocument();
+  
+  var iter = Changeset.opIterator(assem.toString());
+  while (iter.hasNext()) {
+    var op = iter.next();
+    if ( ! op.attribs) { continue; }
+    if (op.opcode == '-') { delta.del += op.lines || 1; }
+    else if (op.opcode == '+') { delta.ins += op.lines || 1; }
+  }
   
   return delta;
 }
