@@ -61,7 +61,13 @@
   </div></div>
   <% if (appjet.config.outsourceFeedbackKey) { %>
   <div class="questions sidebarsection">
-  <%= helpers.renderPartial("turk/report_" + (req.requester.userId == session.userId ? "requester" : "worker"), { id: req.id }) %>
+  <% if (req.requester.userId == session.userId) { %>
+  <%= helpers.renderPartial("turk/report_requester", { id: req.id }) %>
+  <% } else if (req.worker.userId == session.userId) { %>
+  <%= helpers.renderPartial("turk/report_worker", { id: req.id }) %>
+  <% } else { %>
+  <%= req.id %>
+  <% } %>
   </div>
   <% } %>
   <iframe src="/contrib:<%= req.worker.userId %>:<%= req.assigned %>..<%= req.completed %>/<%= req.projectname %>"></iframe>

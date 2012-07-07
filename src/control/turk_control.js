@@ -78,7 +78,7 @@ function complete_instawork_task(taskId, projectname, filename) {
 function render_report() {
   var userId = getSession().userId;
   var requests = turk.getRequestsFull().filter(function(req) {
-    return req.requester.userId == userId || req.worker.userId == userId;
+    return req.requester.userId == userId || req.worker.userId == userId || ! workspace.restricted(userId);
   });
   
   var chatlogs = {};
