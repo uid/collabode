@@ -14,8 +14,8 @@ import("pad.revisions");
 jimport("java.lang.System");
 
 function render_list() {
-  padIds = sqlbase.getAllJSONKeys("PAD_META")
-  editors = {};
+  var padIds = sqlbase.getAllJSONKeys("PAD_META");
+  var editors = {};
   padIds.forEach(function(padId) {
     editors[padId] = [];
     var attribs = sqlbase.getJSON("PAD_APOOL", padId)['numToAttrib'];
