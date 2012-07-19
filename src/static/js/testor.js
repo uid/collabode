@@ -1,6 +1,7 @@
 function Testor(collab) {
   
   var testNodes = {};
+  var testOrder = {};
   var container = $('#testorcontainer');
   
   function onTestToggleTrace(div) {
@@ -32,7 +33,8 @@ function Testor(collab) {
         return;
       }
       
-      node = $('<div>').data('testname', test.name);
+      var place = testOrder[test.name] || test.name; // fall back to alphabetical
+      node = $('<div>').data('place', place);
       testNodes[test.name] = node;
       
       node.append($('<div class="extra top"></div><div class="extra left"></div><div class="extra right"></div>'));
@@ -49,7 +51,7 @@ function Testor(collab) {
       node.append(trace);
       
       container.children().each(function(idx) {
-        if ($(this).data('testname') > test.name) {
+        if ($(this).data('place') > place) {
           node.insertBefore(this);
           return false;
         }
@@ -71,6 +73,19 @@ function Testor(collab) {
       $('.testtrace', node).toggle(false);
     }
     $('button', node).unbind('click.testor').bind('click.testor', function() { onTestUpdateStatus(test, result); });
+  };
+  
+  testor.updateOrder = function(order) {
+    for (var idx in order) {
+      var name = order[idx];
+      testOrder[name] = idx;
+      if (name in testNodes) {
+        testNodes[name].data('place', idx);
+      }
+    }
+    container.children().sort(function(a, b) {
+      return $(a).data('place') - $(b).data('place');
+    }).appendTo(container);
   };
   
   return testor;

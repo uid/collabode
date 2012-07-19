@@ -287,7 +287,9 @@ function _onTestsRequest(padId, userId, connectionId, msg) {
   var owner = ProjectTestsOwner.of(doc.collab.file.getProject());
   switch (msg.action) {
   case 'state':
-    owner.reportResults(scalaFn(2, function(test, result) {
+    owner.reportResults(scalaFn(1, function(order) {
+      collab_server.sendConnectionExtendedMessage(connectionId, _testOrderMessage(order));
+    }), scalaFn(2, function(test, result) {
       collab_server.sendConnectionExtendedMessage(connectionId, _testResultMessage(test, result));
     }));
     break;
@@ -380,6 +382,26 @@ function taskTestResult(project, test, result) {
     return filenameFor(padId) && (projectName == filenameFor(padId).split("/", 3)[1]);
   });
   var msg = _testResultMessage(test, result);
+  padIds.forEach(function(padId) {
+    model.accessPadGlobal(padId, function(pad) {
+      collab_server.sendPadExtendedMessage(pad, msg);
+    });
+  });
+}
+
+function _testOrderMessage(order) {
+  return {
+    type: "TEST_ORDER",
+    order: order.map(function(test) { return test.name; })
+  };
+}
+
+function taskTestOrder(project, order) {
+  var projectName = "" + project.getName();
+  var padIds = collab_server.getAllPadsWithConnections().filter(function(padId) {
+    return filenameFor(padId) && (projectName == filenameFor(padId).split("/", 3)[1]); // XXX make this a function
+  });
+  var msg = _testOrderMessage(order);
   padIds.forEach(function(padId) {
     model.accessPadGlobal(padId, function(pad) {
       collab_server.sendPadExtendedMessage(pad, msg);
