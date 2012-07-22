@@ -472,12 +472,40 @@ body.nosidebar #padeditor { margin-left: 0; }
 #testorcontainer a {
 	text-decoration: none;
 }
+.testheader {
+	margin-top: 12px;
+	cursor: pointer;
+	padding-left: 16px;
+	background: url("/static/img/arrow-open.png") no-repeat left center;
+}
+.closed .testheader {
+	background: url("/static/img/arrow-closed.png") no-repeat left center;
+}
+.testheader:hover {
+	background-color: #f0f0f0;
+}
+#testorcontainer .testcontainer:first-child .testheader {
+	margin-top: 0;
+}
+.teststatus {
+	float: right;
+	color: #363;
+	background: rgba(219, 255, 219, 0.5);
+	padding: 0 0.6em;
+}
+.teststatus.failing {
+	color: #fff;
+	background: rgba(222, 53, 56, 0.5);
+}
 .test {
 	border-width:1px;
 	border-style:solid;
 	margin-top:4px;
 	padding:6px 8px;
 	position:relative;
+}
+.closed .test {
+	display: none;
 }
 .test .testclass {
 	font-size: smaller;

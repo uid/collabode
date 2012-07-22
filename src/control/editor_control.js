@@ -230,7 +230,8 @@ function _render_file(project, file, lineno, projectfiles) {
     extension: extension,
     user_has_acl: function(permission) {
       return ( ! getSession().restricted) || auth.has_acl(project, file, getSession().userId, permission);
-    }
+    },
+    add: {}
   };
   if (extension && _controllers[extension]) {
     data.add = _controllers[extension](project, file);
