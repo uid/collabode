@@ -149,7 +149,7 @@ public class CollabDocument implements Iterable<PadDocument> {
                 for (IRegion region : diskMap.unionOnlyRegions()) {
                     if (diskMap.unionToLocal(region.getOffset()) == edit.getOffset()
                             && region.getLength() == edit.getText().length()) {
-                        commitUnionInsert(region, edit.getText());
+                        commitUnionInsert(region);
                     }
                 }
             }
@@ -185,7 +185,7 @@ public class CollabDocument implements Iterable<PadDocument> {
         }
     }
     
-    private void commitUnionInsert(IRegion unionOnly, String text) throws BadLocationException {
+    private void commitUnionInsert(IRegion unionOnly) throws BadLocationException {
         for (Map.Entry<? extends IDocument, CoordinateMap> entry : localAndDiskMaps()) {
             List<IRegion> parts = entry.getValue().unionOnlyRegionsContainedBy(unionOnly);
             if (parts.isEmpty()) { continue; }
