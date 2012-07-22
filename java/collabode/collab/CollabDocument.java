@@ -162,6 +162,35 @@ public class CollabDocument implements Iterable<PadDocument> {
         }
     }
     
+    /**
+     * Commit to disk edits on {@code doc} intersecting the given region.
+     * Includes deletions adjacent to intersecting insertions even if they fall outside the region.
+     */
+    public synchronized void commitUnionCoordinateRegionsIn(PadDocument doc, int start, int end) throws BadLocationException {
+        int min = start, max = end;
+        List<IRegion> notInLocal = unionOnlyRegions(doc);
+        for (IRegion region : unionOnlyRegionsOfDisk()) {
+            if (region.getOffset() <= end && region.getOffset() + region.getLength() >= start && ! notInLocal.contains(region)) {
+                commitUnionInsert(region);
+                min = Math.min(region.getOffset(), min);
+                max = Math.max(region.getOffset() + region.getLength(), max);
+            }
+        }
+        
+        List<IRegion> onlyInLocal = localOnlyRegions(doc);
+        for (IRegion region : localOnlyRegionsOfDisk()) {
+            if (region.getOffset() >= min && region.getOffset() <= max && ! onlyInLocal.contains(region)) {
+                commitUnionDelete(region);
+            }
+        }
+        
+        disk.commit();
+        
+        for (CollabListener listener : listeners) {
+            listener.committed(this);
+        }
+    }
+    
     private Iterable<Map.Entry<? extends IDocument, CoordinateMap>> localAndDiskMaps() {
         List<Map.Entry<? extends IDocument, CoordinateMap>> entries = new ArrayList<Map.Entry<? extends IDocument, CoordinateMap>>();
         entries.addAll(localMaps.entrySet());

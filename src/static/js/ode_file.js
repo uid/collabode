@@ -138,4 +138,9 @@ $(document).ready(function() {
     outsourceWidget.createRequest(ace.getSelection());
     return false;
   });
+  $("#forcecommit").click(function() {
+    var selection = ace.getSelection();
+    collab.sendExtendedMessage({ type: "FORCE_COMMIT", start: selection.startOffset, end: selection.endOffset });
+    return false;
+  });
 });

@@ -334,6 +334,9 @@ body.nosidebar #padeditor { margin-left: 0; }
 #outsource.enabled {
     background: url(/static/img/eclipse/help.ui.view.help.gif) no-repeat center center;
 }
+#forcecommit.enabled {
+    background: url(/static/img/force-commit.png) no-repeat center center;
+}
 
 #editorcontainerbox {
   border-left: 1px solid #c4c4c4; border-right: 1px solid #c4c4c4;

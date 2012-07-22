@@ -33,6 +33,7 @@ function onStartup() {
   collab_server.setExtendedHandler("FORMAT_REQUEST", _onFormatRequest);
   collab_server.setExtendedHandler("ORGIMPORTS_REQUEST", _onOrganizeImportsRequest);
   collab_server.setExtendedHandler("ORGIMPORTS_RESOLVED", _onOrganizeImportsResolved);
+  collab_server.setExtendedHandler("FORCE_COMMIT", _onForceCommit);
 }
 
 function _log(type, padId, userId) {
@@ -241,6 +242,11 @@ function _makeChangeSetStr(pad, iterator) {
 }
 
 function onNewEditor(padId, connectionId) {
+}
+
+function _onForceCommit(padId, userId, connectionId, msg) {
+  var doc = documentFor(userId, padId);
+  doc.collab.commitUnionCoordinateRegionsIn(doc, msg.start, msg.end);
 }
 
 function _onAnnotationsRequest(padId, userId, connectionId, msg) {

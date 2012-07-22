@@ -1016,6 +1016,8 @@ function OUTER(gscope) {
     inCallStackIfNecessary("getsel", function() {
       var start = selection.start = rep.selStart;
       var end = selection.end = rep.selEnd;
+      selection.startOffset = rep.lines.offsetOfIndex(start[0]) + start[1];
+      selection.endOffset = rep.lines.offsetOfIndex(end[0]) + end[1];
       var text = rep.lines.slice(start[0], end[0]+1).map(function (node) { return node.text; });
       text[text.length-1] = text[text.length-1].substring(0, end[1]);
       text[0] = text[0].substring(start[1]);
