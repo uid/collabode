@@ -89,7 +89,7 @@ function create_project() {
   if (projecttype == "webappproject") {
     project = Workspace.createWebAppProject(projectname);
   } else {
-    project = Workspace.createJavaProject(projectname);
+    project = Workspace.createJavaProject(projectname, projecttype == "javatdproject");
   }
   response.redirect(''+project.getFullPath());
   return true;
