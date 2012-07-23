@@ -393,6 +393,7 @@ function taskTestResult(project, test, result) {
       collab_server.sendPadExtendedMessage(pad, msg);
     });
   });
+  log.log('tests', msg);
 }
 
 function _testOrderMessage(order) {

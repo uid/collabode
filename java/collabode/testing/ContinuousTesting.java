@@ -17,6 +17,7 @@ import org.eclipse.jdt.junit.model.ITestRunSession;
 import org.eclipse.jdt.launching.IJavaLaunchConfigurationConstants;
 
 import collabode.Application;
+import collabode.Debug;
 
 public class ContinuousTesting implements Runnable {
     
@@ -106,8 +107,10 @@ public class ContinuousTesting implements Runnable {
                 toRun.removeAll(Collections.singleton(project));
                 
                 try {
+                    Debug.Entry debug = Debug.begin("runTests").add("project", project.getName());
                     ILaunch launch = launch(javaProject);
                     awaitTermination(launch);
+                    debug.end();
                 } catch (CoreException ce) {
                     ce.printStackTrace(); // XXX
                 }
