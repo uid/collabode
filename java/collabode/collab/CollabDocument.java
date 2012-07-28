@@ -167,11 +167,16 @@ public class CollabDocument implements Iterable<PadDocument> {
      * Includes deletions adjacent to intersecting insertions even if they fall outside the region.
      */
     public synchronized void commitUnionCoordinateRegionsIn(PadDocument doc, int start, int end) throws BadLocationException {
+        Debug.Entry debug = Debug.begin("forceCommit").add("user", doc.owner.username).add("path", doc.collab.file.getProjectRelativePath());
+        int inserts = 0;
+        int deletes = 0;
+        
         int min = start, max = end;
         List<IRegion> notInLocal = unionOnlyRegions(doc);
         for (IRegion region : unionOnlyRegionsOfDisk()) {
             if (region.getOffset() <= end && region.getOffset() + region.getLength() >= start && ! notInLocal.contains(region)) {
                 commitUnionInsert(region);
+                inserts++;
                 min = Math.min(region.getOffset(), min);
                 max = Math.max(region.getOffset() + region.getLength(), max);
             }
@@ -181,8 +186,11 @@ public class CollabDocument implements Iterable<PadDocument> {
         for (IRegion region : localOnlyRegionsOfDisk()) {
             if (region.getOffset() >= min && region.getOffset() <= max && ! onlyInLocal.contains(region)) {
                 commitUnionDelete(region);
+                deletes++;
             }
         }
+        
+        debug.add("inserts", inserts).add("deletes", deletes).end();
         
         disk.commit();
         
