@@ -39,7 +39,13 @@
   <div class="sidebarsection">
     <%= helpers.renderList("explorer", projectfiles, file) %>
   </div>
-  <div id="testorcontainer" class="sidebarsection">
+  <div id="testorcontainer" class="sidebarsection testcontainer">
+    <% if (add.testDriven) { %>
+     <div id="testcontainernew" class="testcontainer forTest"><div class="testheader">New Tests</div></div>
+     <div id="testcontainerneedsimpl" class="testcontainer forImpl"><div class="testheader">Need Implementation</div></div>
+     <div id="testcontainerneedsreview" class="testcontainer forTest"><div class="testheader">Need Review</div></div>
+     <div id="testcontaineraccepted" class="testcontainer forImpl"><div class="testheader">Accepted</div></div>
+    <% } %>
   </div>
   <div id="outsourcedcontainer" class="sidebarsection">
   </div>

@@ -92,7 +92,7 @@ function create_project() {
   if (projecttype == "webappproject") {
     project = Workspace.createWebAppProject(projectname);
   } else {
-    project = Workspace.createJavaProject(projectname);
+    project = Workspace.createJavaProject(projectname, projecttype == "javatdproject");
   }
   response.redirect(''+project.getFullPath());
   return true;
@@ -233,7 +233,8 @@ function _render_file(project, file, lineno, projectfiles) {
     extension: extension,
     user_has_acl: function(permission) {
       return ( ! getSession().restricted) || auth.has_acl(project, file, getSession().userId, permission);
-    }
+    },
+    add: {}
   };
   if (extension && _controllers[extension]) {
     data.add = _controllers[extension](project, file);

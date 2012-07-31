@@ -6,6 +6,7 @@ $(document).ready(function() {
   });
   
   var mods = $('.'+linestylefilter.getAuthorClassName(clientVars.author)).filter('.u, .s');
+  mods.addClass('authored');
   mods.parent().addClass('unfaded');
   
   Readonly.foldAwayNot('.unfaded');

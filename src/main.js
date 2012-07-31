@@ -93,6 +93,9 @@ serverhandlers.tasks.runningOutput = function(id, file, text, attribs) {
 serverhandlers.tasks.testResult = function(project, test, result) {
     workspace.taskTestResult(project, test, result);
 };
+serverhandlers.tasks.testOrder = function(project, order) {
+    workspace.taskTestOrder(project, order);
+};
 serverhandlers.tasks.orgImportsPrompt = function(connectionId, openChoices, ranges) {
     workspace.taskOrgImportsPrompt(connectionId, openChoices, ranges);
 };

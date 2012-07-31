@@ -35,6 +35,7 @@ public class ProjectTestsOwner {
     }
     
     final IJavaProject project;
+    private List<Test> order = new ArrayList<Test>();
     private final ConcurrentMap<Test, TestResult> results = new ConcurrentHashMap<Test, TestResult>();
     private final ConcurrentMap<String, NavigableSet<MethodRelevance>> rankedCoverage = new ConcurrentHashMap<String, NavigableSet<MethodRelevance>>();
     
@@ -93,6 +94,11 @@ public class ProjectTestsOwner {
         for (Test test : wontRun) {
             reportRemove(test);
         }
+        
+        if ( ! tests.equals(order)) {
+            order = tests;
+            reportOrder();
+        }
     }
     
     /**
@@ -127,12 +133,17 @@ public class ProjectTestsOwner {
         Workspace.scheduleTask("testResult", project.getProject(), test, null);
     }
     
+    private void reportOrder() {
+        Workspace.scheduleTask("testOrder", project.getProject(), order.toArray());
+    }
+    
     /**
      * Report all current test results.
      */
-    public void reportResults(Function2<Test,TestResult,Boolean> reporter) {
+    public void reportResults(Function1<Object[],Boolean> orderer, Function2<Test,TestResult,Boolean> resulter) {
+        orderer.apply(order.toArray());
         for (Test test : results.keySet()) {
-            reporter.apply(test, results.get(test));
+            resulter.apply(test, results.get(test));
         }
     }
     

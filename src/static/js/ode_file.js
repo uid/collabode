@@ -79,6 +79,9 @@ $(document).ready(function() {
   collab.setOnExtendedMessage("TEST_RESULT", function(msg) {
     testor.updateTest(msg.test, msg.result);
   });
+  collab.setOnExtendedMessage("TEST_ORDER", function(msg) {
+    testor.updateOrder(msg.order);
+  });
   collab.setOnExtendedMessage("ORGIMPORTS_PROMPT", function(msg) {
     orgImportsWidget.handleOrgImportsResolve(msg.suggestion);
   });
@@ -133,6 +136,11 @@ $(document).ready(function() {
   });
   $("#outsource").click(function() {
     outsourceWidget.createRequest(ace.getSelection());
+    return false;
+  });
+  $("#forcecommit").click(function() {
+    var selection = ace.getSelection();
+    collab.sendExtendedMessage({ type: "FORCE_COMMIT", start: selection.startOffset, end: selection.endOffset });
     return false;
   });
 });

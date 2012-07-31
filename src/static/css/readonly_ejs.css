@@ -47,13 +47,19 @@ body { font-family: Arial, sans-serif; }
 .faded .ace-line.unfaded {
 	opacity: inherit;
 }
-.pad s {
+.pad s, .faded .unfaded .authored s {
 	text-decoration: line-through;
 	background-color: #faa;
 }
-.pad u {
+.faded .unfaded s {
+	background-color: #ffe6e6;
+}
+.pad u, .faded .unfaded .authored u {
 	text-decoration: none;
 	background-color: #afa;
+}
+.faded .unfaded u {
+	background-color: #e6ffe6;
 }
 .folded {
 	cursor: pointer;
