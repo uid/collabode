@@ -8,7 +8,9 @@
 <a href="#" id="format" class="docbarbutton enabled" title="Format Source"></a>
 <a href="#" id="orgimports" class="docbarbutton enabled" title="Organize Imports"></a>
 <% } %>
+<% if (add.testDriven) { %>
 <a href="#" id="forcecommit" class="docbarbutton enabled" title="Force Commit"></a>
+<% } %>
 <a href="/console<%= file.getFullPath() %>" target="java_console_<%= file.getName() %>" id="console" class="docbarbutton <%= add.isTest ? '' : 'enabled' %>" title="Show Console"></a>
 <% if ( ! add.continuousTesting) { %>
 <a href="#" id="runtests" class="docbarbutton enabled" title="Run Tests"></a>
