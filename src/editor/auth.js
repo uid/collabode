@@ -57,9 +57,12 @@ function del_acl(project, filename, userId) {
   }), null);
 }
 
-function has_acl(projectname, filename, userId, permission, restrictionFunction) {
+function has_acl(projectOrName, fileOrName, userId, permission, restrictionFunction) {
+  var project = (typeof projectOrName == 'string') ? Workspace.accessProject(projectOrName) : projectOrName;
+  var filename = (typeof fileOrName == 'string') ? fileOrName : fileOrName.getProjectRelativePath().toString();
+  
   var permitting = null;
-  var allowed = acl(Workspace.accessProject(projectname)).some(function(acl) {
+  var allowed = acl(project).some(function(acl) {
     permitting = acl;
     if ((acl.userId != ANYONE) && (acl.userId != userId)) { return false; }
     if (acl.path.length > filename.length) {

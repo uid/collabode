@@ -1,13 +1,19 @@
 <% if (add.testDriven) { helpers.addBodyClass('testDriven') } %>
 <% helpers.addBodyClass('editing' + (add.isTest ? 'Test' : 'Impl')) %>
 
-<% if (user_has_acl(auth.WRITE) || ! session.restricted) { %>
+<% if (add.outsourceProvider && user_has_acl(auth.OWNER)) { %>
+<a href="#" id="outsource" class="docbarbutton enabled" title="Outsource"></a>
+<% } %>
+<% if (user_has_acl(auth.WRITE)) { %>
 <a href="#" id="format" class="docbarbutton enabled" title="Format Source"></a>
 <a href="#" id="orgimports" class="docbarbutton enabled" title="Organize Imports"></a>
-<a href="/console<%= file.getFullPath() %>" target="java_console_<%= file.getName() %>" id="console" class="docbarbutton <%= add.isTest ? '' : 'enabled' %>" title="Show Console"></a>
-<% if ( ! add.continuousTesting) { %>
-<a href="#" id="runtests" class="docbarbutton enabled" title="Run Tests"></a>
+<% if (add.testDriven) { %>
+<a href="#" id="forcecommit" class="docbarbutton enabled" title="Force Commit"></a>
 <% } %>
 <% } else if (user_has_acl(auth.CLAIM)) { %>
 <a href="/clone<%= file.getFullPath() %>" id="clone" class="docbarbutton enabled" title="Clone"></a>
+<% } %>
+<a href="/console<%= file.getFullPath() %>" target="java_console_<%= file.getName() %>" id="console" class="docbarbutton <%= add.isTest ? '' : 'enabled' %>" title="Show Console"></a>
+<% if ( ! add.continuousTesting) { %>
+<a href="#" id="runtests" class="docbarbutton enabled" title="Run Tests"></a>
 <% } %>

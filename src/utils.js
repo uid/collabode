@@ -110,3 +110,60 @@ function renderHtml(bodyFileName, data) {
 function camelToUnderscore(camel) {
   return camel.replace(/[A-Z]/, function(m) { return '_'+m.toLowerCase(); });
 }
+
+function urlGet(url0, params) { // logic and return structure from netutils.urlPost(...)
+  var partialUrl = new java.net.URL(url0);
+  
+  var components = [];
+  eachProperty(params, function(k, v) {
+    components.push(encodeURIComponent(k)+"="+encodeURIComponent(v));
+  });
+  var query = components.join('&');
+  
+  var url = new java.net.URL(url0 + (partialUrl.getQuery() ? '&' : '?') + query);
+  
+  var conn = url.openConnection();
+  var content = conn.getContent();
+  var responseCode = conn.getResponseCode();
+  var contentType = conn.getContentType();
+  var contentEncoding = conn.getContentEncoding();
+  
+  if ((content instanceof java.io.InputStream) && (new java.lang.String(contentType)).startsWith("text/")) {
+    if (! contentEncoding) {
+      var encoding = contentType.split(/;\s*/);
+      if (encoding.length > 1) {
+        encoding = encoding[1].split("=");
+        if (encoding[0] == "charset")
+          contentEncoding = encoding[1];
+      }
+    }
+    content = net.appjet.common.util.BetterFile.getStreamBytes(content);
+    if (contentEncoding) {
+      content = (new java.lang.String(content, contentEncoding));
+    }
+  }
+  
+  return {
+    content: content,
+    status: responseCode,
+    contentType: contentType,
+    contentEncoding: contentEncoding
+  };
+}
+
+//"func" is a function over 0..(numItems-1) that is monotonically
+//"increasing" with index (false, then true).  Finds the boundary
+//between false and true, a number between 0 and numItems inclusive.
+function binarySearch(numItems, func) { // duplicated from ace2_common
+  if (numItems < 1) return 0;
+  if (func(0)) return 0;
+  if (! func(numItems-1)) return numItems;
+  var low = 0; // func(low) is always false
+  var high = numItems-1; // func(high) is always true
+  while ((high - low) > 1) {
+    var x = Math.floor((low+high)/2); // x != low, x != high
+    if (func(x)) high = x;
+    else low = x;
+  }
+  return high;
+}

@@ -131,6 +131,9 @@ Changeset.opIterator = function(opsStr, optStartIndex) {
     else {
       regex.lastIndex = curIndex;
       result = regex.exec(opsStr);
+      if (result == null) {
+        Changeset.error("Hit bad opcode in op stream at " + curIndex + " in " + opsStr);
+      }
       curIndex = regex.lastIndex;
       if (result[0] == '?') {
         Changeset.error("Hit error opcode in op stream");
@@ -923,7 +926,7 @@ Changeset._slicerZipperFunc = function(attOp, csOp, opOut, pool) {
 	  opOut.opcode = '-';
 	  opOut.chars = csOp.chars;
 	  opOut.lines = csOp.lines;
-	  opOut.attribs = '';
+	  opOut.attribs = csOp.attribs;
 	}
 	attOp.chars -= csOp.chars;
 	attOp.lines -= csOp.lines;
@@ -938,7 +941,7 @@ Changeset._slicerZipperFunc = function(attOp, csOp, opOut, pool) {
 	  opOut.opcode = '-';
 	  opOut.chars = attOp.chars;
 	  opOut.lines = attOp.lines;
-	  opOut.attribs = '';
+	  opOut.attribs = attOp.attribs;
 	}
 	csOp.chars -= attOp.chars;
 	csOp.lines -= attOp.lines;
@@ -1500,9 +1503,10 @@ Changeset.builder = function(oldLen) {
       charBank.append(text);
       return self;
     },
-    remove: function(N, L) {
+    remove: function(N, L, attribs, pool) {
       o.opcode = '-';
-      o.attribs = '';
+      o.attribs = (attribs &&
+                   Changeset.makeAttribsString('+', attribs, pool)) || '';
       o.chars = N;
       o.lines = (L || 0);
       assem.append(o);

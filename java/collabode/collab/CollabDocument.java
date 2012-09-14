@@ -149,9 +149,38 @@ public class CollabDocument implements Iterable<PadDocument> {
                 for (IRegion region : diskMap.unionOnlyRegions()) {
                     if (diskMap.unionToLocal(region.getOffset()) == edit.getOffset()
                             && region.getLength() == edit.getText().length()) {
-                        commitUnionInsert(region, edit.getText());
+                        commitUnionInsert(region);
                     }
                 }
+            }
+        }
+        
+        disk.commit();
+        
+        for (CollabListener listener : listeners) {
+            listener.committed(this);
+        }
+    }
+    
+    /**
+     * Commit to disk edits on {@code doc} intersecting the given region.
+     * Includes deletions adjacent to intersecting insertions even if they fall outside the region.
+     */
+    public synchronized void commitUnionCoordinateRegionsIn(PadDocument doc, int start, int end) throws BadLocationException {
+        int min = start, max = end;
+        List<IRegion> notInLocal = unionOnlyRegions(doc);
+        for (IRegion region : unionOnlyRegionsOfDisk()) {
+            if (region.getOffset() <= end && region.getOffset() + region.getLength() >= start && ! notInLocal.contains(region)) {
+                commitUnionInsert(region);
+                min = Math.min(region.getOffset(), min);
+                max = Math.max(region.getOffset() + region.getLength(), max);
+            }
+        }
+        
+        List<IRegion> onlyInLocal = localOnlyRegions(doc);
+        for (IRegion region : localOnlyRegionsOfDisk()) {
+            if (region.getOffset() >= min && region.getOffset() <= max && ! onlyInLocal.contains(region)) {
+                commitUnionDelete(region);
             }
         }
         
@@ -185,7 +214,7 @@ public class CollabDocument implements Iterable<PadDocument> {
         }
     }
     
-    private void commitUnionInsert(IRegion unionOnly, String text) throws BadLocationException {
+    private void commitUnionInsert(IRegion unionOnly) throws BadLocationException {
         for (Map.Entry<? extends IDocument, CoordinateMap> entry : localAndDiskMaps()) {
             List<IRegion> parts = entry.getValue().unionOnlyRegionsContainedBy(unionOnly);
             if (parts.isEmpty()) { continue; }
@@ -224,8 +253,18 @@ public class CollabDocument implements Iterable<PadDocument> {
         return localMaps.get(doc).localOnlyRegions();
     }
     
-    int unionToLocalOffsetOfDisk(int offset) {
+    /**
+     * Convert a union offset to a disk local offset.
+     */
+    public int unionToDiskOffset(int offset) {
         return diskMap.unionToLocal(offset);
+    }
+    
+    /**
+     * Convert a disk local offset to a union offset.
+     */
+    public int diskToUnionOffset(int offset) {
+        return diskMap.localToUnion(offset);
     }
     
     /**

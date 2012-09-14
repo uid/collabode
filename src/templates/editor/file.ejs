@@ -1,4 +1,4 @@
-<% helpers.setHtmlTitle([ project.getName(), file.getProjectRelativePath() ]) %>
+<% helpers.setHtmlTitle([ file.getProjectRelativePath(), project.getName() ]) %>
 <% helpers.addBodyClass(filetype) %>
 <% helpers.includeCss("editor_ejs.css") %>
 <% helpers.includeCometJs() %>
@@ -8,7 +8,9 @@
 <% helpers.includeJs("ace/ace2_outer.js") %>
 <% helpers.includeJs("ace/widget_list.js") %>
 <% helpers.includeJs("ace/widget_orgimports.js") %>
+<% helpers.includeJs("ace/widget_outsource.js") %>
 <% helpers.includeJs("testor.js") %>
+<% helpers.includeJs("userlist.js") %>
 <% helpers.includeJs("collab_client.js") %>
 <% helpers.includeJs("ode_file.js") %>
 <% helpers.includeJs("layout.js") %>
@@ -37,12 +39,23 @@
   <div class="sidebarsection">
     <%= helpers.renderList("explorer", projectfiles, file) %>
   </div>
-  <div id="testorcontainer" class="sidebarsection">
+  <div id="testorcontainer" class="sidebarsection testcontainer">
+    <% if (add.testDriven) { %>
+     <div id="testcontainernew" class="testcontainer forTest"><div class="testheader">New Tests</div></div>
+     <div id="testcontainerneedsimpl" class="testcontainer forImpl"><div class="testheader">Need Implementation</div></div>
+     <div id="testcontainerneedsreview" class="testcontainer forTest"><div class="testheader">Need Review</div></div>
+     <div id="testcontaineraccepted" class="testcontainer forImpl"><div class="testheader">Accepted</div></div>
+    <% } %>
+  </div>
+  <div id="outsourcedcontainer" class="sidebarsection">
   </div>
 </div>
 
 <div id="padmain">
   <div id="padeditor">
+    <div id="hovercontainerbox" class="autoresized">
+      <a id="hoverclose" href="#" title="Close"></a>
+    </div>
     <div id="editorcontainerbox" class="autoresized">
       <div id="editorloadingbox">Loading...</div>
       <div id="editorcontainer"><!-- --></div>

@@ -1,0 +1,35 @@
+<% helpers.setHtmlTitle(toHTML(task.description)) %>
+<% helpers.includeCss("turk_ejs.css") %>
+<% helpers.includeJQuery() %>
+<% helpers.includeJs("ace/widget_outsource.js") %>
+
+<table cellpadding="0" cellspacing="0" border="0">
+<tr><td height="1%">
+<div id="task">
+<table cellpadding="0" cellspacing="0" border="0"><tr><td>
+<%= toHTML(task.description) %>
+</td><td>
+<form method="POST" class="right">
+<button type="submit" id="done" disabled="disabled">Work complete!</button>
+</form>
+</td></tr></table>
+</div>
+
+</td></tr>
+<tr><td height="99%">
+
+<div id="container">
+<iframe src="<%= frameURL %>"></iframe>
+<div id="overlay">
+<div id="intro">
+<b>Welcome!</b><br/><br/>
+Use this web-based code editor to complete the request above.<br/>
+When done, click the <span class="buttonish">work complete</span> button above.<br/>
+To ask questions, click <span class="linkish">chat with requester</span> in the sidebar.<br/><br/>
+<button id="start">Get started!</button>
+</div>
+</div>
+</div>
+
+</td></tr>
+</table>

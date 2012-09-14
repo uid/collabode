@@ -1,7 +1,7 @@
 package collabode.testing;
 
-import static collabode.testing.AnnotationsInitializer.PACKAGE;
-import static collabode.testing.AnnotationsInitializer.STATUSES;
+import static collabode.testing.TestSupportInitializer.PACKAGE;
+import static collabode.testing.TestSupportInitializer.STATUSES;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -64,6 +64,13 @@ public class TestResult {
             }
         } catch (Exception e) { }
         return "unknown";
+    }
+    
+    /**
+     * Filtered stack track.
+     */
+    public String filteredTrace() {
+        return FailureTraceFilter.filterStack(trace.getTrace());
     }
     
     @Override public boolean equals(Object obj) {

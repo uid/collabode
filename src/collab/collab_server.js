@@ -186,7 +186,7 @@ function applyUserChanges(pad, baseRev, changeset, optSocketId, optAuthor) {
 
   var correctionChangeset = _correctMarkersInPad(pad.atext(), pad.pool());
   if (correctionChangeset) {
-    pad.appendRevision(correctionChangeset);
+    pad.appendRevision(correctionChangeset, thisAuthor); // XXX should be null-authored
   }
 
   ///// make document end in blank line if it doesn't:
@@ -862,4 +862,17 @@ function sendPadExtendedMessage(pad, msg) {
   _getPadConnections(pad).forEach(function(connection) {
     sendConnectionExtendedMessage(connection.connectionId, msg);
   });
+}
+
+function sendUserExtendedMessage(userId, msg) {
+  var sent = false;
+  getAllRooms().forEach(function(roomName) {
+    getRoomConnections(roomName).forEach(function(connection) {
+      if (connection.data.userInfo.userId == userId) {
+        sendConnectionExtendedMessage(connection.connectionId, msg);
+        sent = true;
+      }
+    });
+  });
+  return sent;
 }

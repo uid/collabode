@@ -1,16 +1,17 @@
 package collabode.testing;
 
 import java.io.*;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.debug.core.ILaunch;
-import org.eclipse.debug.core.ILaunchConfiguration;
+import org.eclipse.core.runtime.*;
+import org.eclipse.debug.core.*;
+import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.junit.launcher.JUnitLaunchConfigurationDelegate;
 import org.eclipse.jdt.launching.IVMRunner;
 import org.eclipse.jdt.launching.VMRunnerConfiguration;
+import org.mortbay.util.IO;
+
+import collabode.Application;
 
 /**
  * Launch configuration delegate for JUnit tests with restricted security permissions.
@@ -33,16 +34,57 @@ public class JUnitRestrictedLaunchConfigurationDelegate extends JUnitLaunchConfi
             vmArguments.add(MANAGER_ARG);
         }
         try {
-            int port = Integer.parseInt((String)programArguments.get(programArguments.indexOf("-port")+1));
-            
             File policy = File.createTempFile(PREFIX, SUFFIX);
             policy.deleteOnExit();
             
             PrintWriter out = new PrintWriter(new OutputStreamWriter(new FileOutputStream(policy)));
+            
+            // baseline permissions
+            InputStream run = new FileInputStream(Application.bundleResourcePath("config/export/security.run.policy"));
+            IO.copy(new InputStreamReader(run), out);
+            
+            IJavaProject proj = getJavaProject(configuration);
+            String bin = proj.getProject().getWorkspace().getRoot().getFile(proj.getOutputLocation()).getRawLocation() + "/-";
+            
+            out.println("grant codeBase \"file:" + FileLocator.toFileURL(Platform.getBundle("org.junit").getEntry("/junit.jar")).getPath() + "\" {");
+            out.println("  permission java.io.FilePermission \"" + bin + "\", \"read\";"); // XXX secure?
+            out.println("};");
+            
+            out.println("grant codeBase \"file:" + FileLocator.toFileURL(Platform.getBundle("org.eclipse.jdt.junit4.runtime").getEntry("/")).getPath() + "\" {");
+            out.println("  permission java.io.FilePermission \"" + bin + "\", \"read\";"); // XXX secure?
+            out.println("};");
+            
+            String junit = FileLocator.toFileURL(Platform.getBundle("org.eclipse.jdt.junit.runtime").getEntry("/")).getPath();
+            out.println("grant codeBase \"file:" + junit + "\" {");
+            out.println("  permission java.io.FilePermission \"" + bin + "\", \"read\";"); // XXX secure?
+            // discovering test classes
+            if (programArguments.contains("-testNameFile")) {
+                String testNameFile = (String)programArguments.get(programArguments.indexOf("-testNameFile")+1);
+                out.println("  permission java.io.FilePermission \"" + testNameFile + "\", \"read\";"); // XXX secure?
+            }
+            // sending results back to remote test runner
+            int junitPort = Integer.parseInt((String)programArguments.get(programArguments.indexOf("-port")+1));
+            out.println("  permission java.net.SocketPermission \"localhost:" + junitPort + "\", \"connect\";");
+            out.println("};");
+            
             // reflection to find tests
             out.println("grant { permission java.lang.RuntimePermission \"accessDeclaredMembers\"; };");
-            // sending results back to remote test runner
-            out.println("grant { permission java.net.SocketPermission \"localhost:" + port + "\", \"connect\"; };");
+            
+            Map<String, String> env = configuration.getAttribute(ILaunchManager.ATTR_ENVIRONMENT_VARIABLES, (Map)null);
+            int coverPort = Integer.parseInt(env.get(Coverage.PORT));
+            // weaving
+            out.println("grant { permission java.util.PropertyPermission \"java.class.version\", \"read\"; };");
+            out.println("grant { permission java.util.PropertyPermission \"org.aspectj.*\", \"read\"; };");
+            out.println("grant codeBase \"file:" + TestSupportInitializer.weaverPath() + "\" {");
+            out.println("  permission java.io.FilePermission \"<<ALL FILES>>\", \"read\";"); // XXX secure?
+            out.println("  permission java.lang.RuntimePermission \"getClassLoader\";");
+            out.println("  permission java.util.PropertyPermission \"*\", \"read\";");
+            out.println("};");
+            
+            // sending coverage results
+            out.println("grant { permission java.lang.RuntimePermission \"getenv." + Coverage.PORT + "\"; };");
+            out.println("grant { permission java.net.SocketPermission \"localhost:" + coverPort + "\", \"connect\"; };");
+            
             out.close();
             
             for (Iterator it = vmArguments.iterator(); it.hasNext(); ) {

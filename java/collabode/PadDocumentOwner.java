@@ -85,6 +85,9 @@ public class PadDocumentOwner extends WorkingCopyOwner {
      * Must already have been {@link #create}d.
      */
     public PadDocument get(String path) throws IOException {
+        if ( ! documents.containsKey(path)) {
+            System.err.println("No document " + path + " in " + this); // XXX
+        }
         return documents.get(path);
     }
     
@@ -94,6 +97,9 @@ public class PadDocumentOwner extends WorkingCopyOwner {
      */
     @SuppressWarnings("unchecked")
     public <T extends PadDocument> T get(String path, Class<T> clazz) {
+        if ( ! documents.containsKey(path)) {
+            System.err.println("No document " + path + " (" + clazz + ") in " + this); // XXX
+        }
         return (T)documents.get(path);
     }
     
@@ -116,5 +122,9 @@ public class PadDocumentOwner extends WorkingCopyOwner {
             }
         }
         return filtered;
+    }
+    
+    @Override public String toString() {
+        return getClass().getSimpleName() + "<" + username + ">";
     }
 }

@@ -1,7 +1,7 @@
 package collabode.testing;
 
-import static collabode.testing.AnnotationsInitializer.PACKAGE;
-import static collabode.testing.AnnotationsInitializer.STATUSES;
+import static collabode.testing.TestSupportInitializer.PACKAGE;
+import static collabode.testing.TestSupportInitializer.STATUSES;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -35,7 +35,9 @@ public class ProjectTestsOwner {
     }
     
     final IJavaProject project;
+    private List<Test> order = new ArrayList<Test>();
     private final ConcurrentMap<Test, TestResult> results = new ConcurrentHashMap<Test, TestResult>();
+    private final ConcurrentMap<String, NavigableSet<MethodRelevance>> rankedCoverage = new ConcurrentHashMap<String, NavigableSet<MethodRelevance>>();
     
     private ProjectTestsOwner(IJavaProject project) {
         this.project = project;
@@ -47,7 +49,7 @@ public class ProjectTestsOwner {
     public boolean isTestDriven() throws JavaModelException {
         for (IClasspathEntry entry : project.getRawClasspath()) {
             if (entry.getEntryKind() == IClasspathEntry.CPE_CONTAINER
-                    && entry.getPath().equals(AnnotationsInitializer.PATH)) {
+                    && entry.getPath().equals(TestSupportInitializer.PATH)) {
                 return true;
             }
         }
@@ -92,6 +94,11 @@ public class ProjectTestsOwner {
         for (Test test : wontRun) {
             reportRemove(test);
         }
+        
+        if ( ! tests.equals(order)) {
+            order = tests;
+            reportOrder();
+        }
     }
     
     /**
@@ -126,12 +133,17 @@ public class ProjectTestsOwner {
         Workspace.scheduleTask("testResult", project.getProject(), test, null);
     }
     
+    private void reportOrder() {
+        Workspace.scheduleTask("testOrder", project.getProject(), order.toArray());
+    }
+    
     /**
      * Report all current test results.
      */
-    public void reportResults(Function2<Test,TestResult,Boolean> reporter) {
+    public void reportResults(Function1<Object[],Boolean> orderer, Function2<Test,TestResult,Boolean> resulter) {
+        orderer.apply(order.toArray());
         for (Test test : results.keySet()) {
-            reporter.apply(test, results.get(test));
+            resulter.apply(test, results.get(test));
         }
     }
     
@@ -139,5 +151,41 @@ public class ProjectTestsOwner {
         JavaPadDocument doc = getDocument.apply(project.findType(className).getUnderlyingResource());
         String to = STATUSES.get(STATUSES.indexOf(from) + 1);
         return doc.setAnnotation(new String[] { PACKAGE, from }, new String[] { PACKAGE, to }, className, methodName, new String[0]);
+    }
+    
+    void update(Coverage coverage) {
+        computeRelevance(coverage.calls);
+    }
+    
+    private void computeRelevance(Map<IMethod, Map<IMethod, Integer>> calls) {
+        rankedCoverage.clear();
+        
+        Map<IMethod, Double> idf = new HashMap<IMethod, Double>();
+        for (Map<IMethod, Integer> val : calls.values()) {
+            for (IMethod call : val.keySet()) {
+                Double count = idf.get(call);
+                idf.put(call, count == null ? 1 : count+1);
+            }
+        }
+        for (Map.Entry<IMethod, Double> entry : idf.entrySet()) {
+            entry.setValue(Math.log(calls.size() / entry.getValue()));
+        }
+        for (Map.Entry<IMethod, Map<IMethod, Integer>> test : calls.entrySet()) {
+            NavigableSet<MethodRelevance> set;
+            IMethod method = test.getKey();
+            String name = method.getDeclaringType().getFullyQualifiedName() + "." + method.getElementName();
+            rankedCoverage.put(name, set = new TreeSet<MethodRelevance>());
+            for (Map.Entry<IMethod, Integer> call : test.getValue().entrySet()) {
+                set.add(new MethodRelevance(call.getKey(), call.getValue() * idf.get(call.getKey())));
+            }
+        }
+    }
+    
+    public IMethod getMethod(String className, String methodName) throws JavaModelException {
+        return project.findType(className).getMethod(methodName, new String[0]);
+    }
+    
+    public NavigableSet<MethodRelevance> getCoverage(String className, String methodName) {
+        return rankedCoverage.get(className + "." + methodName);
     }
 }

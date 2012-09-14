@@ -51,7 +51,7 @@ function _list_accessible_projects(revealed) {
   var userId = getSession().userId;
   if (workspace.restricted(userId)) {
     projects = projects.filter(function(project) {
-      return (project == revealed) || ( ! workspace.restricted(userId)) || auth.has_acl(project.getName(), '', userId, auth.READ);
+      return (project == revealed) || ( ! workspace.restricted(userId)) || auth.has_acl(project, '', userId, auth.READ);
     });
   }
   return projects;
@@ -89,7 +89,7 @@ function create_project() {
   if (projecttype == "webappproject") {
     project = Workspace.createWebAppProject(projectname);
   } else {
-    project = Workspace.createJavaProject(projectname);
+    project = Workspace.createJavaProject(projectname, projecttype == "javatdproject");
   }
   response.redirect(''+project.getFullPath());
   return true;
@@ -181,6 +181,7 @@ function _find_markers(resource) {
 var _controllers = {
   java: function(project, file) {
     return {
+      outsourceProvider: appjet.config.outsourceProvider,
       continuousTesting: appjet.config.continuousTesting == 'true',
       testDriven: workspace.accessTestsOwner(project).isTestDriven(),
       isTest: file.getName().match(/Test\.java$/)
@@ -205,8 +206,6 @@ var _renderers = {
         initialRevisionList: revisions.getRevisionList(pad),
         serverTimestamp: +(new Date),
         initialOptions: pad.getPadOptionsObj(),
-        userId: getSession().userId,
-        userName: getSession().userName,
         opts: {}
       });
     });
@@ -230,8 +229,9 @@ function _render_file(project, file, lineno, projectfiles) {
     projectfiles: projectfiles,
     extension: extension,
     user_has_acl: function(permission) {
-      return auth.has_acl(project.getName(), file.getName(), getSession().userId, permission);
-    }
+      return ( ! getSession().restricted) || auth.has_acl(project, file, getSession().userId, permission);
+    },
+    add: {}
   };
   if (extension && _controllers[extension]) {
     data.add = _controllers[extension](project, file);
@@ -248,6 +248,10 @@ function _render_file(project, file, lineno, projectfiles) {
   }
   
   data.__proto__ = _renderers._file(project, file);
+  helpers.addClientVars({
+    editorProject: "" + project.getName(),
+    editorFile: "" + file.getProjectRelativePath()
+  });
   if (lineno) { helpers.addClientVars({ scrollToLineNo: lineno }); }
   renderHtml("editor/file.ejs", data);
   return true;

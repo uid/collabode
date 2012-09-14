@@ -1,7 +1,7 @@
 package collabode;
 
 import java.io.ByteArrayInputStream;
-import java.util.Hashtable;
+import java.util.*;
 
 import net.appjet.ajstdlib.execution;
 
@@ -19,7 +19,7 @@ import org.eclipse.jdt.launching.JavaRuntime;
 import org.osgi.service.prefs.BackingStoreException;
 import org.osgi.service.prefs.Preferences;
 
-import collabode.testing.AnnotationsInitializer;
+import collabode.testing.TestSupportInitializer;
 
 @SuppressWarnings("restriction")
 interface Restricted {
@@ -62,7 +62,7 @@ public class Workspace {
         return new ProjectScope(project).getNode(Application.BUNDLE.getSymbolicName()).node(node);
     }
     
-    public static IProject createJavaProject(String projectname) throws CoreException {
+    public static IProject createJavaProject(String projectname, final boolean testDriven) throws CoreException {
         final IProject project = getWorkspace().getRoot().getProject(projectname);
         if ( ! project.exists()) {
             getWorkspace().run(new IWorkspaceRunnable() {
@@ -70,7 +70,7 @@ public class Workspace {
                     project.create(null);
                     project.open(null);
                     addJavaNature(project);
-                    setupJavaClasspath(project);
+                    setupJavaClasspath(project, testDriven);
                 }
             }, null);
         }
@@ -78,7 +78,7 @@ public class Workspace {
     }
     
     public static IProject createWebAppProject(String projectname) throws CoreException {
-        return createJavaProject(projectname + "-webapp");
+        return createJavaProject(projectname + "-webapp", false);
     }
     
     /**
@@ -133,7 +133,7 @@ public class Workspace {
         project.setDescription(description, null);
     }
 
-    private static void setupJavaClasspath(IProject project) throws CoreException {
+    private static void setupJavaClasspath(IProject project, boolean testDriven) throws CoreException {
         IFolder srcFolder = project.getFolder("src");
         srcFolder.create(true, true, null);
         IFolder binFolder = project.getFolder("bin");
@@ -142,13 +142,14 @@ public class Workspace {
         }
         IJavaProject javaProject = JavaCore.create(project);
         javaProject.setOutputLocation(binFolder.getFullPath(), null);
-        IClasspathEntry[] entries = new IClasspathEntry[] {
-                JavaRuntime.getDefaultJREContainerEntry(),
-                JavaCore.newContainerEntry(JUnitCore.JUNIT4_CONTAINER_PATH),
-                JavaCore.newContainerEntry(AnnotationsInitializer.PATH),
-                JavaCore.newSourceEntry(srcFolder.getFullPath())
-        };
-        javaProject.setRawClasspath(entries, null);
+        
+        List<IClasspathEntry> entries = new ArrayList<IClasspathEntry>();
+        entries.add(JavaRuntime.getDefaultJREContainerEntry());
+        entries.add(JavaCore.newContainerEntry(JUnitCore.JUNIT4_CONTAINER_PATH));
+        if (testDriven) { entries.add(JavaCore.newContainerEntry(TestSupportInitializer.PATH)); }
+        entries.add(JavaCore.newSourceEntry(srcFolder.getFullPath()));
+        
+        javaProject.setRawClasspath(entries.toArray(new IClasspathEntry[0]), null);
     }
     
     /**
