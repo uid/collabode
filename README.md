@@ -36,6 +36,15 @@ Running Collabode as a headless server
  * Run the server with ```[path to exported eclipse] -config [full path to
    config] -data [full path to workspace]```
 
+ 
+ NOTE: for OS X users, the exported Eclipse.app can be run from the command line 
+ with the following command:  ```open -n ./Eclipse.app/ --args 
+   -config [full path to
+   config] -data [full path to workspace]``` <BR>
+   if you would like to user relative paths, the config and data paths are 
+   relative to ```Eclipse.app/Contents/MacOS/```
+   The data path should be an empty dir, Collabode with create a the correct project.
+
 
 Running Collabode as a two-headed hydra
 ---------------------------------------
@@ -50,3 +59,13 @@ Running Collabode as a two-headed hydra
  * If needed, use *Window &rarr; Show View &rarr; Other...* and enable
    "Collabode Server"
  * After launching the server, browse to <http://localhost:9000/>
+ 
+Authentication in Collabode
+---------------------------------------
+ * Once you are running collabode, unless you are in Development mode, when you will be
+  logged in as admin, you will need to authenticate.
+  The default authentication scheme for collabode is to allow any username, where the 
+  password is the first 4 chars of the MD5 hash.  
+ * To find the password for any given username, the following command can be used: 
+  ```echo [username] | md5 | cut -c 1-4``` <BR>
+
